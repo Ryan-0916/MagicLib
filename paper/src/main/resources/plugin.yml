@@ -1,0 +1,7 @@
+name: MagicLib
+version: 1.0
+main: com.magicrealms.magiclib.paper.MagicLib
+api-version: 1.20
+commands:
+  MagicLib:
+    description: '魔法领域-集成'
