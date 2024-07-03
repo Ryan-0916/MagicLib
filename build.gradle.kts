@@ -29,6 +29,7 @@ allprojects {
         implementation("org.mongodb:bson:3.12.11")
         implementation("org.mongodb:mongodb-driver:3.12.11")
         implementation("org.mongodb:mongodb-driver-core:3.12.11")
+        implementation("mysql:mysql-connector-java:8.0.32")
     }
 
     tasks.withType<JavaCompile> {

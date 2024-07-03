@@ -3,7 +3,6 @@ package com.magicrealms.magiclib.common.manage;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.message.bungee.BungeeMessage;
 import com.magicrealms.magiclib.common.utils.JsonUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import redis.clients.jedis.Jedis;
@@ -54,7 +53,7 @@ public class BungeeMessageManager extends JedisPubSub {
             connection.auth(builder.password);
             subscribe(builder.channel);
         } catch (Exception e) {
-            Bukkit.getLogger().warning("订阅 Redis 服务异常");
+            PLUGIN.getLoggerManager().warning("订阅 Redis 服务异常");
         }
 
     }

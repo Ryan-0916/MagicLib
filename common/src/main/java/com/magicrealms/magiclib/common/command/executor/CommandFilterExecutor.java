@@ -9,10 +9,13 @@ import com.magicrealms.magiclib.common.command.factory.CommandFilterFactory;
 import com.magicrealms.magiclib.common.command.factory.PermissionFilterFactory;
 import com.magicrealms.magiclib.common.command.filter.label.LabelFilter;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import static com.magicrealms.magiclib.common.command.enums.CommandFailureCause.PERMISSION_DENIED;
 
 
 /**
@@ -53,10 +56,12 @@ public class CommandFilterExecutor extends AbstractFilterExecutor {
             if (!permissionFlg && permissionType != null && failureConsumer != null) {
                 failureConsumer.accept(switch (permissionType) {
                     case PLAYER -> new CommandFailure(sender, CommandFailureCause.NOT_PLAYER);
-                    case ADMIN -> sender.isOp() ? new CommandFailure(sender, CommandFailureCause.NOT_PLAYER)
-                    : new CommandFailure(sender, CommandFailureCause.PERMISSION_DENIED);
+                    case ADMIN -> sender.isOp() ? new CommandFailure(sender, CommandFailureCause.NOT_PLAYER) :
+                        new CommandFailure(sender, PERMISSION_DENIED);
                     case CONSOLE -> new CommandFailure(sender, CommandFailureCause.NOT_CONSOLE);
-                    default -> new CommandFailure(sender, CommandFailureCause.PERMISSION_DENIED);
+                    case PERMISSION -> sender instanceof Player ? new CommandFailure(sender, PERMISSION_DENIED) :
+                            new CommandFailure(sender, CommandFailureCause.NOT_PLAYER);
+                    default -> new CommandFailure(sender, PERMISSION_DENIED);
                 });
             }
         }

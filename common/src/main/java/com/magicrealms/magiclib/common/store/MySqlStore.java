@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * @author Ryan-0916
@@ -47,16 +48,15 @@ public class MySqlStore {
         }
     }
 
-    public Optional<ResultSet> select(@NotNull String sql, @NotNull Object[] obj){
+    public void select(@NotNull String sql, @NotNull Object[] obj, @NotNull Consumer<ResultSet> resultConsumer){
         Optional<Connection> connectionOptional = getConnection();
-        if (connectionOptional.isEmpty()) return Optional.empty();
+        if (connectionOptional.isEmpty()) return;
         try (Connection connection = connectionOptional.get();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             for (int i = 0; i < obj.length; i++) preparedStatement.setObject(i + 1,obj[i]);
-            return Optional.ofNullable(preparedStatement.executeQuery());
+            resultConsumer.accept(preparedStatement.executeQuery());
         } catch (SQLException e) {
             PLUGIN.getLoggerManager().error("MYSQL 查询异常请检查 MYSQL 服务", e);
-            return Optional.empty();
         }
     }
 

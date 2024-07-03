@@ -1,0 +1,29 @@
+Title: '确认操作'
+
+# B 是由其他 GUI 传入的物品
+# A 是确认按钮
+# C 是取消按钮
+
+Layout:
+  - '###ABC###'
+
+
+Icons:
+  A:
+    display:
+      mats: GLASS_PANE
+      modelData: 0
+      name: '&E&L确认'
+      lore:
+        - ''
+        - '&6&L确认'
+        - ''
+  C:
+    display:
+      mats: GLASS_PANE
+      modelData: 0
+      name: '&E&L取消'
+      lore:
+        - ''
+        - '&6&L取消'
+        - ''

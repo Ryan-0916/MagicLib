@@ -15,6 +15,8 @@ public class MagicLib extends MagicRealmsPlugin {
 
     private static MagicLib INSTANCE;
 
+    public static final String YML_CONFIRM_MENU = "confirmMenu";
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -24,7 +26,6 @@ public class MagicLib extends MagicRealmsPlugin {
             registerCommand(getCommandManager());
             Bukkit.getPluginManager().registerEvents(new PlayerListener(this), this);
         });
-
     }
 
     @Override
@@ -33,19 +34,11 @@ public class MagicLib extends MagicRealmsPlugin {
     }
 
     @Override
-    protected void registerCommand(CommandManager commandManager) {
-        System.out.println("进入");
-        commandManager.registerCommand("MagicLib", e -> {
-            System.out.println("注册成功");
-            System.out.println("注册成功");
-            System.out.println("注册成功");
-            System.out.println("注册成功");
-        });
-    }
+    protected void registerCommand(CommandManager commandManager) {}
 
     @Override
     protected void loadConfig(ConfigManage configManage) {
-
+        configManage.loadConfig(YML_CONFIRM_MENU);
     }
 
     public static MagicLib getInstance() { return INSTANCE; }
