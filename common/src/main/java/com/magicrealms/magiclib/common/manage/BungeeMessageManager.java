@@ -29,28 +29,26 @@ public class BungeeMessageManager extends JedisPubSub {
         this.UNSUBSCRIBE_LISTENER = builder.unSubscribeListener;
 
         if (PLUGIN == null) {
-            throw new NullPointerException("SubScribe message plugin is null");
+            throw new NullPointerException("Bungee消息 Plugin 属性不可为空");
         }
 
         if (MESSAGE_LISTENER == null) {
-            throw new NullPointerException("SubScribe message listener is null");
+            throw new NullPointerException("Bungee消息 MessageListener 属性不可为空");
         }
 
         if (builder.channel == null) {
-            throw new NullPointerException("SubScribe channel is null");
+            throw new NullPointerException("Bungee消息 channel 属性不可为空");
         }
 
         if (builder.host == null) {
-            throw new NullPointerException("Redis host is null");
-        }
-
-        if (builder.password == null) {
-            throw new NullPointerException("Redis password is null");
+            throw new NullPointerException("Bungee消息 Redis Host 属性不可为空");
         }
 
         try {
             connection = new Jedis(builder.host, builder.port, 60000);
-            connection.auth(builder.password);
+            if (builder.password != null) {
+                connection.auth(builder.password);
+            }
             subscribe(builder.channel);
         } catch (Exception e) {
             PLUGIN.getLoggerManager().warning("订阅 Redis 服务异常");

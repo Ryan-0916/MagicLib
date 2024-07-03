@@ -3,6 +3,7 @@ package com.magicrealms.magiclib.common.store;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.utils.JsonUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
 
 import java.util.*;
@@ -33,7 +34,7 @@ public class RedisStore implements IRedisStore{
     private final int PORT;
     private final String PASSWORD;
 
-    public RedisStore(MagicRealmsPlugin plugin, String host, int port, String password) {
+    public RedisStore(@NotNull MagicRealmsPlugin plugin, @NotNull String host, int port, @Nullable String password) {
         this.PLUGIN = plugin;
         this.HOST = host;
         this.PORT = port;
@@ -43,7 +44,9 @@ public class RedisStore implements IRedisStore{
     private Optional<Jedis> getConnection() {
         try {
             Jedis connection = new Jedis(HOST, PORT);
-            connection.auth(PASSWORD);
+            if (PASSWORD != null) {
+                connection.auth(PASSWORD);
+            }
             return Optional.of(connection);
         } catch (Exception e) {
             PLUGIN.getLoggerManager().error("Redis 连接异常请检查 Redis 服务", e);

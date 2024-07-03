@@ -23,7 +23,7 @@ public class MySqlStore {
     private final String USER;
     private final String PASSWORD;
 
-    public MySqlStore(MagicRealmsPlugin plugin, String host, int port, String database, boolean useSSL, String user, String password) {
+    public MySqlStore(@NotNull MagicRealmsPlugin plugin, @NotNull String host, int port, @NotNull String database, boolean useSSL, @NotNull String user, @NotNull String password) {
         this.PLUGIN = plugin;
         this.HOST = host;
         this.PORT = port;
