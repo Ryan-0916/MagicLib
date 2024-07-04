@@ -116,12 +116,12 @@ public class AdventureHelper {
         return stringBuilder.toString();
     }
 
-    public static @NotNull String serializeComponent(@NotNull Component component) {
-        return getMiniMessage().serialize(component);
-    }
-
     public static @NotNull Component deserializeComponent(@NotNull String serializeStr) {
         return getMiniMessage().deserialize(serializeStr);
+    }
+
+    public static @NotNull String serializeComponent(@NotNull Component component) {
+        return getGson().serialize(component);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

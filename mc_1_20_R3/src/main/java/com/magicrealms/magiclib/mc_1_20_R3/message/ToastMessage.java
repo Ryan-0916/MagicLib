@@ -102,8 +102,7 @@ public class ToastMessage extends AbstractMessage {
 
         /* 发送成就信息 */
         sendToast(player, icon, StringUtil.removeTags(AdventureHelper.serializeComponent(AdventureHelper.deserializeComponent(
-                        legacy ? AdventureHelper.legacyToMiniMessage(message) : message)),
-                "material", "modelData", "type", "command", "legacy", "inValidateTime"), type);
+                legacy ? AdventureHelper.legacyToMiniMessage(message) : message)), "material", "modelData", "type", "command", "legacy", "inValidateTime"), type);
 
         commandOptional.ifPresent(command -> {
             Listener listener = new Listener() {

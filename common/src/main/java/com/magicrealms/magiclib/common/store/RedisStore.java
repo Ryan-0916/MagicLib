@@ -19,9 +19,6 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused")
 public class RedisStore implements IRedisStore{
 
-    private static final String LOCK_SUCCESS = "OK";
-    private static final String SET_IF_NOT_EXIST = "NX";
-    private static final String SET_WITH_EXPIRE_TIME = "PX";
     private static final String SET_INHERITANCE_TTL_SCRIPT;
     private static final String LEFT_PUSH_SCRIPT;
     private static final String LEFT_PUSH_INHERITANCE_TTL_SCRIPT;
@@ -29,6 +26,9 @@ public class RedisStore implements IRedisStore{
     private static final String RIGHT_PUSH_INHERITANCE_TTL_SCRIPT;
     private static final String MAP_SET_SCRIPT;
     private static final String MAP_SET_INHERITANCE_TTL_SCRIPT;
+    private static final String DISTRIBUTED_LOCK_SCRIPT;
+    private static final String RELEASED_LOCK_SCRIPT;
+
     private final MagicRealmsPlugin PLUGIN;
     private final String HOST;
     private final int PORT;
@@ -133,6 +133,11 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
+    public boolean hSetValue(@NotNull String key, @NotNull String subKey, @NotNull String value, long expire) {
+        return hSetValue(key, new LinkedHashMap<>(Map.of(subKey, value)), expire);
+    }
+
+    @Override
     public boolean hSetValue(@NotNull String key, @NotNull LinkedHashMap<String, String> values, long expire) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -157,6 +162,11 @@ public class RedisStore implements IRedisStore{
             PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
+    }
+
+    @Override
+    public boolean hSetObject(@NotNull String key, @NotNull String subKey, @NotNull Object value, long expire) {
+        return hSetObject(key, new LinkedHashMap<>(Map.of(subKey, value)), expire);
     }
 
     @Override
@@ -278,6 +288,31 @@ public class RedisStore implements IRedisStore{
         }
     }
 
+    @Override
+    public boolean tryLock(@NotNull String lockKey, @NotNull String lockHolder, long expire) {
+        Optional<Jedis> connectionOptional = getConnection();
+        if (connectionOptional.isEmpty()) return false;
+        try (Jedis connection = connectionOptional.get()){
+            return connection.eval(DISTRIBUTED_LOCK_SCRIPT,
+                    Collections.singletonList(lockKey), List.of(lockHolder, String.valueOf(expire))).equals(1L);
+        } catch (Exception e) {
+            PLUGIN.getLoggerManager().error("Redis 使用分布式锁时出现未知异常", e);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean releasedLock(@NotNull String lockKey, @NotNull String lockHolder) {
+        Optional<Jedis> connectionOptional = getConnection();
+        if (connectionOptional.isEmpty()) return false;
+        try (Jedis connection = connectionOptional.get()){
+            return connection.eval(RELEASED_LOCK_SCRIPT, Collections.singletonList(lockKey), Collections.singletonList(lockHolder)).equals(1L);
+        } catch (Exception e) {
+            PLUGIN.getLoggerManager().error("Redis 解锁分布式锁时出现未知异常", e);
+        }
+        return false;
+    }
+
     static {
         /* Lua脚本 这个脚本首先检查键是否存在，
         如果存在则获取其TTL，
@@ -356,5 +391,12 @@ public class RedisStore implements IRedisStore{
                             "redis.call('EXPIRE', KEYS[#KEYS], TTL) " +
                         "end " +
                 "end";
+        /* Lua脚本 这个脚本用于分布式锁上锁 */
+        DISTRIBUTED_LOCK_SCRIPT = "if redis.call('SET', KEYS[1], ARGV[1], 'NX') then " +
+                    "redis.call('EXPIRE', KEYS[1], ARGV[2]) " +
+                    "return 1 else return 0 end";
+        /* Lua脚本 这个脚本用于分布式锁解锁 */
+        RELEASED_LOCK_SCRIPT = "if redis.call('GET',KEYS[1]) == ARGV[1] then " +
+                "return redis.call('DEL', KEYS[1]) else return 0 end";
     }
 }

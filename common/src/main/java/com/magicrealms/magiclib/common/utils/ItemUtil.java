@@ -1,16 +1,21 @@
 package com.magicrealms.magiclib.common.utils;
 
+import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.manage.ConfigManage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
-import com.xbaimiao.inv.sync.serializer.item.NBTAPIItemSerializer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,18 +40,33 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static String serializerUnClone(@NotNull ItemStack itemStack) {
-        return new NBTAPIItemSerializer().serializer(itemStack);
+    public static Optional<String> serializerUnClone(@NotNull MagicRealmsPlugin plugin, @NotNull ItemStack itemStack) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)
+        ){
+            dataOutput.writeObject(itemStack);
+            return Optional.of(Base64Coder.encodeLines(outputStream.toByteArray()));
+        } catch (Exception exception) {
+            plugin.getLoggerManager().error("尝试序列化物品时出现未知异常", exception);
+            return Optional.empty();
+        }
     }
 
     @NotNull
-    public static String serializer(@NotNull ItemStack itemStack) {
-        return serializerUnClone(itemStack.clone());
+    public static Optional<String> serializer(@NotNull MagicRealmsPlugin plugin, @NotNull ItemStack itemStack) {
+        return serializerUnClone(plugin, itemStack.clone());
     }
 
-    @Nullable
-    public static ItemStack deserializer(@NotNull String deserializer) {
-        return new NBTAPIItemSerializer().deserializer(deserializer);
+    @NotNull
+    public static Optional<ItemStack> deserializer(@NotNull MagicRealmsPlugin plugin, @NotNull String deserializer) {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(deserializer));
+             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)
+        ){
+            return Optional.of((ItemStack) dataInput.readObject());
+        } catch (Exception exception) {
+            plugin.getLoggerManager().error("尝试反序列化物品时出现未知异常", exception);
+            return Optional.empty();
+        }
     }
 
     @NotNull
