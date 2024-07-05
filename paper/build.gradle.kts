@@ -7,5 +7,12 @@ dependencies {
     implementation(project(":common"))
     implementation(project(mapOf("path" to ":mc_1_20_R3")))
     compileOnly("org.projectlombok:lombok:1.18.24")
-    compileOnly(files("libs/purpur-1.20.4.jar"))
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

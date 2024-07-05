@@ -1,20 +1,17 @@
-plugins {
-    id("java")
-}
-
-group = "com.magicrealms.magiclib"
-version = "unspecified"
-
-repositories {
-    mavenCentral()
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    options.release.set(17)
 }
 
 dependencies {
-    compileOnly(files("libs/InvSync-1.2.6.jar"))
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-tasks.test {
-    useJUnitPlatform()
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

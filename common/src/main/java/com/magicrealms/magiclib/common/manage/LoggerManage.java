@@ -1,15 +1,14 @@
 package com.magicrealms.magiclib.common.manage;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
-
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Ryan-0916
  * @Desc 日志管理器
  * @date 2024-05-26
  **/
+@Slf4j
 public class LoggerManage {
 
    private final MagicRealmsPlugin PLUGIN;
@@ -19,15 +18,14 @@ public class LoggerManage {
     }
 
     public void info(String msg) {
-        PLUGIN.getLogger().log(new LogRecord(Level.INFO, msg));
+        log.info(msg);
     }
 
     public void warning(String msg) {
-        PLUGIN.getLogger().log(new LogRecord(Level.WARNING, msg));
+        log.warn(msg);
     }
     public void error(String msg, Exception exception) {
-        PLUGIN.getLogger().log(new LogRecord(Level.WARNING, msg));
-        exception.printStackTrace();
+        log.error(msg, exception);
     }
 
 }

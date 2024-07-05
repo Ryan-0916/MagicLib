@@ -1,12 +1,14 @@
 package com.magicrealms.magiclib.common.utils;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.manage.ConfigManage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
+import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -19,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
  * @date 2024-05-27
  **/
 @SuppressWarnings("unused")
+@Slf4j
 public class ItemUtil {
 
     public static final ItemStack AIR = new ItemStack(Material.AIR);
@@ -40,31 +44,31 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static Optional<String> serializerUnClone(@NotNull MagicRealmsPlugin plugin, @NotNull ItemStack itemStack) {
+    public static Optional<String> serializerUnClone(@NotNull ItemStack itemStack) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)
         ){
             dataOutput.writeObject(itemStack);
             return Optional.of(Base64Coder.encodeLines(outputStream.toByteArray()));
         } catch (Exception exception) {
-            plugin.getLoggerManager().error("尝试序列化物品时出现未知异常", exception);
+            log.error("尝试反序列化物品时出现未知异常", exception);
             return Optional.empty();
         }
     }
 
     @NotNull
-    public static Optional<String> serializer(@NotNull MagicRealmsPlugin plugin, @NotNull ItemStack itemStack) {
-        return serializerUnClone(plugin, itemStack.clone());
+    public static Optional<String> serializer(@NotNull ItemStack itemStack) {
+        return serializerUnClone(itemStack.clone());
     }
 
     @NotNull
-    public static Optional<ItemStack> deserializer(@NotNull MagicRealmsPlugin plugin, @NotNull String deserializer) {
+    public static Optional<ItemStack> deserializer(@NotNull String deserializer) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(deserializer));
              BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)
         ){
             return Optional.of((ItemStack) dataInput.readObject());
         } catch (Exception exception) {
-            plugin.getLoggerManager().error("尝试反序列化物品时出现未知异常", exception);
+            log.error("尝试反序列化物品时出现未知异常", exception);
             return Optional.empty();
         }
     }
@@ -130,17 +134,13 @@ public class ItemUtil {
         if (isAirOrNull(to) || isAirOrNull(from)) {
             return;
         }
-
-        final int maxItemSize = to.getMaxStackSize();
-
+        int maxItemSize = to.getMaxStackSize();
         if (to.getAmount() == maxItemSize) {
             return;
         }
-
         if (!to.isSimilar(from)) {
             return;
         }
-
         if (to.getAmount() + from.getAmount() >= maxItemSize) {
             from.setAmount((to.getAmount() + from.getAmount()) - maxItemSize);
             to.setAmount(maxItemSize);
@@ -148,6 +148,66 @@ public class ItemUtil {
             to.setAmount(to.getAmount() + from.getAmount());
             from.setAmount(0);
         }
+    }
+
+    public static boolean canFitIntoInventory(@NotNull Player player, @Nullable ItemStack itemStack) {
+        PlayerInventory playerInventory = player.getInventory();
+        if (!player.isOnline()){
+            return false;
+        }
+        if (isAirOrNull(itemStack)){
+            return true;
+        }
+        int maxStackSize = itemStack.getMaxStackSize();
+        int amount = itemStack.getAmount();
+        /* 判断物品数量是否为 0 */
+        if (amount == 0) {
+            return true;
+        }
+        /* 判断背包是否存在空物品 */
+        if (playerInventory.firstEmpty() != -1){
+            return true;
+        } else if (maxStackSize == amount) {
+            return false;
+        }
+        AtomicInteger needFitNum = new AtomicInteger(itemStack.getAmount());
+        playerInventory.all(itemStack.getType()).
+                forEach((index, inventoryItem) -> {
+                        if (needFitNum.get() == 0 || !inventoryItem.isSimilar(itemStack)) {
+                            return;
+                        }
+                        if (needFitNum.get() <= maxStackSize - inventoryItem.getAmount()) {
+                            needFitNum.set(0);
+                        } else {
+                            needFitNum.set(needFitNum.get() - (maxStackSize - inventoryItem.getAmount()));
+                        }
+                });
+        return needFitNum.get() <= 0;
+    }
+
+    public static boolean giveItemToPlayerInventory(@NotNull Player player, @NotNull ItemStack itemStack) {
+        PlayerInventory playerInventory = player.getInventory();
+        if (!player.isOnline()){
+            return false;
+        }
+        if(!canFitIntoInventory(player, itemStack)) {
+            return false;
+        }
+        if (itemStack.getAmount() != itemStack.getMaxStackSize()) {
+            playerInventory.all(itemStack.getType()).forEach((index, inventoryItem) ->
+                    similarItem(inventoryItem, itemStack));
+        }
+        if (itemStack.getAmount() == 0) {
+            return true;
+        }
+        int emptySlot = playerInventory.firstEmpty();
+        if (emptySlot != -1) {
+            playerInventory.setItem(emptySlot, itemStack);
+        }
+
+        /* 出现特殊遗漏一般不会出现这种问题 */
+        log.error("玩家 " + player.getName() + " 给予物品至背包时出现意外遗漏遗漏，物品信息（Base64）：" + serializer(itemStack));
+        return true;
     }
 
     public static class Builder {

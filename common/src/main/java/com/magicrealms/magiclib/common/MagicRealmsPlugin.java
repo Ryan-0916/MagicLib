@@ -58,6 +58,15 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
         runnable.run();
     }
 
+    public boolean dependenciesCheck(String... dependenciesName) {
+        for (String name : dependenciesName) {
+            if (Bukkit.getPluginManager().getPlugin(name) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected abstract void registerCommand(CommandManager commandManager);
 
     protected abstract void loadConfig(ConfigManage configManage);

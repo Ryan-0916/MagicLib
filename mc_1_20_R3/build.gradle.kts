@@ -5,7 +5,6 @@ plugins {
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20.4-R0.1-SNAPSHOT")
     compileOnly(files("libs/purpur-1.20.4.jar"))
-    compileOnly(files("libs/BasicAdapter.jar"))
     compileOnly(project(":common"))
 }
 
