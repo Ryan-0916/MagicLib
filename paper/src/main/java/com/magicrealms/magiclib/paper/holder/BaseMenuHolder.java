@@ -141,7 +141,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     @Override
-    public void clickBottomSlotEvent(InventoryClickEvent e, int clickedSlot) {
+    public void clickBottomSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot) {
 
     }
 

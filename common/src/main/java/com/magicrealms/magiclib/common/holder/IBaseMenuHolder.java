@@ -4,6 +4,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 菜单构造器-接口
@@ -12,15 +13,15 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
  */
 public interface IBaseMenuHolder {
 
-    void clickSlotEvent(InventoryClickEvent e, int clickedSlot);
+    void clickSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot);
 
-    void dragEvent(InventoryDragEvent e);
+    void dragEvent(@NotNull InventoryDragEvent e);
 
-    void openEvent(InventoryOpenEvent e);
+    void openEvent(@NotNull InventoryOpenEvent e);
 
-    void closeEvent(InventoryCloseEvent e);
+    void closeEvent(@NotNull InventoryCloseEvent e);
 
-    void clickBottomSlotEvent(InventoryClickEvent e, int clickedSlot);
+    void clickBottomSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot);
 
     void closeMenu();
 }

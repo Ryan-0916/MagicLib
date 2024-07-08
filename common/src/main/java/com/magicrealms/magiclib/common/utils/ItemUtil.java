@@ -203,10 +203,9 @@ public class ItemUtil {
         int emptySlot = playerInventory.firstEmpty();
         if (emptySlot != -1) {
             playerInventory.setItem(emptySlot, itemStack);
+        } else {
+            log.error("玩家 " + player.getName() + " 给予物品至背包时出现意外遗漏遗漏，物品信息（Base64）：" + serializer(itemStack));
         }
-
-        /* 出现特殊遗漏一般不会出现这种问题 */
-        log.error("玩家 " + player.getName() + " 给予物品至背包时出现意外遗漏遗漏，物品信息（Base64）：" + serializer(itemStack));
         return true;
     }
 

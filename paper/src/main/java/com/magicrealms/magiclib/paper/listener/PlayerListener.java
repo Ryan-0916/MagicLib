@@ -34,15 +34,33 @@ public class PlayerListener implements Listener {
             e.setCancelled(menu.isLock());
             int clickedSlot = e.getRawSlot();
             ItemStack clickedItem = e.getCurrentItem();
+
+            /*
+            * UPDATE BY Ryan0916 - 2024-07-06
+            * Remark: 添加上锁的箱子点击底部进入事件
+            *
             if (clickedSlot < 0 || (menu.isLock() && (ItemUtil.isAirOrNull(clickedItem)
                     || clickedSlot >= menu.getLayout().length()
                     || clickedSlot >= e.getInventory().getSize()))) {
                 return;
             }
-            if (clickedSlot >= menu.getLayout().length() || clickedSlot >= e.getInventory().getSize()) {
+            */
+
+            if (clickedSlot < 0) {
+                return;
+            }
+
+            if (clickedSlot >= menu.getLayout().length() ||
+                    clickedSlot >= e.getInventory().getSize()) {
                 menu.clickBottomSlotEvent(e, clickedSlot);
                 return;
             }
+
+            /* 如果箱子上锁了，点击了空的地方无需做任何处理 */
+            if (menu.isLock() && ItemUtil.isAirOrNull(clickedItem)) {
+                return;
+            }
+
             menu.clickSlotEvent(e, clickedSlot);
         }
     }

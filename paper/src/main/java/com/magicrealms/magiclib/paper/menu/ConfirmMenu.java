@@ -52,7 +52,7 @@ public class ConfirmMenu extends BaseMenuHolder {
     }
 
     @Override
-    public void clickSlotEvent(InventoryClickEvent e, int clickedSlot) {
+    public void clickSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot) {
         char c = super.getLayout().charAt(clickedSlot);
         Player whoClicked = (Player) e.getWhoClicked();
         super.playSound("Icons." + c + ".display.sound");

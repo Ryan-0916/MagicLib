@@ -1,26 +1,21 @@
-package com.magicrealms.magiclib.mc_1_20_R3.message;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+package com.magicrealms.magiclib.mc_1_20_R1.message;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import net.minecraft.advancements.*;
-import net.minecraft.advancements.critereon.CriterionTriggerImpossible;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.advancements.critereon.ImpossibleTrigger;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.*;
-import net.minecraft.resources.MinecraftKey;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBundlePacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket;
+import net.minecraft.resources.ResourceLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -41,12 +36,12 @@ import java.util.*;
 public class ToastMessage extends AbstractMessage {
 
     private static volatile ToastMessage INSTANCE;
-    private final MinecraftKey MINECRAFT_KEY;
+    private final ResourceLocation MINECRAFT_KEY;
     private final Map<UUID, Listener> LISTENER;
     private final Map<UUID, BukkitTask> TASK;
 
     private ToastMessage() {
-        this.MINECRAFT_KEY = new MinecraftKey("magiclib", "toast");
+        this.MINECRAFT_KEY = new ResourceLocation("magiclib", "toast");
         this.LISTENER = new HashMap<>();
         this.TASK = new HashMap<>();
     }
@@ -95,9 +90,9 @@ public class ToastMessage extends AbstractMessage {
         }
 
         /* 拿到成就信息的类型 */
-        AdvancementFrameType type = Optional.of(
-                AdvancementFrameType.valueOf(StringUtil.getStringBTWTags(message, "type")
-                        .orElse("TASK"))).orElse(AdvancementFrameType.a);
+        FrameType type = Optional.of(
+                FrameType.valueOf(StringUtil.getStringBTWTags(message, "type")
+                        .orElse("TASK"))).orElse(FrameType.TASK);
 
         /* 发送成就信息 */
         sendToast(player, icon, StringUtil.removeTags(AdventureHelper.serializeComponent(AdventureHelper.deserializeComponent(
@@ -140,34 +135,39 @@ public class ToastMessage extends AbstractMessage {
         });
     }
 
-    private void sendToast(@NotNull Player player, @NotNull ItemStack icon, @NotNull String msg, @NotNull AdvancementFrameType type) {
-        Optional<AdvancementDisplay> displayInfo = Optional.of(
-                new AdvancementDisplay(
-                        CraftItemStack.asNMSCopy(icon),
-                        Optional.ofNullable(IChatBaseComponent.ChatSerializer.a(msg)).orElse(IChatBaseComponent.i()),
-                        IChatBaseComponent.i(),
-                        Optional.empty(),
-                        type, true, false, true));
-        Advancement advancement = new Advancement(Optional.empty(),
+    private void sendToast(@NotNull Player player, @NotNull ItemStack icon, @NotNull String msg, @NotNull FrameType type) {
+        DisplayInfo displayInfo = new DisplayInfo(
+                CraftItemStack.asNMSCopy(icon),
+                Optional.ofNullable(Component.Serializer.fromJson(msg)).orElse(Component.empty()),
+                Component.empty(),
+                null,
+                type, true, false, true);
+
+        String[][] requirements = {{"impossible"}};
+        HashMap<String, Criterion> criteria = new HashMap<>(Map.of("impossible", new Criterion(new ImpossibleTrigger.TriggerInstance())));
+        Advancement advancement = new Advancement(MINECRAFT_KEY,
+                null,
                 displayInfo,
-                AdvancementRewards.b,
-                Map.of("impossible", new Criterion<>(new CriterionTriggerImpossible(), new CriterionTriggerImpossible.a())),
-                new AdvancementRequirements(List.of(List.of("impossible")))
+                AdvancementRewards.EMPTY,
+                criteria,
+                requirements
                 , false);
+        Map<ResourceLocation, AdvancementProgress> advancementsToGrant = new HashMap<>();
         AdvancementProgress advancementProgress = new AdvancementProgress();
-        advancementProgress.a(advancement.f());
-        Objects.requireNonNull(advancementProgress.c("impossible")).b();
-        List<Packet<PacketListenerPlayOut>> packets = List.of(new PacketPlayOutAdvancements(
+        advancementProgress.update(criteria, requirements);
+        Objects.requireNonNull(advancementProgress.getCriterion("impossible")).grant();
+        advancementsToGrant.put(MINECRAFT_KEY, advancementProgress);
+        List<Packet<ClientGamePacketListener>> packets = List.of(
+                new ClientboundUpdateAdvancementsPacket(
                 false,
-                List.of(new AdvancementHolder(MINECRAFT_KEY, advancement)),
-                new HashSet<>(),
-                Map.of(MINECRAFT_KEY, advancementProgress)
-        ), new PacketPlayOutAdvancements(
+                        new ArrayList<>(List.of(advancement)),
+                        new HashSet<>(),
+                        advancementsToGrant)
+        , new ClientboundUpdateAdvancementsPacket(
                 false,
-                new ArrayList<>(),
-                new HashSet<>(List.of(MINECRAFT_KEY)),
-                new HashMap<>()
-        ));
-        ((CraftPlayer)player).getHandle().c.b(new ClientboundBundlePacket(packets));
+                        new ArrayList<>(),
+                        new HashSet<>(List.of(MINECRAFT_KEY)),
+                        new HashMap<>()));
+        ((CraftPlayer)player).getHandle().connection.send(new ClientboundBundlePacket(packets));
     }
 }

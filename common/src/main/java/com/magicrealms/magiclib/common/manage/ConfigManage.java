@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -140,30 +141,31 @@ public class ConfigManage implements IConfigManage {
         return Optional.empty();
     }
 
-
-
     @Override
     public boolean containsYmlKey(@NotNull String path, @NotNull String key) {
         YamlConfiguration config = ALL_CONFIG.get(path);
         return config != null && config.contains(key);
     }
 
+    public Optional<YamlConfiguration> getYamlConfiguration(@NotNull String path){
+        return getYamlConfiguration(path, null);
+    }
 
-
-    private Optional<YamlConfiguration> getYamlConfiguration(@NotNull String path){
-        String fileName = path + ".yml";
-        File config = new File(PLUGIN.getDataFolder(), fileName);
+    public Optional<YamlConfiguration> getYamlConfiguration(@NotNull String path, @Nullable String referencePath){
+        path = path.endsWith(".yml") ? path : path + ".yml";
+        referencePath = referencePath == null ? null : referencePath.endsWith(".yml") ? referencePath : referencePath + ".yml";
+        File config = new File(PLUGIN.getDataFolder(), path);
         if (config.exists()) {
             return Optional.of(YamlConfiguration.loadConfiguration(config));
         }
-        PLUGIN.getLoggerManager().info("正在生成 " + fileName + "文件...");
+        PLUGIN.getLoggerManager().info("正在生成 " + path + " 文件...");
         long timeMillis = System.currentTimeMillis();
         try {
-            PLUGIN.saveResource(fileName, false);
-            PLUGIN.getLoggerManager().info(fileName + " 文件生成完毕，耗时 " + (System.currentTimeMillis() - timeMillis) + " ms");
-            return Optional.of(YamlConfiguration.loadConfiguration(new File(PLUGIN.getDataFolder(), fileName)));
+            PLUGIN.saveResource(path, referencePath, false);
+            PLUGIN.getLoggerManager().info(path + " 文件生成完毕，耗时 " + (System.currentTimeMillis() - timeMillis) + " ms");
+            return Optional.of(YamlConfiguration.loadConfiguration(new File(PLUGIN.getDataFolder(), path)));
         } catch (Exception exception) {
-            PLUGIN.getLoggerManager().error(fileName + " 文件生成失败", exception);
+            PLUGIN.getLoggerManager().error(path + " 文件生成失败", exception);
         }
         return Optional.empty();
     }
@@ -237,7 +239,4 @@ public class ConfigManage implements IConfigManage {
         }
         return Optional.empty();
     }
-
-
-
 }

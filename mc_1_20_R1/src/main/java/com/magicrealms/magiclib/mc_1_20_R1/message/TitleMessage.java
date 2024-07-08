@@ -1,14 +1,15 @@
-package com.magicrealms.magiclib.mc_1_20_R3.message;
+package com.magicrealms.magiclib.mc_1_20_R1.message;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -114,14 +115,14 @@ public class TitleMessage extends AbstractMessage {
     }
 
     private void sendTitle(@NotNull Player player, @Nullable String title, @Nullable String subTitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        List<Packet<PacketListenerPlayOut>> packetListeners = List.of(
+        List<Packet<ClientGamePacketListener>> packetListeners = List.of(
                 new ClientboundSetTitlesAnimationPacket(fadeInTicks, stayTicks, fadeOutTicks),
                 new ClientboundSetTitleTextPacket(Optional.ofNullable(
-                        IChatBaseComponent.ChatSerializer.a(title == null ? StringUtil.EMPTY : title)).orElse(IChatBaseComponent.i())),
+                        CraftChatMessage.fromJSON(title == null ? StringUtil.EMPTY : title)).orElse(Component.empty())),
                 new ClientboundSetSubtitleTextPacket(Optional.ofNullable(
-                        IChatBaseComponent.ChatSerializer.a(subTitle == null ? StringUtil.EMPTY : subTitle)).orElse(IChatBaseComponent.i()))
+                        CraftChatMessage.fromJSON(subTitle == null ? StringUtil.EMPTY : subTitle)).orElse(Component.empty()))
         );
-        ((CraftPlayer)player).getHandle().c.b(new ClientboundBundlePacket(packetListeners));
+        ((CraftPlayer)player).getHandle().connection.send(new ClientboundBundlePacket(packetListeners));
     }
 
 }
