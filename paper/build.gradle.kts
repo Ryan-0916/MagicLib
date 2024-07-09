@@ -5,8 +5,8 @@ tasks.withType<JavaCompile> {
 
 dependencies {
     implementation(project(":common"))
-    implementation(project(mapOf("path" to ":mc_1_20_R3")))
-    implementation(project(mapOf("path" to ":mc_1_20_R1")))
+    implementation(project(mapOf("path" to ":mc_1_20_R3", "configuration" to "reobf")))
+    implementation(project(mapOf("path" to ":mc_1_20_R1", "configuration" to "reobf")))
     compileOnly("org.projectlombok:lombok:1.18.24")
 }
 

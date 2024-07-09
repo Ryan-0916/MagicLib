@@ -142,19 +142,16 @@ public class ToastMessage extends AbstractMessage {
                 Component.empty(),
                 null,
                 type, true, false, true);
-
-        String[][] requirements = {{"impossible"}};
-        HashMap<String, Criterion> criteria = new HashMap<>(Map.of("impossible", new Criterion(new ImpossibleTrigger.TriggerInstance())));
         Advancement advancement = new Advancement(MINECRAFT_KEY,
                 null,
                 displayInfo,
                 AdvancementRewards.EMPTY,
-                criteria,
-                requirements
-                , false);
+                new HashMap<>(Map.of("impossible", new Criterion(new ImpossibleTrigger.TriggerInstance()))),
+                new String[][]{{"impossible"}},
+                false);
         Map<ResourceLocation, AdvancementProgress> advancementsToGrant = new HashMap<>();
         AdvancementProgress advancementProgress = new AdvancementProgress();
-        advancementProgress.update(criteria, requirements);
+        advancementProgress.update(advancement.getCriteria(), advancement.getRequirements());
         Objects.requireNonNull(advancementProgress.getCriterion("impossible")).grant();
         advancementsToGrant.put(MINECRAFT_KEY, advancementProgress);
         List<Packet<ClientGamePacketListener>> packets = List.of(

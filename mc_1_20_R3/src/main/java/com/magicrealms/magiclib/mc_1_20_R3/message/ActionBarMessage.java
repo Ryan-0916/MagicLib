@@ -4,7 +4,7 @@ import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
@@ -110,9 +110,9 @@ public class ActionBarMessage extends AbstractMessage {
     }
 
     private void sendActionBar(@NotNull Player player, @NotNull String msg) {
-        ((CraftPlayer)player).getHandle().c.b(
-                new ClientboundSetActionBarTextPacket(Optional.ofNullable(IChatBaseComponent.ChatSerializer.a(msg)).orElse(
-                        IChatBaseComponent.i())));
+        ((CraftPlayer)player).getHandle().connection.send(
+                new ClientboundSetActionBarTextPacket(Optional.ofNullable(Component.Serializer.fromJson(msg)).orElse(
+                        Component.empty())));
     }
 
     private void printActionBar(@NotNull Player player, @NotNull String msg,

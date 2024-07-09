@@ -19,3 +19,5 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
+
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.REOBF_PRODUCTION

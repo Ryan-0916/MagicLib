@@ -5,10 +5,10 @@ import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.game.*;
-import net.minecraft.resources.MinecraftKey;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.sounds.SoundCategory;
-import net.minecraft.world.entity.EnumItemSlot;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
@@ -30,10 +30,10 @@ public class TotemMessage extends AbstractMessage {
 
     private static volatile TotemMessage INSTANCE;
 
-    private final MinecraftKey SOUND_KEY;
+    private final ResourceLocation SOUND_KEY;
 
     private TotemMessage() {
-        this.SOUND_KEY = new MinecraftKey(Sound.ITEM_TOTEM_USE.key().value());
+        this.SOUND_KEY = new ResourceLocation(Sound.ITEM_TOTEM_USE.key().value());
     }
 
     public static TotemMessage getInstance() {
@@ -65,16 +65,16 @@ public class TotemMessage extends AbstractMessage {
     }
 
     public void sendTotem(@NotNull Player player, @NotNull ItemStack totem) {
-        EntityPlayer entityPlayer = ((CraftPlayer)player).getHandle();
-        entityPlayer.c.b(new PacketPlayOutEntityEquipment(player.getEntityId(), List.of(Pair.of(EnumItemSlot.b, CraftItemStack.asNMSCopy(totem)))));
+        ServerPlayer serverPlayer = ((CraftPlayer)player).getHandle();
+        serverPlayer.connection.send(new ClientboundSetEquipmentPacket(player.getEntityId(), List.of(Pair.of(EquipmentSlot.OFFHAND, CraftItemStack.asNMSCopy(totem)))));
         Stream.of(new Thread(() -> {
             ItemStack previousItem = player.getInventory().getItemInOffHand();
-            entityPlayer.c.b(new ClientboundBundlePacket(List.of(
-                    new PacketPlayOutEntityStatus(entityPlayer, (byte)35),
-                    new PacketPlayOutEntityEquipment(player.getEntityId(), List.of(Pair.of(EnumItemSlot.b, CraftItemStack.asNMSCopy(previousItem))))
+            serverPlayer.connection.send(new ClientboundBundlePacket(List.of(
+                    new ClientboundEntityEventPacket(serverPlayer, (byte)35),
+                    new ClientboundSetEquipmentPacket(player.getEntityId(), List.of(Pair.of(EquipmentSlot.OFFHAND, CraftItemStack.asNMSCopy(previousItem))))
             )));
-        }), new Thread(() -> entityPlayer.c.b(new ClientboundBundlePacket(List.of(
-                new PacketPlayOutStopSound(SOUND_KEY, SoundCategory.h)
+        }), new Thread(() -> serverPlayer.connection.send(new ClientboundBundlePacket(List.of(
+                new ClientboundStopSoundPacket(SOUND_KEY, SoundSource.PLAYERS)
         ))))).forEach(Thread::start);
     }
 

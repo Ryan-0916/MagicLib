@@ -6,10 +6,9 @@ import com.magicrealms.magiclib.common.utils.StringUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
-import net.minecraft.resources.MinecraftKey;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.sounds.SoundCategory;
-import net.minecraft.sounds.SoundEffect;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
@@ -99,10 +98,12 @@ public class SoundMessage extends AbstractMessage {
     }
 
     private void sendSound(@NotNull Player player, @NotNull String path, float volume, float pitch, long speed) {
-        EntityPlayer entityPlayer = ((CraftPlayer)player).getHandle();
-        List<Packet<PacketListenerPlayOut>> packetListeners = List.of(
-             new PacketPlayOutEntitySound(Holder.a(SoundEffect.a(new MinecraftKey(path))), SoundCategory.h, entityPlayer, volume, pitch, speed)
+        List<Packet<ClientGamePacketListener>> packetListeners = List.of(
+                new ClientboundSoundPacket(Holder.direct(SoundEvent.createVariableRangeEvent(new ResourceLocation(path))),
+                        SoundSource.PLAYERS, player.getLocation().getX(),
+                        player.getLocation().getY(), player.getLocation().getZ(),
+                        volume, pitch, speed)
         );
-        entityPlayer.c.b(new ClientboundBundlePacket(packetListeners));
+        ((CraftPlayer)player).getHandle().connection.send(new ClientboundBundlePacket(packetListeners));
     }
 }

@@ -4,6 +4,8 @@ import com.magicrealms.magiclib.common.manage.ConfigManage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 public class ItemUtil {
 
     public static final ItemStack AIR = new ItemStack(Material.AIR);
+
+    public static final Component UN_ITALIC = Component.text(StringUtil.EMPTY, Style.style(TextDecoration.ITALIC.withState(false)));
 
     public static boolean isAirOrNull(@Nullable ItemStack itemStack) {
         return itemStack == null || itemStack.getType() == Material.AIR;
@@ -224,7 +228,7 @@ public class ItemUtil {
             return this;
         }
         public Builder setName(@NotNull String name) {
-            this.name = AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(name));
+            this.name = UN_ITALIC.append(AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(name)));
             return this;
         }
         public Builder setComponentLore(@NotNull List<Component> lore) {
@@ -233,7 +237,7 @@ public class ItemUtil {
         }
 
         public Builder setLore(@NotNull List<String> lore) {
-            this.lore = lore.stream().map(l -> AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(l))).collect(Collectors.toList());
+            this.lore = lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(l)))).collect(Collectors.toList());
             return this;
         }
 
