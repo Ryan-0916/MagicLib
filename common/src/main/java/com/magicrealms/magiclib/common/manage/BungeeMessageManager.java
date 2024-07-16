@@ -46,12 +46,12 @@ public class BungeeMessageManager extends JedisPubSub {
 
         try {
             connection = new Jedis(builder.host, builder.port, 60000);
-            if (builder.password != null) {
+            if (builder.passwordModel) {
                 connection.auth(builder.password);
             }
             subscribe(builder.channel);
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().warning("订阅 Redis 服务异常");
+            PLUGIN.getLoggerManager().error("订阅 Redis 服务异常", e);
         }
 
     }
@@ -131,6 +131,7 @@ public class BungeeMessageManager extends JedisPubSub {
         private String host;
         private int port;
         private String password;
+        private boolean passwordModel;
         private Consumer<BungeeMessage> messageListener;
         private Consumer<String> subscribeListener;
         private Consumer<String> unSubscribeListener;
@@ -152,6 +153,11 @@ public class BungeeMessageManager extends JedisPubSub {
 
         public Builder password(String password) {
             this.password = password;
+            return this;
+        }
+
+        public Builder passwordModel(boolean passwordModel) {
+            this.passwordModel = passwordModel;
             return this;
         }
 

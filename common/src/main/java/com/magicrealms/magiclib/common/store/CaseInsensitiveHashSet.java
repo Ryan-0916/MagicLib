@@ -19,7 +19,7 @@ public class CaseInsensitiveHashSet {
     }
 
     public CaseInsensitiveHashSet(@NotNull Collection<? extends String> values) {
-        MAP = new HashMap<>(Math.max((int) (values.size()/.75f) + 1, 16));
+        this.MAP = new HashMap<>(Math.max((int) (values.size()/.75f) + 1, 16));
         addAll(values);
     }
 
@@ -40,5 +40,9 @@ public class CaseInsensitiveHashSet {
 
     public Set<String> getAll() {
         return MAP.keySet();
+    }
+
+    public void clear() {
+        this.MAP.clear();
     }
 }

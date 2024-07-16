@@ -124,6 +124,10 @@ public class AdventureHelper {
         return getGson().serialize(component);
     }
 
+    public static @NotNull String serializeComponentByMiniMessage(@NotNull Component component) {
+        return getMiniMessage().serialize(component);
+    }
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isColorCode(char c) {
         return c == '§' || c == '&';

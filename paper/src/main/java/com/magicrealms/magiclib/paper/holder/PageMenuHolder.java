@@ -162,6 +162,12 @@ public class PageMenuHolder extends BaseMenuHolder {
     public @NotNull Component getTitle(@NotNull Map<String, String> placeholderMap) {
         placeholderMap.put("page", String.valueOf(page));
         placeholderMap.put("max_page", String.valueOf(maxPage));
+        placeholderMap.put("next_page_title", super.getPlugin().getConfigManage()
+                .getYmlValue(super.getConfigPath(), page >= maxPage ? "PageTitle.NextPage.Disable" :
+                        "PageTitle.NextPage.Active"));
+        placeholderMap.put("previous_page_title", super.getPlugin().getConfigManage()
+                .getYmlValue(super.getConfigPath(), page <= 1 ? "PageTitle.PreviousPage.Disable" :
+                        "PageTitle.PreviousPage.Active"));
         return super.getTitle(placeholderMap);
     }
 }

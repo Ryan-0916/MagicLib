@@ -83,6 +83,7 @@ public class ItemUtil {
         return getItemStackByConfig(configManage, configPath, key, null, itemFlags);
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @NotNull
     public static ItemStack getItemStackByConfig(@NotNull ConfigManage configManage, @NotNull String configPath,
                                                  @NotNull String key, @Nullable Map<String, String> map,
@@ -91,7 +92,8 @@ public class ItemUtil {
                 configManage.getYmlValue(configPath, key + ".mats")));
         Optional<String> name = configManage.containsYmlKey(configPath, key + ".name") ?
                 Optional.of(configManage.getYmlValue(configPath, key + ".name")) : Optional.empty();
-        Optional<List<String>> lore = configManage.getYmlListValue(configPath, key + ".lore");
+        Optional<List<String>> lore = configManage.containsYmlKey(configPath, key + ".lore") ?
+                configManage.getYmlListValue(configPath, key + ".lore")  : Optional.empty();
         if (material.isEmpty()) {
             return AIR;
         }
@@ -114,6 +116,8 @@ public class ItemUtil {
                                                  ItemFlag... itemFlags) {
        return setItemStackByConfig(configManage, itemStack, configPath, key, null, itemFlags);
     }
+
+    @SuppressWarnings("DuplicatedCode")
     @NotNull
     public static ItemStack setItemStackByConfig(@NotNull ConfigManage configManage, @NotNull ItemStack itemStack,
                                                  @NotNull String configPath,
@@ -121,13 +125,14 @@ public class ItemUtil {
                                                  ItemFlag... itemFlags) {
         Optional<String> nameOptional = configManage.containsYmlKey(configPath, key + ".name") ?
                 Optional.of(configManage.getYmlValue(configPath, key + ".name")) : Optional.empty();
-        Optional<List<String>> loreOptional = configManage.getYmlListValue(configPath, key + ".lore");
+        Optional<List<String>> loreOptional = configManage.containsYmlKey(configPath, key + ".lore") ?
+                configManage.getYmlListValue(configPath, key + ".lore") : Optional.empty();
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setCustomModelData(configManage.getYmlIntegerValue(configPath, key + ".modelData", 0));
-        nameOptional.ifPresent(name -> itemMeta.displayName(AdventureHelper.deserializeComponent(
-                AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(name, map)))));
-        loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream().map(l -> AdventureHelper.deserializeComponent(
-                AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(l, map))))
+        nameOptional.ifPresent(name -> itemMeta.displayName(UN_ITALIC.append(AdventureHelper.deserializeComponent(
+                AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(name, map))))));
+        loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(
+                AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(l, map)))))
                 .collect(Collectors.toList())));
         itemMeta.addItemFlags(itemFlags);
         itemStack.setItemMeta(itemMeta);
@@ -152,6 +157,12 @@ public class ItemUtil {
             to.setAmount(to.getAmount() + from.getAmount());
             from.setAmount(0);
         }
+    }
+
+    public static Component getItemName(@NotNull ItemStack itemStack) {
+        return itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName() ?
+                itemStack.getItemMeta().displayName() :
+                Component.translatable((itemStack.getType().isBlock() ? "block." : "item.") + itemStack.getType().getKey().toString().replace(':', '.'));
     }
 
     public static boolean canFitIntoInventory(@NotNull Player player, @Nullable ItemStack itemStack) {

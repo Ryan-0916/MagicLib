@@ -17,5 +17,8 @@ public enum PermissionType {
     /* 仅控制台 */
     CONSOLE,
     /* 管理员或控制台 */
-    OP
+    OP,
+    /* 控制台或者拥有某项权限组 */
+    CONSOLE_OR_PERMISSION
+
 }

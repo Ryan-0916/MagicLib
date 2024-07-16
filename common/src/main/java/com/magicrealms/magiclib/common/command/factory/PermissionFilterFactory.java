@@ -31,6 +31,7 @@ public class PermissionFilterFactory implements IFilterFactory {
                 case ADMIN -> AdminPermissionFilter.INSTANCE;
                 case CONSOLE -> ConsolePermissionFilter.INSTANCE;
                 case OP -> OpPermissionFilter.INSTANCE;
+                case CONSOLE_OR_PERMISSION -> ConsoleOrPermissionFilter.INSTANCE;
             };
         }
         throw new UnknownTypeException("权限过滤工厂无法解析未知的枚举类型");

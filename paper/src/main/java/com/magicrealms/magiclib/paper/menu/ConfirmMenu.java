@@ -11,27 +11,26 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 import static com.magicrealms.magiclib.paper.MagicLib.YML_CONFIRM_MENU;
 
 /**
  * @author Ryan-0916
  * @Desc 确认菜单
- * @date 2024-07-02
+ * @date 2024-07-16
  */
 @SuppressWarnings("unused")
 public class ConfirmMenu extends BaseMenuHolder {
-    private final Consumer<Boolean> callBack;
-    private final ItemStack itemStack;
+    private final ItemStack showItem;
+    private final Runnable confirmRun;
+    private final Runnable cancelOrCloseRun;
     private boolean manualClose;
 
-    public ConfirmMenu(@NotNull Player player,
-                       @NotNull ItemStack itemStack,
-                       @NotNull Consumer<Boolean> callBack) {
-        super(MagicLib.getInstance(), player, YML_CONFIRM_MENU, "###ABC###");
-        this.callBack = callBack;
-        this.itemStack = itemStack;
+    private ConfirmMenu(Builder builder) {
+        super(MagicLib.getInstance(), builder.player, YML_CONFIRM_MENU, "###ABC###");
+        this.showItem = builder.showItem;
+        this.confirmRun = builder.confirmRun;
+        this.cancelOrCloseRun = builder.cancelOrCloseRun;
         openMenu();
     }
 
@@ -39,7 +38,7 @@ public class ConfirmMenu extends BaseMenuHolder {
         int size =  super.getLayout().length();
         for (int i = 0; i < size; i++){
             if (super.getLayout().charAt(i) == 'B') {
-                super.setItemSlot(i, itemStack);
+                super.setItemSlot(i, showItem);
                 continue;
             }
             super.setItemSlot(i);
@@ -71,7 +70,11 @@ public class ConfirmMenu extends BaseMenuHolder {
     private void clickButton(Player player, boolean isConfirm) {
         Bukkit.getScheduler().runTask(MagicLib.getInstance(), () -> {
             player.closeInventory();
-            callBack.accept(isConfirm);
+            if (isConfirm) {
+                confirmRun.run();
+                return;
+            }
+            cancelOrCloseRun.run();
         });
     }
 
@@ -87,9 +90,43 @@ public class ConfirmMenu extends BaseMenuHolder {
         super.closeEvent(e);
         Bukkit.getScheduler().runTask(MagicLib.getInstance(), () -> {
             if (manualClose) {
-                callBack.accept(false);
+                cancelOrCloseRun.run();
             }
         });
     }
 
+    public static class Builder {
+        private ItemStack showItem;
+        private Runnable confirmRun;
+        private Runnable cancelOrCloseRun;
+        private Player player;
+
+        public Builder showItem(@NotNull ItemStack showItem) {
+            this.showItem = showItem;
+            return this;
+        }
+
+        public Builder confirmRun(@NotNull Runnable confirmRun) {
+            this.confirmRun = confirmRun;
+            return this;
+        }
+
+        public Builder cancelOrCloseRun(@NotNull Runnable cancelOrCloseRun) {
+            this.cancelOrCloseRun = cancelOrCloseRun;
+            return this;
+        }
+
+        public Builder player(@NotNull Player player) {
+            this.player = player;
+            return this;
+        }
+
+        public void open() {
+            if (player == null) throw new NullPointerException("构建确认菜单时出现未知异常，确认者不可为空");
+            if (showItem == null) throw new NullPointerException("构建确认菜单时出现未知异常，展示物品不可为空");
+            if (confirmRun == null) throw new NullPointerException("构建确认菜单时出现未知异常，确认后的操作不可为空");
+            if (cancelOrCloseRun == null) throw new NullPointerException("构建确认菜单时出现未知异常，确认或取消后的不可为空");
+            new ConfirmMenu(this);
+        }
+    }
 }
