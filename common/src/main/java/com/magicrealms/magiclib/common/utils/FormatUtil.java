@@ -33,13 +33,14 @@ public class FormatUtil {
                     hour = calendar.get(Calendar.HOUR_OF_DAY),
                     minute = calendar.get(Calendar.MINUTE),
                     second = calendar.get(Calendar.SECOND);
-            format.put(StringUtils.isBlank(prefix) ? "yyyy" : prefix + "yyyy", String.valueOf(year));
-            format.put(StringUtils.isBlank(prefix) ? "yy" : prefix + "yy", String.valueOf(year).substring(2));
-            format.put(StringUtils.isBlank(prefix) ? "MM" : prefix + "MM", String.format("%02d", month));
-            format.put(StringUtils.isBlank(prefix) ? "dd" : prefix + "dd", String.format("%02d", day));
-            format.put(StringUtils.isBlank(prefix) ? "HH" : prefix + "HH", String.format("%02d", hour));
-            format.put(StringUtils.isBlank(prefix) ? "mm" : prefix + "mm", String.format("%02d", minute));
-            format.put(StringUtils.isBlank(prefix) ? "ss" : prefix + "ss", String.format("%02d", second));
+            boolean prefixBlank = StringUtils.isBlank(prefix);
+            format.put(prefixBlank ? "yyyy" : prefix + "yyyy", String.valueOf(year));
+            format.put(prefixBlank ? "yy" : prefix + "yy", String.valueOf(year).substring(2));
+            format.put(prefixBlank ? "MM" : prefix + "MM", String.format("%02d", month));
+            format.put(prefixBlank ? "dd" : prefix + "dd", String.format("%02d", day));
+            format.put(prefixBlank ? "HH" : prefix + "HH", String.format("%02d", hour));
+            format.put(prefixBlank ? "mm" : prefix + "mm", String.format("%02d", minute));
+            format.put(prefixBlank ? "ss" : prefix + "ss", String.format("%02d", second));
             return format;
         } catch (Exception e) {
             return format;

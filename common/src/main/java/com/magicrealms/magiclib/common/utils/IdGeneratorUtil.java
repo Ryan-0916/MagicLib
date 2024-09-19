@@ -12,7 +12,9 @@ import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * ID 生成器
+ * @author Ryan-0916
+ * @Desc ID 生成器
+ * @date 2024-06-20
  */
 @SuppressWarnings("unused")
 public final class IdGeneratorUtil implements Serializable {

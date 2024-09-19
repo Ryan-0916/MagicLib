@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * @Desc 具体消息工厂实现类 - 对应 MC 版本 1.20.3、1.20.4
  * @date 2024-05-06
  **/
+
 public class MC_1_20_R3_MessageFactory implements IMessageFactory {
 
     private static volatile MC_1_20_R3_MessageFactory INSTANCE;
@@ -25,7 +26,6 @@ public class MC_1_20_R3_MessageFactory implements IMessageFactory {
                 }
             }
         }
-
         return INSTANCE;
     }
 

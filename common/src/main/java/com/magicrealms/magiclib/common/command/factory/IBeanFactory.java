@@ -8,7 +8,7 @@ import java.util.Map;
  * @date 2023-10-01
  **/
 @SuppressWarnings("unused")
-public interface BeanFactory {
+public interface IBeanFactory {
 
     /**
      * 通过 Bean Name 获取携带 @Component 注解的 JavaBean

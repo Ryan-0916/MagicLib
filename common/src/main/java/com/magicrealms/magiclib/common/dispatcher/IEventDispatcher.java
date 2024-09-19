@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 public interface IEventDispatcher {
 
     /**
-     * 调起一个事件，并给予回调
+     * 调起一个事件，并异步给予回调
      * @param plugin 插件同步执行回调
      * @param event 事件
      * @param callback 成功执行回调

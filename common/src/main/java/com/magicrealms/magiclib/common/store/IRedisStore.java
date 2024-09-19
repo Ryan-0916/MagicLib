@@ -36,6 +36,5 @@ public interface IRedisStore {
     boolean removeHkey(@NotNull String key, @NotNull String... subKey);
     void publishValue(@NotNull String channel, @NotNull String value);
     boolean tryLock(@NotNull String lockKey, @NotNull String lockHolder, long expire);
-
     boolean releasedLock(@NotNull String lockKey, @NotNull String lockHolder);
 }

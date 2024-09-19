@@ -5,6 +5,7 @@ import com.magicrealms.magiclib.common.holder.IBaseMenuHolder;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.ItemUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
+import com.magicrealms.magiclib.paper.dispatcher.NMSDispatcher;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -112,9 +113,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     public void clickSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot) {}
 
     @Override
-    public void dragEvent(@NotNull InventoryDragEvent e) {
-
-    }
+    public void dragEvent(@NotNull InventoryDragEvent e) {}
 
     @Override
     public void openEvent(@NotNull InventoryOpenEvent e) {
@@ -184,10 +183,30 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
                 "Icons." + slotChar + (opened ? ".openDisplay" : ".closeDisplay")));
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @NotNull
     public Component getTitle(@NotNull Map<String, String> map) {
         map.put("player_name", player.getName());
         return AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(title, map)));
+    }
+
+    protected void updateTitle(@NotNull Map<String, String> map) {
+        NMSDispatcher.getInstance().updateInventoryTitle(player, title);
     }
 
     public boolean hasBackMenuRunnable() {

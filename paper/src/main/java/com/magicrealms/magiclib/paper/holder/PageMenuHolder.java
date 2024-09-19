@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * 翻页菜单构造器
  * @author Ryan-0916
+ * @Desc 翻页菜单构造器
  * @date 2024-04-11
  */
 @SuppressWarnings("unused")

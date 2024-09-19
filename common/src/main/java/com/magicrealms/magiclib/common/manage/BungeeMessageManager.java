@@ -3,8 +3,7 @@ package com.magicrealms.magiclib.common.manage;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.message.bungee.BungeeMessage;
 import com.magicrealms.magiclib.common.utils.JsonUtil;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
@@ -15,11 +14,12 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class BungeeMessageManager extends JedisPubSub {
+
     private final MagicRealmsPlugin PLUGIN;
     private final Consumer<BungeeMessage> MESSAGE_LISTENER;
     private final Consumer<String> SUBSCRIBE_LISTENER;
     private final Consumer<String> UNSUBSCRIBE_LISTENER;
-    private BukkitTask bukkitTask;
+    private int taskId;
     private Jedis connection;
 
     private BungeeMessageManager(Builder builder) {
@@ -27,6 +27,7 @@ public class BungeeMessageManager extends JedisPubSub {
         this.MESSAGE_LISTENER = builder.messageListener;
         this.SUBSCRIBE_LISTENER = builder.subscribeListener;
         this.UNSUBSCRIBE_LISTENER = builder.unSubscribeListener;
+        this.taskId = -1;
 
         if (PLUGIN == null) {
             throw new NullPointerException("Bungee消息 Plugin 属性不可为空");
@@ -57,21 +58,15 @@ public class BungeeMessageManager extends JedisPubSub {
     }
 
     public void subscribe(String channel) {
-        BungeeMessageManager pubSub = this;
-        bukkitTask = new BukkitRunnable() {
-            @Override
-            public void run() {
-                connection.subscribe(pubSub, channel);
-            }
-        }.runTaskAsynchronously(PLUGIN);
+        taskId = Bukkit.getScheduler().runTaskAsynchronously(PLUGIN,
+                () -> connection.subscribe(this, channel)).getTaskId();
     }
 
     @Override
     public void unsubscribe() {
-        if (bukkitTask != null && !bukkitTask.isCancelled()) {
-            bukkitTask.cancel();
+        if (taskId != -1 && Bukkit.getScheduler().isCurrentlyRunning(taskId)) {
+            Bukkit.getScheduler().cancelTask(taskId);
         }
-
         if (super.isSubscribed()) {
             super.unsubscribe();
         }

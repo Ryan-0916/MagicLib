@@ -16,7 +16,6 @@ import java.util.logging.Level;
 
 /**
  * @author Ryan-0916
- * @Desc 抽象过滤器
  * @date 2024-05-10
  **/
 public abstract class AbstractFilterExecutor {

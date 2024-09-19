@@ -15,6 +15,7 @@ import java.io.*;
 
 /**
  * @author Ryan-0916
+ * @Desc 抽象插件类
  * @date 2024-05-26
  **/
 @Getter
@@ -71,11 +72,6 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
         return true;
     }
 
-    protected abstract void registerCommand(CommandManager commandManager);
-
-    protected abstract void loadConfig(ConfigManage configManage);
-
-
     /**
      * 生成资源文件
      * @param resourcePath 资源文件生成路径
@@ -114,4 +110,9 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
             getLoggerManager().error("不可以将" + outFile.getName() + "保存至" + outFile, exception);
         }
     }
+
+    protected abstract void registerCommand(CommandManager commandManager);
+
+    protected abstract void loadConfig(ConfigManage configManage);
+
 }

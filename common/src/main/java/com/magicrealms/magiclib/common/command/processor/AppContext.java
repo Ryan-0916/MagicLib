@@ -2,7 +2,7 @@ package com.magicrealms.magiclib.common.command.processor;
 
 import com.magicrealms.magiclib.common.command.annotations.Component;
 import com.magicrealms.magiclib.common.command.annotations.Listener;
-import com.magicrealms.magiclib.common.command.factory.BeanFactory;
+import com.magicrealms.magiclib.common.command.factory.IBeanFactory;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 
@@ -22,7 +22,7 @@ import java.util.logging.Level;
  * @date 2023-10-01
  **/
 @SuppressWarnings("unchecked")
-public class AppContext implements BeanFactory {
+public class AppContext implements IBeanFactory {
 
     private final HashMap<String, Object> context = new HashMap<>();
 

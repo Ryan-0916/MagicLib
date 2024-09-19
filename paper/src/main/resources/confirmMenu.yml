@@ -1,12 +1,19 @@
-Title: '确认操作'
+Title:
+  Background:
+    Text: '确认菜单'
+    Offset: 0
+  Confirm:
+    Text: '确认'
+    Offset: 0
+  Cancel:
+    Text: '取消'
+    Offset: 0
 
 # B 是由其他 GUI 传入的物品
 # A 是确认按钮
 # C 是取消按钮
-
 Layout:
   - '###ABC###'
-
 
 Icons:
   A:

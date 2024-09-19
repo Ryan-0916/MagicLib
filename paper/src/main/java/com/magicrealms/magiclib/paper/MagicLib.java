@@ -34,7 +34,11 @@ public class MagicLib extends MagicRealmsPlugin {
     }
 
     @Override
-    protected void registerCommand(CommandManager commandManager) {}
+    protected void registerCommand(CommandManager commandManager) {
+        commandManager.registerCommand("MagicLib", e -> {
+
+        });
+    }
 
     @Override
     protected void loadConfig(ConfigManage configManage) {
