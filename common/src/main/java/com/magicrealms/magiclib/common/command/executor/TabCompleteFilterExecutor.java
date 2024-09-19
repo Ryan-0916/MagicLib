@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * @author Ryan-0916
  * @Desc 具体过滤器工厂类
  * @date 2024-05-10
- **/
+ */
 public class TabCompleteFilterExecutor extends AbstractFilterExecutor {
 
     public final static TabCompleteFilterExecutor INSTANCE = new TabCompleteFilterExecutor();

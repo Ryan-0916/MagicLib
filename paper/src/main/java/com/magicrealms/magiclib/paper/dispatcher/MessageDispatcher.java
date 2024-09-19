@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Ryan-0916
  * @Desc 消息调度器
  * @date 2024-05-17
- **/
+ */
 @SuppressWarnings("unused")
 public class MessageDispatcher implements IMessageDispatcher {
     private static volatile MessageDispatcher INSTANCE;

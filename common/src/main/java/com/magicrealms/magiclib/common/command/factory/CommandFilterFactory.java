@@ -9,7 +9,7 @@ import com.magicrealms.magiclib.common.exception.UnknownTypeException;
  * @author Ryan-0916
  * @Desc 指令过滤工厂
  * @date 2023-10-01
- **/
+ */
 public class CommandFilterFactory implements IFilterFactory {
 
     public final static CommandFilterFactory INSTANCE = new CommandFilterFactory();

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Ryan-0916
  * @Desc 消息调度器
  * @date 2024-05-17
- **/
+ */
 @SuppressWarnings("unused")
 public interface IMessageDispatcher {
 

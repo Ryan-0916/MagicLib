@@ -6,7 +6,7 @@ import com.magicrealms.magiclib.common.dispatcher.IEventDispatcher;
  * @author Ryan-0916
  * @Desc 事件调度器
  * @date 2024-05-17
- **/
+ */
 @SuppressWarnings("unused")
 public class EventDispatcher implements IEventDispatcher {
 

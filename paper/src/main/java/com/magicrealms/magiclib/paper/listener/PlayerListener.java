@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
  * @author Ryan-0916
  * @Desc 玩家监听器
  * @date 2024-05-08
- **/
+ */
 public class PlayerListener implements Listener {
 
     private final MagicRealmsPlugin PLUGIN;

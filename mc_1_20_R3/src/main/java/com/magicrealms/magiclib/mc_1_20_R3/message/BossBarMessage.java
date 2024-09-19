@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Ryan-0916
  * @Desc 消息栏消息
  * @date 2024-05-17
- **/
+ */
 public class BossBarMessage extends AbstractMessage {
 
     private static volatile BossBarMessage INSTANCE;

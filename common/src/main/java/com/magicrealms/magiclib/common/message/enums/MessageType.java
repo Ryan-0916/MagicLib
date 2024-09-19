@@ -6,7 +6,7 @@ import lombok.Getter;
  * @author Ryan-0916
  * @Desc 枚举-消息类型
  * @date 2024-05-06
- **/
+ */
 @Getter
 public enum MessageType {
     MESSAGE(0, "message"),

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * @author Ryan-0916
  * @Desc 标签过滤器
  * @date 2023-10-01
- **/
+ */
 public class LabelFilter extends AbstractChannelFilter {
 
     public static LabelFilter INSTANCE = new LabelFilter();

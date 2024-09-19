@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Ryan-0916
  * @Desc 声音消息
  * @date 2024-05-17
- **/
+ */
 public class SoundMessage extends AbstractMessage {
 
     private static volatile SoundMessage INSTANCE;

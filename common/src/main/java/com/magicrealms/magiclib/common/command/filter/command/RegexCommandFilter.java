@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * @author Ryan-0916
  * @Desc 正则校验-指令过滤器
  * @date 2023-10-01
- **/
+ */
 public class RegexCommandFilter extends AbstractChannelFilter {
 
     public static final RegexCommandFilter INSTANCE = new RegexCommandFilter();

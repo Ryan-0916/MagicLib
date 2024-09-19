@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * @Desc 插件注册阶段将反射携带此注解的类
  * 插件注册阶段将反射携带此注解的类
  * @date 2023-10-01
- **/
+ */
 @Inherited
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

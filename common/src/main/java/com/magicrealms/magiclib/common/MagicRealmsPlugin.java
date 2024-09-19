@@ -17,7 +17,7 @@ import java.io.*;
  * @author Ryan-0916
  * @Desc 抽象插件类
  * @date 2024-05-26
- **/
+ */
 @Getter
 @SuppressWarnings("unused")
 public abstract class MagicRealmsPlugin extends JavaPlugin {

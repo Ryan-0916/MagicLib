@@ -17,7 +17,7 @@ import java.util.logging.Level;
 /**
  * @author Ryan-0916
  * @date 2024-05-10
- **/
+ */
 public abstract class AbstractFilterExecutor {
 
     public Boolean filter(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Annotation annotation,

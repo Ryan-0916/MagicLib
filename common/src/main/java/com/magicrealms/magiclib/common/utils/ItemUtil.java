@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @author Ryan-0916
  * @Desc 物品工具类
  * @date 2024-05-27
- **/
+ */
 @SuppressWarnings("unused")
 @Slf4j
 public class ItemUtil {

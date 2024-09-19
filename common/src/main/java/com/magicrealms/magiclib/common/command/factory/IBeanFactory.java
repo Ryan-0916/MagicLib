@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author Ryan-0916
  * @date 2023-10-01
- **/
+ */
 @SuppressWarnings("unused")
 public interface IBeanFactory {
 

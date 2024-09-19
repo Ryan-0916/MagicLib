@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Ryan-0916
  * @Desc 权限过滤器 - 玩家
  * @date 2023-10-01
- **/
+ */
 public class PlayerPermissionFilter extends AbstractChannelFilter {
 
     public static final PlayerPermissionFilter INSTANCE = new PlayerPermissionFilter();

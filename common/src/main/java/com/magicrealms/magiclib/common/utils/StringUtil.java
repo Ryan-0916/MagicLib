@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * @author Ryan-0916
  * @Desc 字符串工具类
  * @date 2024-05-06
- **/
+ */
 @SuppressWarnings("unused")
 public class StringUtil {
 

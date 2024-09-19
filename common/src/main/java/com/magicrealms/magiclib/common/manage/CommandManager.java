@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  * @author Ryan-0916
  * @Desc 指令管理器
  * @date 2024-05-25
- **/
+ */
 @SuppressWarnings("unused")
 public class CommandManager {
 

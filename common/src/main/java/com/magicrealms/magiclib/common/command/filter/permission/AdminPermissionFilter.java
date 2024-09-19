@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Ryan-0916
  * @Desc 权限过滤器 - 仅管理员
  * @date 2023-10-01
- **/
+ */
 public class AdminPermissionFilter extends AbstractChannelFilter {
 
     public static AdminPermissionFilter INSTANCE = new AdminPermissionFilter();

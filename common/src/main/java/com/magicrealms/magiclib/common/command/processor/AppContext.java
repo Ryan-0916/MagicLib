@@ -20,7 +20,7 @@ import java.util.logging.Level;
  * @author Ryan-0916
  * @Desc 用于处理反射某包下所有包含 @Component 的注解
  * @date 2023-10-01
- **/
+ */
 @SuppressWarnings("unchecked")
 public class AppContext implements IBeanFactory {
 

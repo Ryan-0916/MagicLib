@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @Desc 申明方法一条补全 Minecraft 指令
  * 必须在类注解 @Listener 中才生效
  * @date 2023-10-01
- **/
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface TabComplete{

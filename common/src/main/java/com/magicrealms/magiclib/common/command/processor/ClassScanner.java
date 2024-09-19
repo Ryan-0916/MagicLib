@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author Ryan-0916
  * @Desc 类扫描器
  * @date 2023-10-01
- **/
+ */
 public class ClassScanner {
 
     private final String basePackage; // 主包

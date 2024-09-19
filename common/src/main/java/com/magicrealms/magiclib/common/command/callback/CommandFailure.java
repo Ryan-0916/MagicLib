@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Ryan-0916
  * @Desc 指令执行失败信息
  * @date 2024-05-10
- **/
+ */
 public class CommandFailure {
     @Getter
     private CommandSender sender;

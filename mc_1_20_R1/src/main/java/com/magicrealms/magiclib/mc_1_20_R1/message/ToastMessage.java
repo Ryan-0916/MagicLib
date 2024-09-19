@@ -32,7 +32,7 @@ import java.util.*;
  * @author Ryan-0916
  * @Desc 成就消息
  * @date 2024-05-06
- **/
+ */
 public class ToastMessage extends AbstractMessage {
 
     private static volatile ToastMessage INSTANCE;

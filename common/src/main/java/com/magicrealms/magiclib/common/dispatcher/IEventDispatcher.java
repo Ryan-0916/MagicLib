@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * @author Ryan-0916
  * @Desc 事件调度器
  * @date 2024-05-10
- **/
+ */
 @SuppressWarnings("unused")
 public interface IEventDispatcher {
 

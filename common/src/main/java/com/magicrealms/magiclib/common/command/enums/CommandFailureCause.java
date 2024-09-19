@@ -4,7 +4,7 @@ package com.magicrealms.magiclib.common.command.enums;
  * @author Ryan-0916
  * @Desc 指令失败原因
  * @date 2023-10-01
- **/
+ */
 public enum CommandFailureCause {
     /* 执行者不是玩家 */
     NOT_PLAYER,

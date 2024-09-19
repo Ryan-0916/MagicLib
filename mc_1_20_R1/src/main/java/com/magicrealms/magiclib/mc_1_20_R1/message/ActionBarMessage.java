@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @author Ryan-0916
  * @Desc 物品栏消息
  * @date 2024-05-17
- **/
+ */
 public class ActionBarMessage extends AbstractMessage {
 
     private static volatile ActionBarMessage INSTANCE;

@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
  * @author Ryan-0916
  * @Desc MagicLib 启动类
  * @date 2024-05-06
- **/
+ */
 public class MagicLib extends MagicRealmsPlugin {
 
     private static MagicLib INSTANCE;

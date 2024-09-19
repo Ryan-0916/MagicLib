@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Ryan-0916
  * @Desc Title 消息
  * @date 2024-05-17
- **/
+ */
 public class TitleMessage extends AbstractMessage {
 
     private static volatile TitleMessage INSTANCE;

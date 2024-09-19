@@ -13,7 +13,7 @@ import java.util.Arrays;
  * @author Ryan-0916
  * @Desc 权限过滤器 - 权限节点
  * @date 2023-10-01
- **/
+ */
 public class PermissionFilter extends AbstractChannelFilter {
 
     public static final PermissionFilter INSTANCE = new PermissionFilter();

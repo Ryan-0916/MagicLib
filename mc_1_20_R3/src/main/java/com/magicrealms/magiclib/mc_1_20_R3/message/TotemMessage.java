@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * @author Ryan-0916
  * @Desc 图腾消息
  * @date 2024-05-25
- **/
+ */
 public class TotemMessage extends AbstractMessage {
 
     private static volatile TotemMessage INSTANCE;

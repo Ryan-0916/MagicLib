@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * @author Ryan-0916
  * @Desc 正则校验-指令过滤器（不区分大小写）
  * @date 2023-10-01
- **/
+ */
 public class CaseInsensitiveRegexCommandFilter extends AbstractChannelFilter {
 
     public static final CaseInsensitiveRegexCommandFilter INSTANCE = new CaseInsensitiveRegexCommandFilter();

@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  * @author Ryan-0916
  * @Desc 配置文件管理器
  * @date 2024-05-26
- **/
+ */
 @SuppressWarnings("unused")
 public interface IConfigManage {
     void loadConfig(String... filePaths);

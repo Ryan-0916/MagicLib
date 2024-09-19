@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Ryan-0916
  * @Desc 抽象消息类
  * @date 2024-05-06
- **/
+ */
 public abstract class AbstractMessage {
 
     /**

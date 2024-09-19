@@ -4,7 +4,7 @@ package com.magicrealms.magiclib.common.command.enums;
  * @author Ryan-0916
  * @Desc 指令权限匹配
  * @date 2023-10-01
- **/
+ */
 public enum PermissionType {
     /* 所有角色 */
     ALL,

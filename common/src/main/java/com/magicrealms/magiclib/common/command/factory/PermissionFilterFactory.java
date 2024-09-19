@@ -9,7 +9,7 @@ import com.magicrealms.magiclib.common.exception.UnknownTypeException;
  * @author Ryan-0916
  * @Desc 权限过滤工厂
  * @date 2023-10-01
- **/
+ */
 public class PermissionFilterFactory implements IFilterFactory {
 
     public final static PermissionFilterFactory INSTANCE = new PermissionFilterFactory();

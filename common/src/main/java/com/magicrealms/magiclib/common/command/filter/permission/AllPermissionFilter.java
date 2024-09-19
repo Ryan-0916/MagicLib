@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Ryan-0916
  * @Desc 权限过滤器 - 所有人
  * @date 2023-10-01
- **/
+ */
 public class AllPermissionFilter extends AbstractChannelFilter {
 
     public static final AllPermissionFilter INSTANCE = new AllPermissionFilter();
