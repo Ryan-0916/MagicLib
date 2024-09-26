@@ -17,7 +17,9 @@ import org.bukkit.inventory.ItemStack;
  * @date 2024-07-16
  */
 @Listener
+@SuppressWarnings("unused")
 public class TestController {
+    
     @Command(text = "^test$")
     public void test(CommandSender sender, String[] args) {
         new InputMenu.Builder().plugin(MagicLib.getInstance())

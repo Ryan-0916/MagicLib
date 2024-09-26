@@ -27,15 +27,12 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("unused")
 public class CommandManager {
-
+    private final MagicRealmsPlugin PLUGIN;
     private final AppContext APP_CONTEXT;
 
-    private final MagicRealmsPlugin PLUGIN;
-
-    public CommandManager(MagicRealmsPlugin plugin) {
-        this.APP_CONTEXT = new AppContext(plugin.getClass().getPackage().getName(),
-                plugin.getClass().getClassLoader());
+    public CommandManager(MagicRealmsPlugin plugin, AppContext appContext) {
         this.PLUGIN = plugin;
+        this.APP_CONTEXT = appContext;
     }
 
     public void registerCommand(@NotNull String name, @NotNull Consumer<CommandFailure> failure) {

@@ -1,14 +1,14 @@
 package com.magicrealms.magiclib.paper.listener;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.common.command.annotations.Event;
+import com.magicrealms.magiclib.common.command.annotations.Listener;
 import com.magicrealms.magiclib.common.utils.ItemUtil;
 import com.magicrealms.magiclib.paper.holder.BaseMenuHolder;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -16,19 +16,11 @@ import org.bukkit.inventory.ItemStack;
  * @Desc 玩家监听器
  * @date 2024-05-08
  */
-public class PlayerListener implements Listener {
+@Listener
+@SuppressWarnings("unused")
+public class PlayerListener{
 
-    private final MagicRealmsPlugin PLUGIN;
-
-    public PlayerListener(MagicRealmsPlugin plugin) {
-        this.PLUGIN = plugin;
-    }
-
-    /**
-     * 当玩家点击物品栏/菜单触发本事件
-     * @param e 玩家点击菜单事件
-     */
-    @EventHandler
+    @Event
     public void onInventoryClickEvent(InventoryClickEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             e.setCancelled(menu.isLock());
@@ -65,11 +57,7 @@ public class PlayerListener implements Listener {
         }
     }
 
-    /**
-     * 玩家滑动物品/菜单触发本事件
-     * @param e 玩家滑动菜单事件
-     */
-    @EventHandler
+    @Event
     public void onInventoryDragEvent(InventoryDragEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             if (menu.isLock()) {
@@ -79,25 +67,23 @@ public class PlayerListener implements Listener {
         }
     }
 
-    /**
-     * 当玩家关闭物品栏/菜单触发本事件
-     * @param e 玩家关闭菜单事件
-     */
-    @EventHandler
+    @Event
     public void onInventoryCloseEvent(InventoryCloseEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             menu.closeEvent(e);
         }
     }
 
-    /**
-     * 当玩家打开物品/菜单触发本事件
-     * @param e 玩家开启菜单事件
-     */
-    @EventHandler
+    @Event
     public void onInventoryOpenEvent(InventoryOpenEvent e) {
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             menu.openEvent(e);
         }
     }
+
+    @Event
+    public void onMagicPlayerJoinEvent(PlayerJoinEvent e) {
+        System.out.println("玩家加入了游戏");
+    }
+
 }

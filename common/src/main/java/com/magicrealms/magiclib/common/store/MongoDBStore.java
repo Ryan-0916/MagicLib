@@ -8,7 +8,6 @@ import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
@@ -16,11 +15,13 @@ public class MongoDBStore {
 
     @Getter
     private final MagicRealmsPlugin plugin;
+    @Getter
+    private MongoDatabase database;
     private final String HOST;
     private final int PORT;
     private final String DATABASE;
     private MongoClient connection;
-    private MongoDatabase database;
+
 
     public MongoDBStore(@NotNull MagicRealmsPlugin plugin, @NotNull String host, int port, @NotNull String database) {
         this.plugin = plugin;
@@ -29,17 +30,12 @@ public class MongoDBStore {
         this.DATABASE = database;
     }
 
-
-    /**
-     * 获取驱动
-     */
     public void getConnection(){
         try {
             this.connection = new MongoClient(HOST, PORT);
             this.database = connection.getDatabase(DATABASE);
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 连接异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 连接异常请检查 MongoDB 服务", e);
         }
     }
 
@@ -55,8 +51,7 @@ public class MongoDBStore {
                 this.database = null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 关闭连接异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 关闭连接异常请检查 MongoDB 服务", e);
         }
     }
 
@@ -73,10 +68,9 @@ public class MongoDBStore {
                 }
             }
             database.createCollection(tableName);
-            Bukkit.getLogger().info("MongoDB 表创建完毕，表名: " + tableName);
+            plugin.getLoggerManager().info("MongoDB 表创建完毕，表名: " + tableName);
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 创表异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 创表异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }
@@ -94,8 +88,7 @@ public class MongoDBStore {
             collection.insertOne(document);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 插入数据异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 插入数据异常请检查 MongoDB 服务", e);
             return false;
         } finally {
             this.close();
@@ -114,8 +107,7 @@ public class MongoDBStore {
             MongoCollection<Document> collection = database.getCollection(tableName);
             return collection.find(bson).iterator();
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 查询数据异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
         }
         return null;
     }
@@ -131,8 +123,7 @@ public class MongoDBStore {
             MongoCollection<Document> collection = database.getCollection(tableName);
             return collection.find().first();
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 查询数据异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
         }
         return null;
     }
@@ -151,8 +142,7 @@ public class MongoDBStore {
                     where,
                     value).getMatchedCount() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 修改数据异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }
@@ -173,8 +163,7 @@ public class MongoDBStore {
                     where,
                     value).getMatchedCount() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 修改数据异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }
@@ -192,15 +181,11 @@ public class MongoDBStore {
             MongoCollection<Document> collection = database.getCollection(tableName);
             return collection.deleteOne(where).getDeletedCount() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning("MongoDB 修改数据异常请检查 MongoDB 服务");
+            plugin.getLoggerManager().error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }
         return false;
     }
 
-    public MongoDatabase getDatabase() {
-        return this.database;
-    }
 }

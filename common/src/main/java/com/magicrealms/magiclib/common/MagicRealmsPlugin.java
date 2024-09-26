@@ -1,8 +1,10 @@
 package com.magicrealms.magiclib.common;
 
 
+import com.magicrealms.magiclib.common.command.processor.AppContext;
 import com.magicrealms.magiclib.common.manage.CommandManager;
 import com.magicrealms.magiclib.common.manage.ConfigManage;
+import com.magicrealms.magiclib.common.manage.EventManager;
 import com.magicrealms.magiclib.common.manage.LoggerManage;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -18,15 +20,23 @@ import java.io.*;
  * @Desc 抽象插件类
  * @date 2024-05-26
  */
-@Getter
 @SuppressWarnings("unused")
 public abstract class MagicRealmsPlugin extends JavaPlugin {
 
+    @Getter
     private ConfigManage configManage;
-
+    @Getter
     private CommandManager commandManager;
-
+    @Getter
     private LoggerManage loggerManager;
+    @Getter
+    private EventManager eventManager;
+    private final AppContext APP_CONTEXT;
+
+    public MagicRealmsPlugin() {
+        this.APP_CONTEXT = new AppContext(this.getClass().getPackage().getName(),
+                this.getClass().getClassLoader());
+    }
 
     @Override
     public void onEnable() {
@@ -34,10 +44,12 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
         this.setupLoggerManager();
         this.setupConfigManager();
         this.setupCommandManger();
+        this.setupEventManager();
     }
 
     @Override
     public void onDisable() {
+        eventManager.unregisterEvents();
     }
 
     private void setupConfigManager() {
@@ -45,7 +57,11 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
     }
 
     private void setupCommandManger() {
-        this.commandManager = new CommandManager(this);
+        this.commandManager = new CommandManager(this, APP_CONTEXT);
+    }
+
+    private void setupEventManager() {
+        this.eventManager = new EventManager(this, APP_CONTEXT);
     }
 
     private void setupLoggerManager() {
@@ -111,8 +127,10 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
         }
     }
 
+    protected abstract void loadConfig(ConfigManage configManage);
+
     protected abstract void registerCommand(CommandManager commandManager);
 
-    protected abstract void loadConfig(ConfigManage configManage);
+    protected abstract void registerEvents(EventManager eventManager);
 
 }

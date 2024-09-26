@@ -4,8 +4,7 @@ import com.magicrealms.magiclib.common.command.annotations.Component;
 import com.magicrealms.magiclib.common.command.annotations.Listener;
 import com.magicrealms.magiclib.common.command.factory.IBeanFactory;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-
+import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -14,7 +13,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 /**
  * @author Ryan-0916
@@ -22,6 +20,7 @@ import java.util.logging.Level;
  * @date 2023-10-01
  */
 @SuppressWarnings("unchecked")
+@Slf4j
 public class AppContext implements IBeanFactory {
 
     private final HashMap<String, Object> context = new HashMap<>();
@@ -47,12 +46,12 @@ public class AppContext implements IBeanFactory {
                     }
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException ex) {
-                    Bukkit.getLogger().log(Level.WARNING, ex.getMessage());
+                    log.error("反射类时出现未知异常", ex);
                 }
             });
             getBeansWithAnnotation(Listener.class).forEach(this::registerMethods);
         } catch (ClassNotFoundException | IOException e) {
-            Bukkit.getLogger().log(Level.WARNING, e.getMessage());
+            log.error("反射类时出现未知异常", e);
             System.exit(-1);
         }
     }

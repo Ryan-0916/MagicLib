@@ -18,11 +18,14 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -114,6 +117,7 @@ public class ToastMessage extends AbstractMessage {
                 LISTENER.remove(player.getUniqueId());
                 HandlerList.unregisterAll(listener);
             }, Math.round(inValidateTime * 20)));
+
             Bukkit.getPluginManager().registerEvents(listener, plugin);
         });
     }
