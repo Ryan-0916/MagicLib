@@ -1,14 +1,13 @@
 package com.magicrealms.magiclib.paper.listener;
 
-import com.magicrealms.magiclib.common.command.annotations.Event;
-import com.magicrealms.magiclib.common.command.annotations.Listener;
 import com.magicrealms.magiclib.common.utils.ItemUtil;
 import com.magicrealms.magiclib.paper.holder.BaseMenuHolder;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -16,11 +15,10 @@ import org.bukkit.inventory.ItemStack;
  * @Desc 玩家监听器
  * @date 2024-05-08
  */
-@Listener
 @SuppressWarnings("unused")
-public class PlayerListener{
+public class PlayerListener implements Listener {
 
-    @Event
+    @EventHandler
     public void onInventoryClickEvent(InventoryClickEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             e.setCancelled(menu.isLock());
@@ -57,7 +55,7 @@ public class PlayerListener{
         }
     }
 
-    @Event
+    @EventHandler
     public void onInventoryDragEvent(InventoryDragEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             if (menu.isLock()) {
@@ -67,23 +65,18 @@ public class PlayerListener{
         }
     }
 
-    @Event
+    @EventHandler
     public void onInventoryCloseEvent(InventoryCloseEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             menu.closeEvent(e);
         }
     }
 
-    @Event
+    @EventHandler
     public void onInventoryOpenEvent(InventoryOpenEvent e) {
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             menu.openEvent(e);
         }
-    }
-
-    @Event
-    public void onMagicPlayerJoinEvent(PlayerJoinEvent e) {
-        System.out.println("玩家加入了游戏");
     }
 
 }

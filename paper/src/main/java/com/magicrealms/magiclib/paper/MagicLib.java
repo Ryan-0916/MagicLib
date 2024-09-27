@@ -3,8 +3,9 @@ package com.magicrealms.magiclib.paper;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.manage.CommandManager;
 import com.magicrealms.magiclib.common.manage.ConfigManage;
-import com.magicrealms.magiclib.common.manage.EventManager;
 import com.magicrealms.magiclib.paper.dispatcher.MessageDispatcher;
+import com.magicrealms.magiclib.paper.listener.PlayerListener;
+import org.bukkit.Bukkit;
 
 /**
  * @author Ryan-0916
@@ -24,7 +25,7 @@ public class MagicLib extends MagicRealmsPlugin {
         dependenciesCheck(() -> {
             loadConfig(getConfigManage());
             registerCommand(getCommandManager());
-            registerEvents(getEventManager());
+            Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         });
     }
 
@@ -48,11 +49,6 @@ public class MagicLib extends MagicRealmsPlugin {
                 case PERMISSION_DENIED -> MessageDispatcher.getInstance().sendMessage(this, e.sender(), "权限不足");
             }
         });
-    }
-
-    @Override
-    protected void registerEvents(EventManager eventManager) {
-        eventManager.registerEvents();
     }
 
     public static MagicLib getInstance() { return INSTANCE; }
