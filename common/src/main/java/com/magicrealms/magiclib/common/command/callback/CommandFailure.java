@@ -1,7 +1,6 @@
 package com.magicrealms.magiclib.common.command.callback;
 
 import com.magicrealms.magiclib.common.command.enums.CommandFailureCause;
-import lombok.Getter;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
