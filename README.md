@@ -1,1 +1,2 @@
-# MagicLib-master
+# MagicLib
+它可以帮助您快速构建您的Paper插件, 封装了指令、文件、消息、菜单、NMS...功能便于您更快的构建您的插件。
