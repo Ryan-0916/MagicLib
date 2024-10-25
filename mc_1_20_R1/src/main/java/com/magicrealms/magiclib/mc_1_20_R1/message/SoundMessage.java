@@ -56,8 +56,8 @@ public class SoundMessage extends AbstractMessage {
      * <sound>ambient.basalt_deltas.additions</sound> 发送一条声音消息给玩家
      * 内连属性:
      * <volume>1</volume> 音量
-     * <pitch>1</pitch> 音准默
-     * <speed>1</speed> 音速默
+     * <pitch>1</pitch> 音准
+     * <speed>1</speed> 音速
      * <times>5</times> 消息发送次数
      * <interval>1.5</interval> 消息发送间隔 （秒）
      */

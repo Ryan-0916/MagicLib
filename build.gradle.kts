@@ -48,8 +48,8 @@ allprojects {
         publishing {
             publications {
                 create<MavenPublication>("mavenJava") {
-                    groupId = "com.magicrealms.magiclib"
-                    artifactId = "MagicLib"
+                    groupId = "com.magicrealms"
+                    artifactId = "magiclib"
                     version = projectVersion
                     artifact(tasks.shadowJar)
                 }

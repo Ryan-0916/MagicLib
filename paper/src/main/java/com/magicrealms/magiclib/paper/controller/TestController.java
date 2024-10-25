@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.paper.controller;
 import com.magicrealms.magiclib.common.command.annotations.Command;
 import com.magicrealms.magiclib.common.command.annotations.Listener;
+import com.magicrealms.magiclib.common.command.enums.PermissionType;
 import com.magicrealms.magiclib.paper.MagicLib;
 import com.magicrealms.magiclib.paper.dispatcher.MessageDispatcher;
 import com.magicrealms.magiclib.paper.entity.InputValidatorResult;
@@ -20,7 +21,7 @@ import org.bukkit.inventory.ItemStack;
 @SuppressWarnings("unused")
 public class TestController {
     
-    @Command(text = "^test$")
+    @Command(text = "^test$", permissionType = PermissionType.PLAYER)
     public void test(CommandSender sender, String[] args) {
         new InputMenu.Builder().plugin(MagicLib.getInstance())
                 .player((Player) sender)
