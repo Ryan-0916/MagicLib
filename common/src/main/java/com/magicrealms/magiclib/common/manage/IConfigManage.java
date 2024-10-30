@@ -1,5 +1,6 @@
 package com.magicrealms.magiclib.common.manage;
 
+import com.magicrealms.magiclib.common.command.enums.YmlValueType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -18,11 +19,7 @@ public interface IConfigManage {
     void reloadAllConfig();
     void reloadConfig(@NotNull String path, @NotNull Consumer<Boolean> callBack);
     String getYmlValue(@NotNull String path, @NotNull String key);
-    int getYmlIntegerValue(@NotNull String path, @NotNull String key, int def);
-    long getYmlLongValue(@NotNull String path, @NotNull String key, long def);
-    float getYmlFloatValue(@NotNull String path, @NotNull String key, float def);
-    double getYmlDoubleValue(@NotNull String path, @NotNull String key, double def);
-    boolean getYmlBooleanValue(@NotNull String path, @NotNull String key);
+    <T> T getYmlValue(@NotNull String path, @NotNull String key, T defaultValue, @NotNull YmlValueType valueType);
     Optional<List<String>> getYmlListValue(@NotNull String path, @NotNull String key);
     Optional<Set<String>> getYmlSubKeys(@NotNull String path, @NotNull String key, boolean f);
     boolean containsYmlKey(@NotNull String path, @NotNull String key);

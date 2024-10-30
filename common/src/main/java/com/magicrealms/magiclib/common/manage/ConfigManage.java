@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.common.manage;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.common.command.enums.YmlValueType;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
@@ -65,53 +66,24 @@ public class ConfigManage implements IConfigManage {
         return createYmlKey(path, key).orElse(StringUtil.EMPTY);
     }
 
+    /**
+     * 获取配置文件中的值
+     * @param path 配置文件路径
+     * @param key 配置文件中的键下级键请用.衔接
+     * @param defaultValue 默认值，如果配置文件中找不到该 key
+     * 或该 key 的值与我们所需的值类型不匹配时将返回该值
+     * @param valueType {@link YmlValueType} 转换类型
+     */
     @Override
-    public int getYmlIntegerValue(@NotNull String path, @NotNull String key, int def) {
+    @SuppressWarnings("unchecked")
+    public <T> T getYmlValue(@NotNull String path, @NotNull String key, T defaultValue, @NotNull YmlValueType valueType) {
         String value = getYmlValue(path, key);
         try {
-            return Integer.parseInt(value);
-        } catch (Exception exception){
-            PLUGIN.getLoggerManager().error("获取YML文件属性时出现异常，原因：无法将文本转换成 Integer，Key：" + key, exception);
+            return (T) valueType.parse(value);
+        } catch (Exception exception) {
+            PLUGIN.getLoggerManager().error("获取YML文件属性时出现异常，原因：无法将文本转换成 " + valueType.getType().getSimpleName() + "，Key：" + key, exception);
         }
-        return def;
-    }
-
-    @Override
-    public long getYmlLongValue(@NotNull String path, @NotNull String key, long def) {
-        String value = getYmlValue(path, key);
-        try {
-            return Long.parseLong(value);
-        } catch (Exception exception){
-            PLUGIN.getLoggerManager().error("获取YML文件属性时出现异常，原因：无法将文本转换成 Long，Key：" + key, exception);
-        }
-        return def;
-    }
-
-    @Override
-    public float getYmlFloatValue(@NotNull String path, @NotNull String key, float def) {
-        String value = getYmlValue(path, key);
-        try {
-            return Float.parseFloat(value);
-        } catch (Exception exception){
-            PLUGIN.getLoggerManager().error("获取YML文件属性时出现异常，原因：无法将文本转换成 Float，Key：" + key, exception);
-        }
-        return def;
-    }
-
-    @Override
-    public double getYmlDoubleValue(@NotNull String path, @NotNull String key, double def) {
-        String value = getYmlValue(path, key);
-        try {
-            return Double.parseDouble(value);
-        } catch (Exception exception){
-            PLUGIN.getLoggerManager().error("获取YML文件属性时出现异常，原因：无法将文本转换成 Double，Key：" + key, exception);
-        }
-        return def;
-    }
-
-    @Override
-    public boolean getYmlBooleanValue(@NotNull String path, @NotNull String key) {
-        return StringUtils.equalsIgnoreCase(getYmlValue(path, key), "true");
+        return defaultValue;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.paper.holder;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.common.command.enums.YmlValueType;
 import com.magicrealms.magiclib.common.holder.IBaseMenuHolder;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.ItemUtil;
@@ -149,8 +150,8 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
             return;
         }
         player.playSound(player, plugin.getConfigManage().getYmlValue(configPath, key + ".path"),
-                plugin.getConfigManage().getYmlFloatValue(configPath, key + ".volume", 1.0F),
-                plugin.getConfigManage().getYmlFloatValue(configPath, key + ".pitch", 1.0F));
+                plugin.getConfigManage().getYmlValue(configPath, key + ".volume", 1.0F, YmlValueType.FLOAT),
+                plugin.getConfigManage().getYmlValue(configPath, key + ".pitch", 1.0F, YmlValueType.FLOAT));
     }
 
     public void setItemSlot(int slot, @NotNull ItemStack itemStack) {
@@ -261,7 +262,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
             ItemStack itemStack = cooldownItems.get(clickSlot);
             cooldownItems.remove(clickSlot);
             inventory.setItem(clickSlot, itemStack);
-        }, Math.round(plugin.getConfigManage().getYmlDoubleValue(configPath, key, 1.0D) * 20L));
+        }, Math.round(plugin.getConfigManage().getYmlValue(configPath, key, 1.0D, YmlValueType.DOUBLE) * 20L));
         return true;
     }
 }

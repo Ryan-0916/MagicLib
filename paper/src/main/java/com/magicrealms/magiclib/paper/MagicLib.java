@@ -16,7 +16,7 @@ public class MagicLib extends MagicRealmsPlugin {
 
     private static MagicLib INSTANCE;
 
-    public static final String YML_CONFIRM_MENU = "confirmMenu";
+    public static final String YML_CONFIRM_MENU = "menu/confirm";
 
     @Override
     public void onEnable() {

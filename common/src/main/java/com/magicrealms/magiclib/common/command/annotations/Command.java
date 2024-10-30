@@ -30,7 +30,7 @@ public @interface Command {
      * 玩家权限，Minecraft 本身角色的身份，参数如下
      * ALL : 全部角色 （包括 玩家、管理员、控制台）
      * PLAYER : 玩家 （包括 玩家、管理员）
-     * PERMISSION_GROUP : 权限组 当为权限组时则会触发 permissionGroup() 校验
+     * PERMISSION : 权限节点，当为权限节点时则会按照 permission 参数中的权限文本进行校验
      * ADMIN : 仅管理员
      * CONSOLE : 仅控制台
      * OP : OP (包括 管理员、控制台)

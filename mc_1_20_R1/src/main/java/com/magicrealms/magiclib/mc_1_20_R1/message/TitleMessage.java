@@ -74,7 +74,7 @@ public class TitleMessage extends AbstractMessage {
                 legacy = StringUtil.getBooleanBTWTags(message, "legacy", true);
 
         String subTitle = StringUtil.getStringBTWTags(message, "subTitle").orElse(StringUtil.EMPTY);
-        String title = StringUtil.removeTags(message, "in", "out", "keep", "times", "interval", "desc", "legacy");
+        String title = StringUtil.removeTags(message, "in", "out", "keep", "times", "interval", "desc", "legacy", "subTitle");
 
         if (times <= 1) {
             sendTitle(player, StringUtil.replacePlaceholder(title, "times", "1"), StringUtil.replacePlaceholder(subTitle, "times", "1"), in, keep, out, legacy);

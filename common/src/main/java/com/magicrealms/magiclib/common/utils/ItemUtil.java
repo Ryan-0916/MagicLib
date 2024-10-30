@@ -1,5 +1,6 @@
 package com.magicrealms.magiclib.common.utils;
 
+import com.magicrealms.magiclib.common.command.enums.YmlValueType;
 import com.magicrealms.magiclib.common.manage.ConfigManage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +100,7 @@ public class ItemUtil {
         }
         Builder itemBuilder = new Builder(material.get())
                 .setItemFlag(itemFlags)
-                .setCustomModelData(configManage.getYmlIntegerValue(configPath, key + ".modelData", 0));
+                .setCustomModelData(configManage.getYmlValue(configPath, key + ".modelData", 0, YmlValueType.INTEGER));
         if (name.isPresent()) {
             itemBuilder = itemBuilder.setName(StringUtil.replacePlaceholder(name.get(), map));
         }
@@ -128,7 +129,7 @@ public class ItemUtil {
         Optional<List<String>> loreOptional = configManage.containsYmlKey(configPath, key + ".lore") ?
                 configManage.getYmlListValue(configPath, key + ".lore") : Optional.empty();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(configManage.getYmlIntegerValue(configPath, key + ".modelData", 0));
+        itemMeta.setCustomModelData(configManage.getYmlValue(configPath, key + ".modelData", 0, YmlValueType.INTEGER));
         nameOptional.ifPresent(name -> itemMeta.displayName(UN_ITALIC.append(AdventureHelper.deserializeComponent(
                 AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(name, map))))));
         loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(

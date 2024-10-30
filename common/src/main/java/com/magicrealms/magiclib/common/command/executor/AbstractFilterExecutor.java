@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 
 /**
  * @author Ryan-0916
+ * @Desc 采用策略模式，对命令/命令补全器采用不同的过滤方式
  * @date 2024-05-10
  */
 @Slf4j

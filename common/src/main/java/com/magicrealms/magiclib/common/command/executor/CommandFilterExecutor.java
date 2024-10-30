@@ -20,7 +20,7 @@ import static com.magicrealms.magiclib.common.command.enums.CommandFailureCause.
 
 /**
  * @author Ryan-0916
- * @Desc 具体过滤器工厂类
+ * @Desc 此处用于过滤命令
  * @date 2024-05-10
  */
 public class CommandFilterExecutor extends AbstractFilterExecutor {
