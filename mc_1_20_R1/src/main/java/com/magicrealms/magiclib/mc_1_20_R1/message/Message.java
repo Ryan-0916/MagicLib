@@ -1,14 +1,11 @@
 package com.magicrealms.magiclib.mc_1_20_R1.message;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import net.minecraft.network.protocol.game.ClientboundCustomChatCompletionsPacket;
-import net.minecraft.network.protocol.game.ClientboundDeleteChatPacket;
-import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Ryan-0916
- * @Desc 消息栏消息
  * @date 2024-05-17
  */
 public class Message extends AbstractMessage {
@@ -47,26 +43,28 @@ public class Message extends AbstractMessage {
     }
 
     /**
-     * @param plugin 发送消息的插件
-     * @param player 消息接收者
+     * 给玩家发送一条消息
+     * @param plugin 要发送消息的插件 {@link MagicRealmsPlugin}
+     * @param player 要接收消息的玩家对象
      * @param message 消息内容，内容信息如下
      * 使用方法:
      * <message>Hello world</message> 发送一条 Hello world 的消息给玩家
-     * 内连属性:
-     * <times>5</times> 消息发送次数
-     * <interval>1.5</interval> 消息发送间隔 （秒）
-     * <desc>true</desc> 倒序 - 默认为 false
-     * <legacy>true</legacy> 是否需要支持 &x&F&F&F&F&F&F 的写法
+     * 内连属性：
+     * <times>1</times> 消息的发送次数，默认值：1
+     * <interval>1</interval> 消息发送间隔 （秒），默认值：1
+     * <desc>false</desc> 倒序，默认值：false
+     * <legacy>false</legacy> 是否使用旧版的MiniMessage格式进行序列化例如颜色 &x&F&F&F&F&F&F 的写法，默认值：false
      * 内置变量:
-     * %times% 当前循环的次数 - 如果反转为 true 则会倒序
+     * %times% 当前次数，如果 <desc> 属性为 true 则会倒序
      */
     @Override
     public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
         cleanMessage(player);
-        int times = StringUtil.getIntegerBTWTags(message, "times", 1);
-        double interval = StringUtil.getDoubleBTWTags(message, "interval", 1D);
-        boolean desc = StringUtil.getBooleanBTWTags(message, "desc", false),
-                legacy = StringUtil.getBooleanBTWTags(message, "legacy", true);
+        int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
+        boolean desc = StringUtil.getValueBTWTags(message, "desc", false, ParseType.BOOLEAN),
+                legacy = StringUtil.getValueBTWTags(message, "legacy", false, ParseType.BOOLEAN);
+        double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE);
+
         String msg = StringUtil.removeTags(message, "times", "interval", "desc", "legacy");
         if (times <= 1) {
             String m = StringUtil.replacePlaceholder(msg, "times", "1");
@@ -74,7 +72,6 @@ public class Message extends AbstractMessage {
                             legacy ? AdventureHelper.legacyToMiniMessage(m) : m));
             return;
         }
-
         AtomicInteger index = new AtomicInteger();
         TASK.put(player.getUniqueId(), Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (!player.isOnline() || index.get() >= times) {

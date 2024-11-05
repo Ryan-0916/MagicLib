@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * @author Ryan-0916
- * @Desc 具体调度器 - 对应 MC 版本 1.20.3、1.20.4
+ * @Desc 具体NMS调度器 - 对应 MC 版本 1.20.3、1.20.4
  * @date 2024-07-17
  */
 @SuppressWarnings("unused")
@@ -40,7 +40,7 @@ public class MC_1_20_R3_NMSDispatcher implements INMSDispatcher {
     }
 
     /**
-     * 获取我的世界容器类型
+     * 获取容器类型
      * @param inventory 容器
      */
     private MenuType<?> getCraftInventoryType(@NotNull Inventory inventory) {

@@ -1,5 +1,9 @@
 package com.magicrealms.magiclib.common.utils;
 
+import com.magicrealms.magiclib.common.enums.ParseType;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,19 +13,22 @@ import java.util.regex.Pattern;
 
 /**
  * @author Ryan-0916
- * @Desc 字符串工具类
+ * @Desc 常用字符串工具类
  * @date 2024-05-06
  */
+@Slf4j
 @SuppressWarnings("unused")
 public class StringUtil {
 
     public static final String EMPTY = "";
 
     /**
-     * 获取标签之间的字符串
-     * @param str 原文本
-     * @param tag 标签名称
-     * @return 返回第一个嵌套在标签之间的字符串，如果未找到则返回空 Optional {@link Optional}
+     * 从给定的字符串中提取位于指定标签之间的文本。
+     * 该方法使用正则表达式来搜索字符串中匹配指定标签的内容，并返回匹配到的文本。
+     * 如果未找到匹配项或输入参数无效（如字符串或标签为 {@code null} 或标签为空），则返回一个空的 {@link Optional}。
+     * @param str 要搜索的字符串，可能为 {@code null}。
+     * @param tag 用于定位文本的标签，可能为 {@code null} 或空字符串。
+     * @return 一个包含提取文本的 {@link Optional}，如果未找到文本或输入参数无效，则返回一个空的 {@link Optional}。
      */
     public static Optional<String> getStringBTWTags(String str, String tag) {
         if (str == null || tag == null || tag.isEmpty()) {
@@ -36,96 +43,36 @@ public class StringUtil {
     }
 
     /**
-     * 获取标签之间的整数
-     * @param str 原文本
-     * @param tag 标签名称
-     * @return 返回第一个嵌套在标签之间的整数，如果未找到则返回默认值
+     * 从给定的字符串中提取位于指定标签之间的文本，并尝试将其解析为指定的数据类型。
+     * @param str 要搜索的字符串。
+     * @param tag 用于定位文本的标签。
+     * @param defaultValue 如果未找到标签或解析失败时返回的默认值。
+     * @param valueType 用于解析文本的数据类型，必须是 {@link ParseType} 枚举中的一个常量。
+     * @param <T> 返回值的类型，与 {@code valueType} 相对应。
+     * @return 解析后的值，如果解析失败或未找到标签，则返回 {@code defaultValue}。
      */
-    public static int getIntegerBTWTags(String str, String tag, int def) {
+    @SuppressWarnings("unchecked")
+    public static <T> T getValueBTWTags(String str, String tag, T defaultValue, @NotNull ParseType valueType) {
         Optional<String> text = getStringBTWTags(str, tag);
         if (text.isEmpty()) {
-            return def;
+            return defaultValue;
         }
         try {
-            return Integer.parseInt(text.get());
-        } catch (Exception e) {
-            return def;
+            return (T) valueType.parse(text.get());
+        } catch (Exception exception) {
+            log.error("获取标签中的文件属性时出现异常，原因：无法将文本转换成 {}", valueType.getType().getSimpleName(), exception);
         }
+        return defaultValue;
     }
+
 
     /**
-     * 获取标签之间的长整数
-     * @param str 原文本
-     * @param tag 标签名称
-     * @return 返回第一个嵌套在标签之间的整数，如果未找到则返回默认值
+     * 将包含标签的字符串解析为标签和对应值的列表。
+     * @param str 需要解析的字符串，可能包含形如<tag>value</tag>的标签
+     * @return 解析后的标签和对应值的列表，
+     * 如果包含标签则返回：tag::value
+     * 如果字符串不包含标签，则返回包含"prefix::"前缀和原字符串的列表
      */
-    public static long getLongBTWTags(String str, String tag, long def) {
-        Optional<String> text = getStringBTWTags(str, tag);
-        if (text.isEmpty()) {
-            return def;
-        }
-        try {
-            return Long.parseLong(text.get());
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    /**
-     * 获取标签之间的浮点数
-     * @param str 原文本
-     * @param tag 标签名称
-     * @return 返回第一个嵌套在标签之间的浮点数，如果未找到则返回默认值
-     */
-    public static float getFloatBTWTags(String str, String tag, float def) {
-        Optional<String> text = getStringBTWTags(str, tag);
-        if (text.isEmpty()) {
-            return def;
-        }
-        try {
-            return Float.parseFloat(text.get());
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    /**
-     * 获取标签之间的浮点数
-     * @param str 原文本
-     * @param tag 标签名称
-     * @return 返回第一个嵌套在标签之间的浮点数，如果未找到则返回默认值
-     */
-    public static double getDoubleBTWTags(String str, String tag, double def) {
-        Optional<String> text = getStringBTWTags(str, tag);
-        if (text.isEmpty()) {
-            return def;
-        }
-        try {
-            return Double.parseDouble(text.get());
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-    /**
-     * 获取标签之间的 boolean
-     * @param str 原文本
-     * @param tag 标签名称
-     * @return 返回第一个嵌套在标签之间的 boolean，如果未找到则返回默认值
-     */
-    public static boolean getBooleanBTWTags(String str, String tag, boolean def) {
-        Optional<String> text = getStringBTWTags(str, tag);
-        if (text.isEmpty()) {
-            return def;
-        }
-        try {
-            return Boolean.parseBoolean(text.get());
-        } catch (Exception e) {
-            return def;
-        }
-    }
-
-
     public static List<String> getTagsToList(String str) {
         Pattern pattern = Pattern.compile("<([^>]+)>([^<]*)");
         if (!pattern.matcher(str).find()) {

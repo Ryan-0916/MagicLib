@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.common.manage;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
-import com.magicrealms.magiclib.common.command.enums.YmlValueType;
+import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
@@ -72,11 +72,11 @@ public class ConfigManage implements IConfigManage {
      * @param key 配置文件中的键下级键请用.衔接
      * @param defaultValue 默认值，如果配置文件中找不到该 key
      * 或该 key 的值与我们所需的值类型不匹配时将返回该值
-     * @param valueType {@link YmlValueType} 转换类型
+     * @param valueType {@link ParseType} 转换类型
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T getYmlValue(@NotNull String path, @NotNull String key, T defaultValue, @NotNull YmlValueType valueType) {
+    public <T> T getYmlValue(@NotNull String path, @NotNull String key, T defaultValue, @NotNull ParseType valueType) {
         String value = getYmlValue(path, key);
         try {
             return (T) valueType.parse(value);

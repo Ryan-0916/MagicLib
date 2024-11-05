@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.mc_1_20_R1.message;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
@@ -18,14 +19,11 @@ import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.EventExecutor;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +31,6 @@ import java.util.*;
 
 /**
  * @author Ryan-0916
- * @Desc 成就消息
  * @date 2024-05-06
  */
 public class ToastMessage extends AbstractMessage {
@@ -61,26 +58,27 @@ public class ToastMessage extends AbstractMessage {
     }
 
     /**
-     * @param plugin 发送消息的插件
-     * @param player 消息接收者
+     * 给玩家发送一条 Toast 消息
+     * @param plugin 要发送消息的插件 {@link MagicRealmsPlugin}
+     * @param player 要接收消息的玩家对象
      * @param message 消息内容，内容信息如下
      * 使用方法:
-     * <toast>Hello world</toast> 发送一条 Hello world 的成就信息给玩家
+     * <toast>Hello world</toast> 发送一条 Hello world 的 Toast 消息给玩家
      * 内连属性:
-     * <material>NAME_TAG</material> 成就信息图标，默认：命名牌
-     * <modelData>1</modelData> 图标材质数据，默认：0
-     * <type>TASK</type> 成就类型 TASK CHALLENGE GOAL，默认：TASK
-     * <legacy>true</legacy> 是否需要支持 &x&F&F&F&F&F&F 的写法
-     * <command>tpa admin</command> 按 F 执行的指令，默认：不执行
-     * <inValidateTime>7</inValidateTime> F 的判断时间 （秒）
+     * <legacy>false</legacy> 是否使用旧版的MiniMessage格式进行序列化例如颜色 &x&F&F&F&F&F&F 的写法，默认值：false
+     * <material>NAME_TAG</material> 成就信息图标，默认值：NAME_TAG
+     * <modelData>1</modelData> 图标材质数据，默认值：0
+     * <type>TASK</type> 成就类型 TASK CHALLENGE GOAL，默认值：TASK
+     * <command>tpa admin</command> 按 F 执行的指令，默认值：不执行
+     * <inValidateTime>7</inValidateTime> F 的判断时间 （秒），默认值：7D
      */
     @Override
     public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
         cleanMessage(player);
         /* 获取消息发送的循环次数、循环间隔、图标、类型等 */
-        int modelData = StringUtil.getIntegerBTWTags(message, "modelData", 0);
-        double inValidateTime = StringUtil.getDoubleBTWTags(message, "inValidateTime", 7D);
-        boolean legacy = StringUtil.getBooleanBTWTags(message, "legacy", true);
+        int modelData = StringUtil.getValueBTWTags(message, "modelData", 0, ParseType.INTEGER);
+        double inValidateTime = StringUtil.getValueBTWTags(message, "inValidateTime", 7D, ParseType.DOUBLE);
+        boolean legacy = StringUtil.getValueBTWTags(message, "legacy", false, ParseType.DOUBLE);
         Optional<String> commandOptional = StringUtil.getStringBTWTags(message, "command");
         ItemStack icon = new ItemStack(Optional.of(Material.valueOf(StringUtil.getStringBTWTags(message, "material")
                 .orElse("NAME_TAG"))).orElse(Material.NAME_TAG));
@@ -124,8 +122,8 @@ public class ToastMessage extends AbstractMessage {
 
     /**
      * 移除玩家全部等待发送的 Toast 消息
-     * NMS 不支持移除已显示的内容 因此此行作废
-     * @param player 玩家
+     * NMS 不支持移除已显示的内容 因此此方法将移除玩家的 F 事件
+     * @param player 要移除消息的玩家对象
      */
     @Override
     public void cleanMessage(@NotNull Player player) {

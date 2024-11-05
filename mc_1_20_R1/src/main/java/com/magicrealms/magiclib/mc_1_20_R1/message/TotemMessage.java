@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.mc_1_20_R1.message;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.mojang.datafixers.util.Pair;
@@ -23,7 +24,6 @@ import java.util.stream.Stream;
 
 /**
  * @author Ryan-0916
- * @Desc 图腾消息
  * @date 2024-05-25
  */
 public class TotemMessage extends AbstractMessage {
@@ -47,15 +47,18 @@ public class TotemMessage extends AbstractMessage {
     }
 
     /**
-     * @param plugin 发送消息的插件
-     * @param player 消息接收者
+     * 给玩家发送一条 Totem 消息
+     * @param plugin 要发送消息的插件 {@link MagicRealmsPlugin}
+     * @param player 要接收消息的玩家对象
      * @param message 消息内容，内容信息如下
      * 使用方法:
-     * <totem><modelData>0</modelData></totem> 发送一条图腾消息给玩家
+     * <totem></totem> 发送一条图腾消息给玩家
+     * 内连属性:
+     * <modelData>1</modelData> 图腾材质数据，默认值：0
      */
     @Override
     public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
-        int modelData = StringUtil.getIntegerBTWTags(message, "modelData", 0);
+        int modelData = StringUtil.getValueBTWTags(message, "modelData", 0, ParseType.INTEGER);
         ItemStack totem = new ItemStack(Material.TOTEM_OF_UNDYING);
         ItemMeta itemMeta = totem.getItemMeta();
         itemMeta.setCustomModelData(modelData);
