@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.common.command.executor;
 
-import com.magicrealms.magiclib.common.command.callback.CommandFailure;
+import com.magicrealms.magiclib.common.command.records.CommandFailure;
 import com.magicrealms.magiclib.common.command.enums.CommandRule;
 import com.magicrealms.magiclib.common.command.enums.PermissionType;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package com.magicrealms.magiclib.common.manage;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.command.annotations.Command;
 import com.magicrealms.magiclib.common.command.annotations.TabComplete;
-import com.magicrealms.magiclib.common.command.callback.CommandFailure;
+import com.magicrealms.magiclib.common.command.records.CommandFailure;
 import com.magicrealms.magiclib.common.command.enums.CommandFailureCause;
 import com.magicrealms.magiclib.common.command.executor.CommandFilterExecutor;
 import com.magicrealms.magiclib.common.command.executor.TabCompleteFilterExecutor;
