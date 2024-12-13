@@ -7,6 +7,7 @@ import com.magicrealms.magiclib.mc_1_20_R1.dispatcher.MC_1_20_R1_NMSDispatcher;
 import com.magicrealms.magiclib.mc_1_20_R3.dispatcher.MC_1_20_R3_NMSDispatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,11 @@ public class NMSDispatcher implements INMSDispatcher {
             }
         }
         return INSTANCE;
+    }
+
+    @Override
+    public void openCustomInventory(@NotNull Player player, @NotNull Inventory inventory, @NotNull String title) {
+        NMS_DISPATCHER.openCustomInventory(player, inventory, title);
     }
 
     @Override

@@ -3,8 +3,12 @@ package com.magicrealms.magiclib.mc_1_20_R1.dispatcher;
 import com.magicrealms.magiclib.common.dispatcher.INMSDispatcher;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftContainer;
 import org.bukkit.craftbukkit.v1_20_R1.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -76,19 +80,34 @@ public class MC_1_20_R1_NMSDispatcher implements INMSDispatcher {
     }
 
     @Override
-    public void updateInventoryTitle(@NotNull Player player, @NotNull String title) {
+    public void openCustomInventory(@NotNull Player player, @NotNull Inventory inventory, @NotNull String title) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        serverPlayer.connection.send(new ClientboundOpenScreenPacket(serverPlayer.containerMenu.containerId,
-                getCraftInventoryType(player.getOpenInventory().getTopInventory()),
-                CraftChatMessage.fromJSON(title)));
-        player.updateInventory();
+        MenuType<?> menuType = getCraftInventoryType(inventory);
+        AbstractContainerMenu menu = new CraftContainer(inventory, serverPlayer, serverPlayer.nextContainerCounter());
+        menu = CraftEventFactory.callInventoryOpenEvent(serverPlayer, menu);
+        if (menu != null) {
+            menu.checkReachable = false;
+            serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId, menuType, CraftChatMessage.fromJSON(title)));
+            serverPlayer.containerMenu = menu;
+            serverPlayer.initMenu(menu);
+        }
     }
 
     @Override
+    public void updateInventoryTitle(@NotNull Player player, @NotNull String title) {
+        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+        AbstractContainerMenu menu = serverPlayer.containerMenu;
+        serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId,
+                menu.getType(), CraftChatMessage.fromJSON(title)));
+        serverPlayer.initMenu(menu);
+    }
+
+
+    @Override
     public InventoryView openAnvil(@NotNull Player player, @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title) {
-        InventoryView inventoryView = player.openAnvil(player.getLocation(), true);
+        openCustomInventory(player, Bukkit.createInventory(null, InventoryType.ANVIL), title);
         setupAnvil(player, anvilItems, title);
-        return inventoryView;
+        return player.getOpenInventory();
     }
 
     @Override

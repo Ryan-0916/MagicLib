@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.common.dispatcher;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,16 @@ import java.util.Map;
  * @Desc NMS 调度器接口，用于处理 MagicRealms 插件中与玩家界面相关的 NMS 操作
  * @date 2024-07-17
  */
+@SuppressWarnings("unused")
 public interface INMSDispatcher {
+
+    /**
+     * 打开一个自定义的容器界面，并设置其标题。
+     * @param player 玩家对象，指定要为其打开容器的玩家。
+     * @param inventory 需要打开的容器对象。
+     * @param title 容器的标题字符串，支持 MiniMessage 格式。
+     */
+    void openCustomInventory(@NotNull Player player, @NotNull Inventory inventory, @NotNull String title);
 
     /**
      * 发送网络消息以修改玩家正在打开的容器（如背包、 chest等）的标题
