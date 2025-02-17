@@ -38,6 +38,7 @@ public class MC_1_20_R1_NMSDispatcher implements INMSDispatcher {
         return INSTANCE;
     }
 
+    1
     /**
      * 获取容器类型
      * @param inventory 容器
