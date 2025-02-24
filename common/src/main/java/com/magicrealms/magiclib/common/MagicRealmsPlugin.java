@@ -32,7 +32,6 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        super.onEnable();
         this.setupLoggerManager();
         this.setupConfigManager();
         this.setupCommandManger();

@@ -102,7 +102,6 @@ public class MC_1_20_R1_NMSDispatcher implements INMSDispatcher {
         serverPlayer.initMenu(menu);
     }
 
-
     @Override
     public InventoryView openAnvil(@NotNull Player player, @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title) {
         openCustomInventory(player, Bukkit.createInventory(null, InventoryType.ANVIL), title);
