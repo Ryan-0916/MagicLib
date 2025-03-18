@@ -6,6 +6,7 @@ plugins {
 
 val projectVersion : String by project
 val projectGroup : String by project
+val projectArtifactId : String by project
 
 allprojects {
 
@@ -14,12 +15,15 @@ allprojects {
     apply(plugin = "com.github.johnrengelman.shadow")
 
     repositories {
-        mavenCentral()
-        maven("https://papermc.io/repo/repository/maven-public/")
+        maven {
+            name = "papermc"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
     }
 
     dependencies {
         compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+        compileOnly("org.apache.commons:commons-lang3:3.8.1")
         compileOnly("org.projectlombok:lombok:1.18.24")
         annotationProcessor("org.projectlombok:lombok:1.18.24")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
@@ -48,8 +52,8 @@ allprojects {
         publishing {
             publications {
                 create<MavenPublication>("mavenJava") {
-                    groupId = "com.magicrealms"
-                    artifactId = "magiclib"
+                    groupId = projectGroup
+                    artifactId = projectArtifactId
                     version = projectVersion
                     artifact(tasks.shadowJar)
                 }
