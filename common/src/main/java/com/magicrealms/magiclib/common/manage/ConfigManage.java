@@ -253,21 +253,27 @@ public class ConfigManage {
                 ? Optional.of(yamlConfiguration.get().getStringList(key)) : Optional.empty();
     }
 
+    /**
+     * 获取指定镜像文件中 key 对应的列表值，如果在缓存中找不到，则尝试生成镜像文件并获取值。
+     *
+     * @param mirrorPath 镜像文件的路径，用于查找对应的配置。
+     * @param key 需要查找的 key，返回该 key 对应的列表值。
+     * @return 如果 key 存在且其值为列表类型，返回一个包含字符串的列表的 Optional，否则返回 Optional.empty()。
+     *         如果缓存中找不到该 key 的值，尝试生成镜像文件并查找。
+     */
+    public Optional<List<String>> getYmlListValue(@NotNull String mirrorPath, @NotNull String key) {
+        Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
+        return fileMirrorInfo.isPresent() ? fileMirrorInfo.get()
+                .getYamlConfiguration().contains(key) && fileMirrorInfo.get()
+                .getYamlConfiguration().isList(key) ? Optional.of(fileMirrorInfo.get()
+                .getYamlConfiguration().getStringList(key)) : generateMirrorYamlListKey(mirrorPath, key) : Optional.empty();
+    }
 
 
 
 
-//    public Optional<List<String>> getYmlListValue(@NotNull String path, @NotNull String key) {
-//        YamlConfiguration config = ALL_CONFIG.get(path);
-//        if (config == null) {
-//            return Optional.empty();
-//        }
-//        if (config.contains(key) && config.isList(key)) {
-//            return Optional.of(config.getStringList(key));
-//        }
-//        return createYmlListKey(path, key);
-//    }
-//
+
+
 //    public Optional<Set<String>> getYmlSubKeys(@NotNull String path, @NotNull String key, boolean deep) {
 //        YamlConfiguration config = ALL_CONFIG.get(path);
 //        if (config == null) {
