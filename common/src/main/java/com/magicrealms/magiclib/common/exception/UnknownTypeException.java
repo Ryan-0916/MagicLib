@@ -7,6 +7,7 @@ package com.magicrealms.magiclib.common.exception;
  */
 @SuppressWarnings("unused")
 public class UnknownTypeException extends RuntimeException {
+
     public UnknownTypeException() {
         super();
     }
@@ -22,4 +23,5 @@ public class UnknownTypeException extends RuntimeException {
     public UnknownTypeException(Throwable cause) {
         super(cause);
     }
+
 }

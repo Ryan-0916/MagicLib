@@ -18,6 +18,7 @@ import java.util.function.Consumer;
  * @Desc 配置文件管理器
  * @date 2024-05-26
  */
+@SuppressWarnings("unused")
 public class ConfigManage {
 
     private final MagicRealmsPlugin PLUGIN;
@@ -68,7 +69,7 @@ public class ConfigManage {
      * @param resourcePath 资源文件文件的路径，不能为空
      * @return Optional<YamlConfiguration> 如果文件存在，则返回 YAML 配置对象；否则返回空的 Optional
      */
-    public Optional<YamlConfiguration> getYamlConfiguration(@NotNull String resourcePath) {
+    private Optional<YamlConfiguration> getYamlConfiguration(@NotNull String resourcePath) {
         return getYamlConfiguration(resourcePath, null);
     }
 
@@ -81,7 +82,7 @@ public class ConfigManage {
      *                   如果 sourcePath 为空，将由 mirrorPath 资源文件作为模板生成配置文件
      * @return Optional<YamlConfiguration> 如果文件存在或成功生成，则返回 YAML 配置对象；否则返回空的 Optional
      */
-    public Optional<YamlConfiguration> getYamlConfiguration(@NotNull String mirrorPath, @Nullable String sourcePath) {
+    private Optional<YamlConfiguration> getYamlConfiguration(@NotNull String mirrorPath, @Nullable String sourcePath) {
         mirrorPath = ensureYmlExtension(mirrorPath);
         sourcePath = sourcePath != null ? ensureYmlExtension(sourcePath) : null;
 
