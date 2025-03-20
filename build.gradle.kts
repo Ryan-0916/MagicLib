@@ -21,6 +21,20 @@ allprojects {
         }
     }
 
+    tasks.processResources {
+        filteringCharset = "UTF-8"
+
+        filesMatching(arrayListOf("craft-engine.properties")) {
+            expand(rootProject.properties)
+        }
+
+        filesMatching(arrayListOf("ignite.mod.json")) {
+            expand(
+                Pair("projectVersion", projectVersion),
+            )
+        }
+    }
+
     dependencies {
         compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
         compileOnly("org.apache.commons:commons-lang3:3.8.1")
