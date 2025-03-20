@@ -1,10 +1,9 @@
 plugins {
-    id("io.papermc.paperweight.userdev") version "1.7.0"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
 }
 
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20.4-R0.1-SNAPSHOT")
-    compileOnly(files("libs/purpur-1.20.4.jar"))
     compileOnly(project(":common"))
 }
 
