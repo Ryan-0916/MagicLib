@@ -1,6 +1,6 @@
 package com.magicrealms.mod.mixin;
 
-import com.magicrealms.mod.entity.animal.Hedgehog;
+import com.magicrealms.mod.entity.animal.Bat2;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -21,13 +21,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @SuppressWarnings("unused")
 public abstract class MixinEntityType <T extends Entity> implements FeatureElement, EntityTypeTest<Entity, T> {
 
-
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void entityRegister(CallbackInfo ci) {
-        register("hedgehog", EntityType.Builder.of(Hedgehog::new, MobCategory.MISC).noLootTable().noSave().noSummon()
+        System.out.println("尝试注册刺猬");
+        EntityType<Bat2> hedgehogEntityType = register("hedgehog",
+                EntityType.Builder.of(Bat2::new, MobCategory.MISC).noLootTable().noSave()
                 .sized(0.6F, 0.6F)
                 .eyeHeight(0.4F)
-                .clientTrackingRange(10));
+                .clientTrackingRange(10)
+        );
+        System.out.println("注册刺猬成功！");
+        System.out.println(hedgehogEntityType);
+        assert hedgehogEntityType != null;
+        System.out.println("是否可以Summon" + hedgehogEntityType.canSummon());
     }
 
     @Shadow

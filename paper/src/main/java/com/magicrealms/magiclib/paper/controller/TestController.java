@@ -9,6 +9,7 @@ import com.magicrealms.magiclib.paper.menu.InputMenu;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,32 +24,38 @@ public class TestController {
     
     @Command(text = "^test$", permissionType = PermissionType.PLAYER)
     public void test(CommandSender sender, String[] args) {
-        new InputMenu.Builder().plugin(MagicLib.getInstance())
-                .player((Player) sender)
-                .customValidator(v -> {
-                    InputValidatorResult result = new InputValidatorResult();
-                    if (StringUtils.isBlank(v)) {
-                        result.setMessage("您为啥输入空啊");
-                        return result;
-                    }
-                    if (v.equals("炼奶")) {
-                        result.setMessage("你凭啥输入自己的名字啊？");
-                        return result;
-                    }
-                    if (v.equals("宁睿")) {
-                        result.setMessage("你凭啥输入我的名字啊？");
-                        return result;
-                    }
-                    result.setMessage("你输入的文字符合");
-                    result.setValidator(true);
-                    return result;
-                })
-                .resultSlot(1)
-                .itemStack(new ItemStack(Material.STONE))
-                .cancelTask(() -> {})
-                .confirmConsumer(e -> MessageDispatcher.getInstance().sendMessage(MagicLib.getInstance(),
-                        sender, e))
-                .open();
+//        Player player = ((Player) sender);
+
+
+//        player.getWorld().spawnEntity(player.getLocation(), EntityType.values());
+
+
+//        new InputMenu.Builder().plugin(MagicLib.getInstance())
+//                .player((Player) sender)
+//                .customValidator(v -> {
+//                    InputValidatorResult result = new InputValidatorResult();
+//                    if (StringUtils.isBlank(v)) {
+//                        result.setMessage("您为啥输入空啊");
+//                        return result;
+//                    }
+//                    if (v.equals("炼奶")) {
+//                        result.setMessage("你凭啥输入自己的名字啊？");
+//                        return result;
+//                    }
+//                    if (v.equals("宁睿")) {
+//                        result.setMessage("你凭啥输入我的名字啊？");
+//                        return result;
+//                    }
+//                    result.setMessage("你输入的文字符合");
+//                    result.setValidator(true);
+//                    return result;
+//                })
+//                .resultSlot(1)
+//                .itemStack(new ItemStack(Material.STONE))
+//                .cancelTask(() -> {})
+//                .confirmConsumer(e -> MessageDispatcher.getInstance().sendMessage(MagicLib.getInstance(),
+//                        sender, e))
+//                .open();
     }
 
 }
