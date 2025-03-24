@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "package": "com.magicrealms.mod.mixin",
+  "plugin": "com.magicrealms.mod.MagicLibPlugin",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinEntityType"
+  ]
+}

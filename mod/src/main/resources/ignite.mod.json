@@ -1,0 +1,7 @@
+{
+  "id": "magiclib",
+  "version": "${projectVersion}",
+  "mixins": [
+    "mixins.magiclib.json"
+  ]
+}
