@@ -1,6 +1,6 @@
 package com.magicrealms.mod.mixin;
 
-import com.magicrealms.mod.entity.animal.Bat2;
+import com.magicrealms.mod.entity.animal.Hedgehog;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -23,9 +23,8 @@ public abstract class MixinEntityType <T extends Entity> implements FeatureEleme
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void entityRegister(CallbackInfo ci) {
-        System.out.println("尝试注册刺猬");
-        EntityType<Bat2> hedgehogEntityType = register("hedgehog",
-                EntityType.Builder.of(Bat2::new, MobCategory.MISC).noLootTable().noSave()
+        EntityType<Hedgehog> hedgehogEntityType = register("hedgehog",
+                EntityType.Builder.of(Hedgehog::new, MobCategory.MISC).noLootTable().noSave()
                 .sized(0.6F, 0.6F)
                 .eyeHeight(0.4F)
                 .clientTrackingRange(10)

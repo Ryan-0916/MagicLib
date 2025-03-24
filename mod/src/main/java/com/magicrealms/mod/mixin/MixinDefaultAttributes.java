@@ -31,7 +31,6 @@ public class MixinDefaultAttributes {
     private static void getSupplier(EntityType<? extends LivingEntity> livingEntity,
                                                  CallbackInfoReturnable<AttributeSupplier> cir) {
         if(!SUPPLIERS.containsKey(livingEntity)) {
-            System.out.println("成功拦截");
             cir.setReturnValue(Animal.createAnimalAttributes()
                     .add(Attributes.MAX_HEALTH, 6.0)
                     .add(Attributes.MOVEMENT_SPEED, 0.25).build());
