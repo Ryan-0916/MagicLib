@@ -46,7 +46,8 @@ public abstract class MixinEntity {
                     }
                 }
             }
-            System.out.println("拦截");
+
+            cir.setReturnValue(this.bukkitEntity);
         }
     }
 
