@@ -61,6 +61,10 @@ public class Hedgehog extends Animal {
         super(entityType, level);
     }
 
+    public void tick() {
+        this.remove(RemovalReason.DISCARDED);
+    }
+
     protected void registerGoals() {
         super.goalSelector.addGoal(0, new FloatGoal(this));
         super.goalSelector.addGoal(1, new PanicGoal(this, 2.0));
