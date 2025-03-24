@@ -29,10 +29,6 @@ public abstract class MixinEntityType <T extends Entity> implements FeatureEleme
                 .eyeHeight(0.4F)
                 .clientTrackingRange(10)
         );
-        System.out.println("注册刺猬成功！");
-        System.out.println(hedgehogEntityType);
-        assert hedgehogEntityType != null;
-        System.out.println("是否可以Summon" + hedgehogEntityType.canSummon());
     }
 
     @Shadow
