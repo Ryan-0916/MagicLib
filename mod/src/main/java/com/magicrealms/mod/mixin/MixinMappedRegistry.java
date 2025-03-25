@@ -1,5 +1,6 @@
 package com.magicrealms.mod.mixin;
 
+import me.lucko.spark.paper.lib.asm.Opcodes;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,7 +30,7 @@ public abstract class MixinMappedRegistry<T> {
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/core/MappedRegistry;unregisteredIntrusiveHolders:Ljava/util/Map;",
-                    opcode = 181
+                    opcode = Opcodes.PUTFIELD
             )
     )
     private void skipUnregisteredIntrusiveHoldersAssignment(MappedRegistry<?> instance, Map<T, Holder.Reference<T>> value) {

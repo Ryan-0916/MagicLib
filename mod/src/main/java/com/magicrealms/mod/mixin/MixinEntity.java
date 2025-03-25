@@ -46,7 +46,6 @@ public abstract class MixinEntity {
                     }
                 }
             }
-
             cir.setReturnValue(this.bukkitEntity);
         }
     }
