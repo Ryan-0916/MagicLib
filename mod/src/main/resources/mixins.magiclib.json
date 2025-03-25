@@ -8,6 +8,7 @@
   "mixins": [
     "MixinDefaultAttributes",
     "MixinEntity",
-    "MixinEntityType"
+    "MixinEntityType",
+    "MixinMappedRegistry"
   ]
 }
