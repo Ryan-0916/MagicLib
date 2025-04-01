@@ -15,7 +15,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
@@ -49,7 +49,7 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static Optional<String> serializerUnClone(@NotNull ItemStack itemStack) {
+    public static Optional<String> serializerUnClone(ItemStack itemStack) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)
         ){
@@ -62,12 +62,12 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static Optional<String> serializer(@NotNull ItemStack itemStack) {
+    public static Optional<String> serializer(ItemStack itemStack) {
         return serializerUnClone(itemStack.clone());
     }
 
     @NotNull
-    public static Optional<ItemStack> deserializer(@NotNull String deserializer) {
+    public static Optional<ItemStack> deserializer(String deserializer) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(deserializer));
              BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)
         ){
@@ -79,15 +79,15 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static ItemStack getItemStackByConfig(@NotNull ConfigManage configManage, @NotNull String configPath,
-                                                 @NotNull String key, ItemFlag... itemFlags) {
+    public static ItemStack getItemStackByConfig(ConfigManage configManage, String configPath,
+                                                 String key, ItemFlag... itemFlags) {
         return getItemStackByConfig(configManage, configPath, key, null, itemFlags);
     }
 
     @SuppressWarnings("DuplicatedCode")
     @NotNull
-    public static ItemStack getItemStackByConfig(@NotNull ConfigManage configManage, @NotNull String configPath,
-                                                 @NotNull String key, @Nullable Map<String, String> map,
+    public static ItemStack getItemStackByConfig(ConfigManage configManage, String configPath,
+                                                 String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
         Optional<Material> material = Optional.ofNullable(Material.matchMaterial(
                 configManage.getYmlValue(configPath, key + ".mats")));
@@ -111,18 +111,18 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static ItemStack setItemStackByConfig(@NotNull ConfigManage configManage, @NotNull ItemStack itemStack,
-                                                 @NotNull String configPath,
-                                                 @NotNull String key,
+    public static ItemStack setItemStackByConfig(ConfigManage configManage, ItemStack itemStack,
+                                                 String configPath,
+                                                 String key,
                                                  ItemFlag... itemFlags) {
        return setItemStackByConfig(configManage, itemStack, configPath, key, null, itemFlags);
     }
 
     @SuppressWarnings("DuplicatedCode")
     @NotNull
-    public static ItemStack setItemStackByConfig(@NotNull ConfigManage configManage, @NotNull ItemStack itemStack,
-                                                 @NotNull String configPath,
-                                                 @NotNull String key, @Nullable Map<String, String> map,
+    public static ItemStack setItemStackByConfig(ConfigManage configManage, ItemStack itemStack,
+                                                 String configPath,
+                                                 String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
         Optional<String> nameOptional = configManage.containsYmlKey(configPath, key + ".name") ?
                 Optional.of(configManage.getYmlValue(configPath, key + ".name")) : Optional.empty();
@@ -160,13 +160,13 @@ public class ItemUtil {
         }
     }
 
-    public static Component getItemName(@NotNull ItemStack itemStack) {
+    public static Component getItemName(ItemStack itemStack) {
         return itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName() ?
                 itemStack.getItemMeta().displayName() :
                 Component.translatable((itemStack.getType().isBlock() ? "block." : "item.") + itemStack.getType().getKey().toString().replace(':', '.'));
     }
 
-    public static boolean canFitIntoInventory(@NotNull Player player, @Nullable ItemStack itemStack) {
+    public static boolean canFitIntoInventory(Player player, @Nullable ItemStack itemStack) {
         PlayerInventory playerInventory = player.getInventory();
         if (!player.isOnline()){
             return false;
@@ -201,7 +201,7 @@ public class ItemUtil {
         return needFitNum.get() <= 0;
     }
 
-    public static boolean giveItemToPlayerInventory(@NotNull Player player, @NotNull ItemStack itemStack) {
+    public static boolean giveItemToPlayerInventory(Player player, ItemStack itemStack) {
         PlayerInventory playerInventory = player.getInventory();
         if (!player.isOnline()){
             return false;
@@ -232,23 +232,23 @@ public class ItemUtil {
         private int customModelData;
         private ItemFlag[] itemFlags;
 
-        public Builder(@NotNull Material material) {
+        public Builder(Material material) {
             this.MATERIAL = material;
         }
-        public Builder setComponentName(@NotNull Component name) {
+        public Builder setComponentName(Component name) {
             this.name = name;
             return this;
         }
-        public Builder setName(@NotNull String name) {
+        public Builder setName(String name) {
             this.name = UN_ITALIC.append(AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(name)));
             return this;
         }
-        public Builder setComponentLore(@NotNull List<Component> lore) {
+        public Builder setComponentLore(List<Component> lore) {
             this.lore = lore;
             return this;
         }
 
-        public Builder setLore(@NotNull List<String> lore) {
+        public Builder setLore(List<String> lore) {
             this.lore = lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(l)))).collect(Collectors.toList());
             return this;
         }

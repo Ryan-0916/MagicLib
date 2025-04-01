@@ -20,7 +20,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -126,7 +126,7 @@ public class InputMenu {
         }, PLUGIN);
     }
 
-    private void setupAnvil(@Nullable ItemStack firstItem, @Nullable ItemStack secondItem, @Nullable ItemStack resultItem, @NotNull String placeholder) {
+    private void setupAnvil(@Nullable ItemStack firstItem, @Nullable ItemStack secondItem, @Nullable ItemStack resultItem, String placeholder) {
         Map<Integer, ItemStack> map = new HashMap<>();
         if(firstItem != null) map.put(0, firstItem);
         if(secondItem != null) map.put(1, secondItem);
@@ -145,32 +145,32 @@ public class InputMenu {
 
         private Function<String, InputValidatorResult> customValidator;
 
-        public Builder itemStack(@NotNull ItemStack itemStack) {
+        public Builder itemStack(ItemStack itemStack) {
             this.itemStack = itemStack;
             return this;
         }
 
-        public Builder confirmConsumer(@NotNull Consumer<String> confirmConsumer) {
+        public Builder confirmConsumer(Consumer<String> confirmConsumer) {
             this.confirmConsumer = confirmConsumer;
             return this;
         }
 
-        public Builder cancelTask(@NotNull Runnable cancelTask) {
+        public Builder cancelTask(Runnable cancelTask) {
             this.cancelRunnable = cancelTask;
             return this;
         }
 
-        public Builder player(@NotNull Player player) {
+        public Builder player(Player player) {
             this.player = player;
             return this;
         }
 
-        public Builder customValidator(@NotNull Function<String, InputValidatorResult> customValidator) {
+        public Builder customValidator(Function<String, InputValidatorResult> customValidator) {
             this.customValidator = customValidator;
             return this;
         }
 
-        public Builder plugin(@NotNull MagicRealmsPlugin plugin) {
+        public Builder plugin(MagicRealmsPlugin plugin) {
             this.plugin = plugin;
             return this;
         }

@@ -17,7 +17,7 @@ import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -57,7 +57,7 @@ public class TotemMessage extends AbstractMessage {
      * <modelData>1</modelData> 图腾材质数据，默认值：0
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         int modelData = StringUtil.getValueBTWTags(message, "modelData", 0, ParseType.INTEGER);
         ItemStack totem = new ItemStack(Material.TOTEM_OF_UNDYING);
         ItemMeta itemMeta = totem.getItemMeta();
@@ -66,7 +66,7 @@ public class TotemMessage extends AbstractMessage {
         sendTotem(player, totem);
     }
 
-    public void sendTotem(@NotNull Player player, @NotNull ItemStack totem) {
+    public void sendTotem(Player player, ItemStack totem) {
         ServerPlayer serverPlayer = ((CraftPlayer)player).getHandle();
         serverPlayer.connection.send(new ClientboundSetEquipmentPacket(player.getEntityId(), List.of(Pair.of(EquipmentSlot.OFFHAND, CraftItemStack.asNMSCopy(totem)))));
         Stream.of(new Thread(() -> {
@@ -82,7 +82,7 @@ public class TotemMessage extends AbstractMessage {
 
 
     @Override
-    public void cleanMessage(@NotNull Player player) {
+    public void cleanMessage(Player player) {
 
     }
 }

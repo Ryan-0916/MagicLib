@@ -8,7 +8,7 @@ import com.magicrealms.magiclib.common.command.factory.CommandFilterFactory;
 import com.magicrealms.magiclib.common.command.factory.PermissionFilterFactory;
 import com.magicrealms.magiclib.common.command.filter.label.LabelFilter;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -25,9 +25,9 @@ public class TabCompleteFilterExecutor extends AbstractFilterExecutor {
     private TabCompleteFilterExecutor() {}
 
     @Override
-    protected Boolean abstractFilter(@NotNull CommandSender sender,
-                              @NotNull String label,
-                              @NotNull String[] args,
+    protected Boolean abstractFilter(CommandSender sender,
+                              String label,
+                              String[] args,
                               @Nullable String text,
                               @Nullable String permission,
                               @Nullable String annotateLabel,

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.Map;
 
@@ -45,26 +45,26 @@ public class NMSDispatcher implements INMSDispatcher {
     }
 
     @Override
-    public void openCustomInventory(@NotNull Player player, @NotNull Inventory inventory, @NotNull String title) {
+    public void openCustomInventory(Player player, Inventory inventory, String title) {
         NMS_DISPATCHER.openCustomInventory(player, inventory, title);
     }
 
     @Override
-    public void updateInventoryTitle(@NotNull Player player, @NotNull String title) {
+    public void updateInventoryTitle(Player player, String title) {
         NMS_DISPATCHER.updateInventoryTitle(player, AdventureHelper.serializeComponent(
                 AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(title))));
     }
 
     @Override
-    public InventoryView openAnvil(@NotNull Player player,
-                                   @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title) {
+    public InventoryView openAnvil(Player player,
+                                   Map<Integer, ItemStack> anvilItems, String title) {
         return NMS_DISPATCHER.openAnvil(player, anvilItems, AdventureHelper.serializeComponent(
                 AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(title))));
     }
 
     @Override
-    public void setupAnvil(@NotNull Player player,
-                           @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title) {
+    public void setupAnvil(Player player,
+                           Map<Integer, ItemStack> anvilItems, String title) {
         NMS_DISPATCHER.setupAnvil(player, anvilItems, AdventureHelper.serializeComponent(
                 AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(title))));
     }

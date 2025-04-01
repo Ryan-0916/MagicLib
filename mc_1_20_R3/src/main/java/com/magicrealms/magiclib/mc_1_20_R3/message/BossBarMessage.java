@@ -7,7 +7,7 @@ import com.magicrealms.magiclib.common.utils.EnumUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import net.minecraft.world.BossEvent;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class BossBarMessage extends AbstractMessage {
      * %times% 当前次数，如果 <desc> 属性为 true 则会倒序
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
         int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
         double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE);
@@ -83,7 +83,7 @@ public class BossBarMessage extends AbstractMessage {
     }
 
     @Override
-    public void cleanMessage(@NotNull Player player) {
+    public void cleanMessage(Player player) {
 
     }
 }

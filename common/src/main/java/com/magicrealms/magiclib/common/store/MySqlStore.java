@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.common.store;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
-import org.jetbrains.annotations.NotNull;
+
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public class MySqlStore {
     private final String USER;
     private final String PASSWORD;
 
-    public MySqlStore(@NotNull MagicRealmsPlugin plugin, @NotNull String host, int port, @NotNull String database, boolean useSSL, @NotNull String user, @NotNull String password) {
+    public MySqlStore(MagicRealmsPlugin plugin, String host, int port, String database, boolean useSSL, String user, String password) {
         this.PLUGIN = plugin;
         this.HOST = host;
         this.PORT = port;
@@ -48,7 +48,7 @@ public class MySqlStore {
         }
     }
 
-    public void select(@NotNull String sql, @NotNull Object[] obj, @NotNull Consumer<ResultSet> resultConsumer){
+    public void select(String sql, Object[] obj, Consumer<ResultSet> resultConsumer){
         Optional<Connection> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return;
         try (Connection connection = connectionOptional.get();
@@ -60,7 +60,7 @@ public class MySqlStore {
         }
     }
 
-    public int update(@NotNull String sql, @NotNull Object[] obj){
+    public int update(String sql, Object[] obj){
         Optional<Connection> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return 0;
         try (Connection connection = connectionOptional.get();
@@ -78,7 +78,7 @@ public class MySqlStore {
      * @param tableName 表名
      * @return {@link Boolean}
      */
-    public boolean existTable(@NotNull String tableName) {
+    public boolean existTable(String tableName) {
         Optional<Connection> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Connection connection = connectionOptional.get();

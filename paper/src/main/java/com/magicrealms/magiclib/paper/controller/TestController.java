@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  * @author Ryan-0916
@@ -21,7 +22,15 @@ import org.bukkit.inventory.ItemStack;
 @Listener
 @SuppressWarnings("unused")
 public class TestController {
-    
+
+
+    @Command(text = "^hello$")
+    public void hello(CommandSender sender, String[] args) {
+        System.out.println("hello");
+
+    }
+
+
     @Command(text = "^test$", permissionType = PermissionType.PLAYER)
     public void test(CommandSender sender, String[] args) {
 //        Player player = ((Player) sender);

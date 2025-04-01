@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.Map;
 
@@ -22,14 +22,14 @@ public interface INMSDispatcher {
      * @param inventory 需要打开的容器对象。
      * @param title 容器的标题字符串，支持 MiniMessage 格式。
      */
-    void openCustomInventory(@NotNull Player player, @NotNull Inventory inventory, @NotNull String title);
+    void openCustomInventory(Player player, Inventory inventory, String title);
 
     /**
      * 发送网络消息以修改玩家正在打开的容器（如背包、 chest等）的标题
      * @param player 玩家对象，指定要修改界面标题的玩家
      * @param title  新的标题字符串，支持 MiniMessage 格式以进行动态文本渲染
      */
-    void updateInventoryTitle(@NotNull Player player, @NotNull String title);
+    void updateInventoryTitle(Player player, String title);
 
     /**
      * 发送网络消息以打开铁砧并设置其标题
@@ -38,7 +38,7 @@ public interface INMSDispatcher {
      * @param title 铁砧的标题字符串，支持 MiniMessage 格式
      * @return 返回打开的铁砧视图对象，可用于进一步的界面操作
      */
-    InventoryView openAnvil(@NotNull Player player, @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title);
+    InventoryView openAnvil(Player player, Map<Integer, ItemStack> anvilItems, String title);
 
     /**
      * 设置玩家正在打开的铁砧的物品与标题（通常用于初始化或更新铁砧界面）
@@ -48,6 +48,6 @@ public interface INMSDispatcher {
      * @param anvilItems 铁砧中展示的物品映射，键为物品槽位，值为物品堆栈
      * @param title 铁砧的标题字符串，支持 MiniMessage 格式
      */
-    void setupAnvil(@NotNull Player player,
-                    @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title);
+    void setupAnvil(Player player,
+                    Map<Integer, ItemStack> anvilItems, String title);
 }

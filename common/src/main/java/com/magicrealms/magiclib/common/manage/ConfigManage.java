@@ -5,7 +5,7 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.manage.entity.FileMirrorInfo;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -58,7 +58,7 @@ public class ConfigManage {
      *                   - 调用 {@link ConfigManage#getYamlConfiguration(String)} 方法获取每个资源文件的 Yaml 配置对象。
      *                   - 如果配置对象存在，将资源路径与 {@link FileMirrorInfo} 对象存入 ALL_CONFIG。
      */
-    public void loadMirrorConfig(@NotNull String mirrorPath, @Nullable String sourcePath) {
+    public void loadMirrorConfig(String mirrorPath, @Nullable String sourcePath) {
         getYamlConfiguration(mirrorPath, sourcePath)
                 .ifPresent(e -> ALL_CONFIG.put(mirrorPath, new FileMirrorInfo(mirrorPath, sourcePath, e)));
     }
@@ -69,7 +69,7 @@ public class ConfigManage {
      * @param resourcePath 资源文件文件的路径，不能为空
      * @return Optional<YamlConfiguration> 如果文件存在，则返回 YAML 配置对象；否则返回空的 Optional
      */
-    private Optional<YamlConfiguration> getYamlConfiguration(@NotNull String resourcePath) {
+    private Optional<YamlConfiguration> getYamlConfiguration(String resourcePath) {
         return getYamlConfiguration(resourcePath, null);
     }
 
@@ -82,7 +82,7 @@ public class ConfigManage {
      *                   如果 sourcePath 为空，将由 mirrorPath 资源文件作为模板生成配置文件
      * @return Optional<YamlConfiguration> 如果文件存在或成功生成，则返回 YAML 配置对象；否则返回空的 Optional
      */
-    private Optional<YamlConfiguration> getYamlConfiguration(@NotNull String mirrorPath, @Nullable String sourcePath) {
+    private Optional<YamlConfiguration> getYamlConfiguration(String mirrorPath, @Nullable String sourcePath) {
         mirrorPath = ensureYmlExtension(mirrorPath);
         sourcePath = sourcePath != null ? ensureYmlExtension(sourcePath) : null;
 
@@ -133,7 +133,7 @@ public class ConfigManage {
      * @param mirrorPath 镜像文件地址，既文件真实地址，而源库文件地址
      * @param callBack 回调函数，用于返回操作结果（成功或失败）
      */
-    public void reloadConfig(@NotNull String mirrorPath, @NotNull Consumer<Boolean> callBack) {
+    public void reloadConfig(String mirrorPath, Consumer<Boolean> callBack) {
         Optional<FileMirrorInfo> fileMirrorInfoOptional = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
         if (fileMirrorInfoOptional.isEmpty()) {
             callBack.accept(false);
@@ -154,7 +154,7 @@ public class ConfigManage {
      * @param key 配置文件中的键下级键请用.衔接
      * @return 配置文件值
      */
-    public String getYmlValue(@NotNull String mirrorPath, @NotNull String key) {
+    public String getYmlValue(String mirrorPath, String key) {
         Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
         return fileMirrorInfo.isPresent() ? fileMirrorInfo.get()
                 .getYamlConfiguration().contains(key) ? fileMirrorInfo.get()
@@ -167,7 +167,7 @@ public class ConfigManage {
      * @param key 配置文件 key
      * @return 返回配置文件中是否存在该 key
      */
-    public boolean containsYmlKey(@NotNull String mirrorPath, @NotNull String key) {
+    public boolean containsYmlKey(String mirrorPath, String key) {
         Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
         return fileMirrorInfo.isPresent() &&
                 fileMirrorInfo.get().getYamlConfiguration().contains(key);
@@ -182,7 +182,7 @@ public class ConfigManage {
      * @param valueType {@link ParseType} 转换类型
      */
     @SuppressWarnings("unchecked")
-    public <T> T getYmlValue(@NotNull String mirrorPath, @NotNull String key, T defaultValue, @NotNull ParseType valueType) {
+    public <T> T getYmlValue(String mirrorPath, String key, T defaultValue, ParseType valueType) {
         String value = getYmlValue(mirrorPath, key);
         try {
             return (T) valueType.parse(value);
@@ -198,7 +198,7 @@ public class ConfigManage {
      * @param key 需要镜像生成的 key
      * @return 返回生成该 key 的 value （如若此 key 非父 key）
      */
-    private Optional<YamlConfiguration> mirrorCreateYamlKey(@NotNull String mirrorPath, @NotNull String key) {
+    private Optional<YamlConfiguration> mirrorCreateYamlKey(String mirrorPath, String key) {
         Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
         if (fileMirrorInfo.isEmpty()) {
             return Optional.empty();
@@ -233,7 +233,7 @@ public class ConfigManage {
      * @param key 需要镜像生成的 key
      * @return 返回生成该 key 的 value （如若此 key 非父 key）
      */
-    private Optional<String> generateMirrorYamlKey(@NotNull String mirrorPath, @NotNull String key) {
+    private Optional<String> generateMirrorYamlKey(String mirrorPath, String key) {
         Optional<YamlConfiguration> yamlConfiguration = mirrorCreateYamlKey(mirrorPath, key);
         return yamlConfiguration.isPresent()
                 && !yamlConfiguration.get().isList(key)
@@ -246,7 +246,7 @@ public class ConfigManage {
      * @param key 需要镜像生成的 key
      * @return 返回生成该 key 的 value （如若此 key 非父 key）
      */
-    private Optional<List<String>> generateMirrorYamlListKey(@NotNull String mirrorPath, @NotNull String key) {
+    private Optional<List<String>> generateMirrorYamlListKey(String mirrorPath, String key) {
         Optional<YamlConfiguration> yamlConfiguration = mirrorCreateYamlKey(mirrorPath, key);
         return yamlConfiguration.isPresent()
                 && yamlConfiguration.get().isList(key)
@@ -261,7 +261,7 @@ public class ConfigManage {
      * @return 如果 key 存在且其值为列表类型，返回一个包含字符串的列表的 Optional，否则返回 Optional.empty()。
      *         如果缓存中找不到该 key 的值，尝试生成镜像文件并查找。
      */
-    public Optional<List<String>> getYmlListValue(@NotNull String mirrorPath, @NotNull String key) {
+    public Optional<List<String>> getYmlListValue(String mirrorPath, String key) {
         Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
         return fileMirrorInfo.isPresent() ? fileMirrorInfo.get()
                 .getYamlConfiguration().contains(key) && fileMirrorInfo.get()
@@ -274,7 +274,7 @@ public class ConfigManage {
 
 
 
-//    public Optional<Set<String>> getYmlSubKeys(@NotNull String path, @NotNull String key, boolean deep) {
+//    public Optional<Set<String>> getYmlSubKeys(String path, String key, boolean deep) {
 //        YamlConfiguration config = ALL_CONFIG.get(path);
 //        if (config == null) {
 //            return Optional.empty();
@@ -289,16 +289,16 @@ public class ConfigManage {
 //        return Optional.empty();
 //    }
 //
-//    public boolean containsYmlKey(@NotNull String path, @NotNull String key) {
+//    public boolean containsYmlKey(String path, String key) {
 //        YamlConfiguration config = ALL_CONFIG.get(path);
 //        return config != null && config.contains(key);
 //    }
 //
-//    public Optional<YamlConfiguration> getYamlConfiguration(@NotNull String path){
+//    public Optional<YamlConfiguration> getYamlConfiguration(String path){
 //        return getYamlConfiguration(path, null);
 //    }
 //
-//    public Optional<YamlConfiguration> getYamlConfiguration(@NotNull String path, @Nullable String referencePath){
+//    public Optional<YamlConfiguration> getYamlConfiguration(String path, @Nullable String referencePath){
 //        path = path.endsWith(".yml") ? path : path + ".yml";
 //        referencePath = referencePath == null ? null : referencePath.endsWith(".yml") ? referencePath : referencePath + ".yml";
 //        File config = new File(PLUGIN.getDataFolder(), path);
@@ -317,7 +317,7 @@ public class ConfigManage {
 //        return Optional.empty();
 //    }
 //
-//    private Optional<Set<String>> createConfigurationSection(@NotNull String path, @NotNull String key, boolean deep) {
+//    private Optional<Set<String>> createConfigurationSection(String path, String key, boolean deep) {
 //        YamlConfiguration config = ALL_CONFIG.get(path);
 //        InputStream inputStream = PLUGIN.getResource(path + ".yml");
 //        if (config == null || inputStream == null) {
@@ -341,7 +341,7 @@ public class ConfigManage {
 //
 //    }
 //
-//    private Optional<String> createYmlKey(@NotNull String path, @NotNull String key) {
+//    private Optional<String> createYmlKey(String path, String key) {
 //        YamlConfiguration config = ALL_CONFIG.get(path);
 //        InputStream inputStream = PLUGIN.getResource(path + ".yml");
 //        if (config == null || inputStream == null) {
@@ -365,7 +365,7 @@ public class ConfigManage {
 //        return Optional.empty();
 //    }
 //
-//    private Optional<List<String>> createYmlListKey(@NotNull String path, @NotNull String key) {
+//    private Optional<List<String>> createYmlListKey(String path, String key) {
 //        YamlConfiguration config = ALL_CONFIG.get(path);
 //        InputStream inputStream = PLUGIN.getResource(path + ".yml");
 //        if (config == null || inputStream == null) {

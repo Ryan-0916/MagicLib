@@ -2,7 +2,7 @@ package com.magicrealms.magiclib.common.command.filter.permission;
 
 import com.magicrealms.magiclib.common.command.filter.AbstractChannelFilter;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -17,7 +17,7 @@ public class OpPermissionFilter extends AbstractChannelFilter {
     private OpPermissionFilter(){}
 
     @Override
-    public Boolean filter(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args,
+    public Boolean filter(CommandSender sender, String label, String[] args,
                           @Nullable String text, @Nullable String permission, @Nullable String annotateLabel) {
         return sender.isOp();
     }

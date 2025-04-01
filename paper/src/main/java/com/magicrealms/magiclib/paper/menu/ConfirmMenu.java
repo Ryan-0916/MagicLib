@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.HashMap;
 
@@ -53,20 +53,20 @@ public class ConfirmMenu extends BaseMenuHolder {
     }
 
     @Override
-    public void openEvent(@NotNull InventoryOpenEvent e) {
+    public void openEvent(InventoryOpenEvent e) {
         super.openEvent(e);
         e.titleOverride(super.getTitle(new HashMap<>()));
         manualClose = true;
     }
 
     @Override
-    public void closeEvent(@NotNull InventoryCloseEvent e) {
+    public void closeEvent(InventoryCloseEvent e) {
         super.closeEvent(e);
         if (manualClose) Bukkit.getScheduler().runTask(MagicLib.getInstance(), CLOSE_RUNNABLE);
     }
 
     @Override
-    public void clickSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot) {
+    public void clickSlotEvent(InventoryClickEvent e, int clickedSlot) {
         char c = super.getLayout().charAt(clickedSlot);
         super.playSound("Icons." + c + ".display.sound");
         if (c == 'A' || c == 'C') operate(c == 'A');
@@ -101,33 +101,33 @@ public class ConfirmMenu extends BaseMenuHolder {
         private Runnable closeRunnable;
         private Player player;
 
-        public Builder itemStack(@NotNull ItemStack itemStack) {
+        public Builder itemStack(ItemStack itemStack) {
             this.itemStack = itemStack;
             return this;
         }
 
-        public Builder confirmTask(@NotNull Runnable confirmTask) {
+        public Builder confirmTask(Runnable confirmTask) {
             this.confirmRunnable = confirmTask;
             return this;
         }
 
-        public Builder cancelTask(@NotNull Runnable cancelTask) {
+        public Builder cancelTask(Runnable cancelTask) {
             this.cancelRunnable = cancelTask;
             return this;
         }
 
-        public Builder closeTask(@NotNull Runnable closeTask) {
+        public Builder closeTask(Runnable closeTask) {
             this.closeRunnable = closeTask;
             return this;
         }
 
-        public Builder cancelOrCloseTask(@NotNull Runnable cancelOrCloseTask) {
+        public Builder cancelOrCloseTask(Runnable cancelOrCloseTask) {
             this.cancelRunnable = cancelOrCloseTask;
             this.closeRunnable = cancelOrCloseTask;
             return this;
         }
 
-        public Builder player(@NotNull Player player) {
+        public Builder player(Player player) {
             this.player = player;
             return this;
         }

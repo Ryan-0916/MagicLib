@@ -30,7 +30,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.*;
 
@@ -78,7 +78,7 @@ public class ToastMessage extends AbstractMessage {
      * <inValidateTime>7</inValidateTime> F 的判断时间 （秒），默认值：7D
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
         /* 获取消息发送的循环次数、循环间隔、图标、类型等 */
         int modelData = StringUtil.getValueBTWTags(message, "modelData", 0, ParseType.INTEGER);
@@ -130,7 +130,7 @@ public class ToastMessage extends AbstractMessage {
      * @param player 玩家
      */
     @Override
-    public void cleanMessage(@NotNull Player player) {
+    public void cleanMessage(Player player) {
         Optional.ofNullable(LISTENER.get(player.getUniqueId())).ifPresent(listener -> {
             LISTENER.remove(player.getUniqueId());
             HandlerList.unregisterAll(listener);
@@ -141,7 +141,7 @@ public class ToastMessage extends AbstractMessage {
         });
     }
 
-    private void sendToast(@NotNull Player player, @NotNull ItemStack icon, @NotNull String msg, @NotNull AdvancementType type) {
+    private void sendToast(Player player, ItemStack icon, String msg, AdvancementType type) {
         Optional<DisplayInfo> displayInfo = Optional.of(
                 new DisplayInfo(
                         CraftItemStack.asNMSCopy(icon),

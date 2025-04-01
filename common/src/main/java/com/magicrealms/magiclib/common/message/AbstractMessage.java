@@ -2,7 +2,7 @@ package com.magicrealms.magiclib.common.message;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 /**
  * @author Ryan-0916
@@ -16,11 +16,11 @@ public abstract class AbstractMessage {
      * @param player 消息接收者
      * @param message 消息
      */
-    public abstract void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message);
+    public abstract void sendMessage(MagicRealmsPlugin plugin, Player player, String message);
 
     /**
      * 清空等待发送的消息
      * @param player 玩家
      */
-    public abstract void cleanMessage(@NotNull Player player);
+    public abstract void cleanMessage(Player player);
 }

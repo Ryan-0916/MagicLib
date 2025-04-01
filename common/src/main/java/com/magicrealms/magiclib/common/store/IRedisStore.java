@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.common.store;
 
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,27 +14,27 @@ import java.util.Optional;
  */
 @SuppressWarnings("unused")
 public interface IRedisStore {
-    boolean exists(@NotNull String key);
-    boolean setValue(@NotNull String key, @NotNull String value, long expire);
-    boolean setObject(@NotNull String key, @NotNull Object value, long expire);
-    boolean lSetValue(@NotNull String key, long expire, String... values);
-    boolean lSetObject(@NotNull String key, long expire, Object... values);
-    boolean rSetValue(@NotNull String key, long expire, String... values);
-    boolean rSetObject(@NotNull String key, long expire, Object... values);
-    boolean hSetValue(@NotNull String key, @NotNull LinkedHashMap<String, String> values, long expire);
-    boolean hSetValue(@NotNull String key, @NotNull String subKey, @NotNull String value, long expire);
-    boolean hSetObject(@NotNull String key, @NotNull String subKey, @NotNull Object value, long expire);
-    boolean hSetObject(@NotNull String key, @NotNull LinkedHashMap<String, Object> values, long expire);
-    Optional<String> getValue(@NotNull String key);
-    <T> Optional<T> getObject(@NotNull String key, @NotNull Class<T> clazz);
-    Optional<String> hGetValue(@NotNull String key, @NotNull String subKey);
-    <T> Optional<T> hGetObject(@NotNull String key, @NotNull String subKey,  @NotNull Class<T> clazz);
-    Optional<List<String>> hGetAllValue(@NotNull String key);
-    <T> Optional<List<T>> hGetAllObject(@NotNull String key,  @NotNull Class<T> clazz);
-    boolean removeKey(@NotNull String... key);
-    boolean removeKeyByPrefix(@NotNull String... prefix);
-    boolean removeHkey(@NotNull String key, @NotNull String... subKey);
-    void publishValue(@NotNull String channel, @NotNull String value);
-    boolean tryLock(@NotNull String lockKey, @NotNull String lockHolder, long expire);
-    boolean releasedLock(@NotNull String lockKey, @NotNull String lockHolder);
+    boolean exists(String key);
+    boolean setValue(String key, String value, long expire);
+    boolean setObject(String key, Object value, long expire);
+    boolean lSetValue(String key, long expire, String... values);
+    boolean lSetObject(String key, long expire, Object... values);
+    boolean rSetValue(String key, long expire, String... values);
+    boolean rSetObject(String key, long expire, Object... values);
+    boolean hSetValue(String key, LinkedHashMap<String, String> values, long expire);
+    boolean hSetValue(String key, String subKey, String value, long expire);
+    boolean hSetObject(String key, String subKey, Object value, long expire);
+    boolean hSetObject(String key, LinkedHashMap<String, Object> values, long expire);
+    Optional<String> getValue(String key);
+    <T> Optional<T> getObject(String key, Class<T> clazz);
+    Optional<String> hGetValue(String key, String subKey);
+    <T> Optional<T> hGetObject(String key, String subKey,  Class<T> clazz);
+    Optional<List<String>> hGetAllValue(String key);
+    <T> Optional<List<T>> hGetAllObject(String key,  Class<T> clazz);
+    boolean removeKey(String... key);
+    boolean removeKeyByPrefix(String... prefix);
+    boolean removeHkey(String key, String... subKey);
+    void publishValue(String channel, String value);
+    boolean tryLock(String lockKey, String lockHolder, long expire);
+    boolean releasedLock(String lockKey, String lockHolder);
 }

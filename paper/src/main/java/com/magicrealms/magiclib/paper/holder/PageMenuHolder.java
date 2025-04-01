@@ -8,7 +8,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -30,43 +30,43 @@ public class PageMenuHolder extends BaseMenuHolder {
     @Getter @Setter
     private int maxPage;
 
-    public PageMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout) {
+    public PageMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout) {
         this(plugin, player, configPath,
                 defLayout, true, true, null);
     }
 
-    public PageMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout,
+    public PageMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout,
                           boolean cache) {
         this(plugin, player, configPath, defLayout, true, cache, null);
     }
 
-    public PageMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout,
+    public PageMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout,
                           @Nullable Runnable backMenuRunnable) {
         this(plugin, player, configPath, defLayout, true, true, backMenuRunnable);
     }
 
-    public PageMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout,
+    public PageMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout,
                           boolean cache,
                           @Nullable Runnable backMenuRunnable) {
         this(plugin, player, configPath, defLayout, true, true, backMenuRunnable);
     }
 
-    public PageMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout,
+    public PageMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout,
                           boolean lock,
                           boolean cache,
                           @Nullable Runnable backMenuRunnable) {
@@ -83,7 +83,7 @@ public class PageMenuHolder extends BaseMenuHolder {
      * 如果您不希望您的物品通过缓存的形式添加请不要使用此方法
      * @param consumer 加载成功/加载失败 {@link Consumer}
      */
-    public void loadingPageItems(@NotNull Consumer<Boolean> consumer) {
+    public void loadingPageItems(Consumer<Boolean> consumer) {
         if (cache && cacheItems.containsKey(page) && cacheItems.get(page) != null) {
             int size = super.getLayout().length();
             for (int i = 0; i < size; i++) {
@@ -112,7 +112,7 @@ public class PageMenuHolder extends BaseMenuHolder {
         return setCurrentPage(maxPage);
     }
 
-    public void changePage(int delta, @NotNull Consumer<Boolean> callBack) {
+    public void changePage(int delta, Consumer<Boolean> callBack) {
         callBack.accept(setCurrentPage(page + delta));
     }
 
@@ -129,7 +129,7 @@ public class PageMenuHolder extends BaseMenuHolder {
     }
 
     @Override
-    public void setItemSlot(int slot, @NotNull ItemStack itemStack) {
+    public void setItemSlot(int slot, ItemStack itemStack) {
         super.setItemSlot(slot, itemStack);
         cacheItemStack(slot, itemStack);
     }
@@ -159,7 +159,7 @@ public class PageMenuHolder extends BaseMenuHolder {
     }
 
     @Override
-    public @NotNull Component getTitle(@NotNull Map<String, String> placeholderMap) {
+    public Component getTitle(Map<String, String> placeholderMap) {
         placeholderMap.put("page", String.valueOf(page));
         placeholderMap.put("max_page", String.valueOf(maxPage));
         placeholderMap.put("next_page_title", super.getPlugin().getConfigManage()

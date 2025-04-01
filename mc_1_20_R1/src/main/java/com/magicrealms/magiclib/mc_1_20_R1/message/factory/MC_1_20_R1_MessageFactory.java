@@ -4,7 +4,7 @@ import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.enums.MessageType;
 import com.magicrealms.magiclib.common.message.factory.IMessageFactory;
 import com.magicrealms.magiclib.mc_1_20_R1.message.*;
-import org.jetbrains.annotations.NotNull;
+
 
 /**
  * @author Ryan-0916
@@ -30,7 +30,7 @@ public class MC_1_20_R1_MessageFactory implements IMessageFactory {
     }
 
     @Override
-    public AbstractMessage create(@NotNull MessageType e) {
+    public AbstractMessage create(MessageType e) {
         return switch (e) {
             case MESSAGE -> Message.getInstance();
             case TITLE -> TitleMessage.getInstance();

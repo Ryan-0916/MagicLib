@@ -1,13 +1,17 @@
 package com.magicrealms.mod.mixin;
 
 import com.magicrealms.mod.entity.animal.Hedgehog;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureElement;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,20 +24,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityType.class)
 @SuppressWarnings("unused")
 public abstract class MixinEntityType <T extends Entity> implements FeatureElement, EntityTypeTest<Entity, T> {
-
-    @Inject(method = "<clinit>", at = @At("RETURN"))
+    @Inject(method = "<clinit>", at = @At("HEAD"))
     private static void entityRegister(CallbackInfo ci) {
-        EntityType<Hedgehog> hedgehogEntityType = register("hedgehog",
-                EntityType.Builder.of(Hedgehog::new, MobCategory.MISC).noLootTable().noSave()
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("migiclib", "hedgehog");
+        ResourceKey<EntityType<?>> resourceKey = ResourceKey.create(Registries.ENTITY_TYPE, location);
+        EntityType<Hedgehog> hedgehogEntityType = EntityType.Builder.of(Hedgehog::new, MobCategory.MISC).noLootTable().noSave()
                 .sized(0.6F, 0.6F)
                 .eyeHeight(0.4F)
-                .clientTrackingRange(10)
-        );
+                .clientTrackingRange(10).build(resourceKey);
+        Registry.register(BuiltInRegistries.ENTITY_TYPE, location, hedgehogEntityType);
     }
-
-    @Shadow
-    private static <T extends Entity> EntityType<T> register(String key, EntityType.Builder<T> builder) {
-        return null;
-    }
-
 }

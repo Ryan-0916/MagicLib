@@ -16,7 +16,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 /**
@@ -46,7 +46,7 @@ public class MC_1_20_R1_NMSDispatcher implements INMSDispatcher {
      * 获取容器类型
      * @param inventory 容器
      */
-    private MenuType<?> getCraftInventoryType(@NotNull Inventory inventory) {
+    private MenuType<?> getCraftInventoryType(Inventory inventory) {
         return switch (inventory.getType()) {
             case CHEST -> switch (inventory.getSize() / 9) {
                     case 1 -> MenuType.GENERIC_9x1;
@@ -80,7 +80,7 @@ public class MC_1_20_R1_NMSDispatcher implements INMSDispatcher {
     }
 
     @Override
-    public void openCustomInventory(@NotNull Player player, @NotNull Inventory inventory, @NotNull String title) {
+    public void openCustomInventory(Player player, Inventory inventory, String title) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         MenuType<?> menuType = getCraftInventoryType(inventory);
         AbstractContainerMenu menu = new CraftContainer(inventory, serverPlayer, serverPlayer.nextContainerCounter());
@@ -94,7 +94,7 @@ public class MC_1_20_R1_NMSDispatcher implements INMSDispatcher {
     }
 
     @Override
-    public void updateInventoryTitle(@NotNull Player player, @NotNull String title) {
+    public void updateInventoryTitle(Player player, String title) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         AbstractContainerMenu menu = serverPlayer.containerMenu;
         serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId,
@@ -103,14 +103,14 @@ public class MC_1_20_R1_NMSDispatcher implements INMSDispatcher {
     }
 
     @Override
-    public InventoryView openAnvil(@NotNull Player player, @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title) {
+    public InventoryView openAnvil(Player player, Map<Integer, ItemStack> anvilItems, String title) {
         openCustomInventory(player, Bukkit.createInventory(null, InventoryType.ANVIL), title);
         setupAnvil(player, anvilItems, title);
         return player.getOpenInventory();
     }
 
     @Override
-    public void setupAnvil(@NotNull Player player, @NotNull Map<Integer, ItemStack> anvilItems, @NotNull String title) {
+    public void setupAnvil(Player player, Map<Integer, ItemStack> anvilItems, String title) {
         InventoryView inventoryView = player.getOpenInventory();
         if (inventoryView.getType() != InventoryType.ANVIL) return;
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();

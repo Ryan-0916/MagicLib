@@ -9,7 +9,7 @@ import com.magicrealms.magiclib.common.command.executor.CommandFilterExecutor;
 import com.magicrealms.magiclib.common.command.executor.TabCompleteFilterExecutor;
 import com.magicrealms.magiclib.common.command.processor.AppContext;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +37,7 @@ public class CommandManager {
                 plugin.getClass().getClassLoader());
     }
 
-    public void registerCommand(@NotNull String name, @NotNull Consumer<CommandFailure> failure) {
+    public void registerCommand(String name, Consumer<CommandFailure> failure) {
         Optional.ofNullable(Bukkit.getPluginCommand(name)).ifPresent(
                 commandManager -> {
                     /* 注册执行器 */

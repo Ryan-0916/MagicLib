@@ -2,7 +2,7 @@ package com.magicrealms.magiclib.common.store;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.utils.JsonUtil;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
 
@@ -34,7 +34,7 @@ public class RedisStore implements IRedisStore{
     private final int PORT;
     private final String PASSWORD;
 
-    public RedisStore(@NotNull MagicRealmsPlugin plugin, @NotNull String host, int port, @Nullable String password) {
+    public RedisStore(MagicRealmsPlugin plugin, String host, int port, @Nullable String password) {
         this.PLUGIN = plugin;
         this.HOST = host;
         this.PORT = port;
@@ -64,7 +64,7 @@ public class RedisStore implements IRedisStore{
      * @param values 值
      * @return 添加状态
      */
-    private boolean pushValueByScript(@NotNull String key, long expire, @NotNull String unInheritanceScript, @NotNull String inheritanceScript,
+    private boolean pushValueByScript(String key, long expire, String unInheritanceScript, String inheritanceScript,
                                      String... values) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -82,7 +82,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean exists(@NotNull String key) {
+    public boolean exists(String key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()){
@@ -94,7 +94,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean setValue(@NotNull String key, @NotNull String value, long expire) {
+    public boolean setValue(String key, String value, long expire) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()){
@@ -108,37 +108,37 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean setObject(@NotNull String key, @NotNull Object value, long expire) {
+    public boolean setObject(String key, Object value, long expire) {
         return setValue(key, JsonUtil.objectToJson(value), expire);
     }
 
     @Override
-    public boolean lSetValue(@NotNull String key, long expire, String... values) {
+    public boolean lSetValue(String key, long expire, String... values) {
         return pushValueByScript(key, expire, LEFT_PUSH_SCRIPT, LEFT_PUSH_INHERITANCE_TTL_SCRIPT, values);
     }
 
     @Override
-    public boolean lSetObject(@NotNull String key, long expire, Object... values) {
+    public boolean lSetObject(String key, long expire, Object... values) {
         return lSetValue(key, expire, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
-    public boolean rSetValue(@NotNull String key, long expire, String... values) {
+    public boolean rSetValue(String key, long expire, String... values) {
         return pushValueByScript(key, expire, RIGHT_PUSH_SCRIPT, RIGHT_PUSH_INHERITANCE_TTL_SCRIPT, values);
     }
 
     @Override
-    public boolean rSetObject(@NotNull String key, long expire, Object... values) {
+    public boolean rSetObject(String key, long expire, Object... values) {
         return rSetValue(key, expire, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
-    public boolean hSetValue(@NotNull String key, @NotNull String subKey, @NotNull String value, long expire) {
+    public boolean hSetValue(String key, String subKey, String value, long expire) {
         return hSetValue(key, new LinkedHashMap<>(Map.of(subKey, value)), expire);
     }
 
     @Override
-    public boolean hSetValue(@NotNull String key, @NotNull LinkedHashMap<String, String> values, long expire) {
+    public boolean hSetValue(String key, LinkedHashMap<String, String> values, long expire) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()){
@@ -165,12 +165,12 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean hSetObject(@NotNull String key, @NotNull String subKey, @NotNull Object value, long expire) {
+    public boolean hSetObject(String key, String subKey, Object value, long expire) {
         return hSetObject(key, new LinkedHashMap<>(Map.of(subKey, value)), expire);
     }
 
     @Override
-    public boolean hSetObject(@NotNull String key, @NotNull LinkedHashMap<String, Object> values, long expire) {
+    public boolean hSetObject(String key, LinkedHashMap<String, Object> values, long expire) {
         return hSetValue(key, values.entrySet().stream().
                 collect(Collectors.toMap(
                     Map.Entry::getKey,
@@ -180,7 +180,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public Optional<String> getValue(@NotNull String key) {
+    public Optional<String> getValue(String key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return Optional.empty();
         try (Jedis connection = connectionOptional.get()){
@@ -192,12 +192,12 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public <T> Optional<T> getObject(@NotNull String key, @NotNull Class<T> clazz) {
+    public <T> Optional<T> getObject(String key, Class<T> clazz) {
         return getValue(key).map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz));
     }
 
     @Override
-    public Optional<String> hGetValue(@NotNull String key, @NotNull String subKey) {
+    public Optional<String> hGetValue(String key, String subKey) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return Optional.empty();
         try (Jedis connection = connectionOptional.get()) {
@@ -209,12 +209,12 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public <T> Optional<T> hGetObject(@NotNull String key, @NotNull String subKey, @NotNull Class<T> clazz) {
+    public <T> Optional<T> hGetObject(String key, String subKey, Class<T> clazz) {
         return hGetValue(key, subKey).map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz));
     }
 
     @Override
-    public Optional<List<String>> hGetAllValue(@NotNull String key) {
+    public Optional<List<String>> hGetAllValue(String key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return Optional.empty();
         try (Jedis connection = connectionOptional.get()) {
@@ -227,14 +227,14 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public <T> Optional<List<T>> hGetAllObject(@NotNull String key, @NotNull Class<T> clazz) {
+    public <T> Optional<List<T>> hGetAllObject(String key, Class<T> clazz) {
         return hGetAllValue(key).map(serializerList -> serializerList.stream().
                 map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
     @Override
-    public boolean removeKey(@NotNull String... key) {
+    public boolean removeKey(String... key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()) {
@@ -247,7 +247,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean removeKeyByPrefix(@NotNull String... prefix) {
+    public boolean removeKeyByPrefix(String... prefix) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()){
@@ -265,7 +265,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean removeHkey(@NotNull String key, @NotNull String... subKey) {
+    public boolean removeHkey(String key, String... subKey) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()) {
@@ -278,7 +278,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public void publishValue(@NotNull String channel, @NotNull String value) {
+    public void publishValue(String channel, String value) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return;
         try (Jedis connection = connectionOptional.get()){
@@ -289,7 +289,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean tryLock(@NotNull String lockKey, @NotNull String lockHolder, long expire) {
+    public boolean tryLock(String lockKey, String lockHolder, long expire) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()){
@@ -302,7 +302,7 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
-    public boolean releasedLock(@NotNull String lockKey, @NotNull String lockHolder) {
+    public boolean releasedLock(String lockKey, String lockHolder) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
         try (Jedis connection = connectionOptional.get()){

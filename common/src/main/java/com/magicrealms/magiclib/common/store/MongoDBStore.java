@@ -8,7 +8,7 @@ import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.jetbrains.annotations.NotNull;
+
 
 @SuppressWarnings("unused")
 public class MongoDBStore {
@@ -23,7 +23,7 @@ public class MongoDBStore {
     private MongoClient connection;
 
 
-    public MongoDBStore(@NotNull MagicRealmsPlugin plugin, @NotNull String host, int port, @NotNull String database) {
+    public MongoDBStore(MagicRealmsPlugin plugin, String host, int port, String database) {
         this.plugin = plugin;
         this.HOST = host;
         this.PORT = port;
@@ -81,7 +81,7 @@ public class MongoDBStore {
      * @param tableName 表名
      * @param document 数据
      */
-    public boolean insertOne(@NotNull String tableName, @NotNull Document document) {
+    public boolean insertOne(String tableName, Document document) {
         this.getConnection();
         try {
             MongoCollection<Document> collection = database.getCollection(tableName);

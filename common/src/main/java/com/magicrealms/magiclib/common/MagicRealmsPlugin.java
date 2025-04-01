@@ -8,7 +8,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -77,7 +77,7 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
      * @param replace 如果资源文件已经存在是否将其替换
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void saveResource(@NotNull String resourcePath, @Nullable String referencePath, boolean replace) {
+    public void saveResource(String resourcePath, @Nullable String referencePath, boolean replace) {
         if (StringUtils.isBlank(resourcePath)) {
             throw new IllegalArgumentException("资源文件生成路径为空");
         }

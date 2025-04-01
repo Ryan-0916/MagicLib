@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
@@ -21,7 +21,7 @@ public class FormatUtil {
     public static String amountFormat (BigDecimal amount) { return amountFormat.format(amount); }
     public static String amountFormat (double amount) { return amountFormat.format(amount); }
     public static String amountFormat (float amount) { return amountFormat.format(amount); }
-    public static @NotNull Map<String, String> datetimeFormat (long time, @Nullable String prefix) {
+    public static Map<String, String> datetimeFormat (long time, @Nullable String prefix) {
         Map<String, String> format = new HashMap<>();
         if (time <= 0) return format;
         try {

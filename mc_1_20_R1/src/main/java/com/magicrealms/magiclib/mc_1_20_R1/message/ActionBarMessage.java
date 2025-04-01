@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,7 +62,7 @@ public class ActionBarMessage extends AbstractMessage {
      * %times% 当前次数，如果 <desc> 属性为 true 则会倒序
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
         int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
         boolean desc = StringUtil.getValueBTWTags(message, "desc", false, ParseType.BOOLEAN),
@@ -100,14 +100,14 @@ public class ActionBarMessage extends AbstractMessage {
     }
 
     @Override
-    public void cleanMessage(@NotNull Player player) {
+    public void cleanMessage(Player player) {
         Optional.ofNullable(TASK.get(player.getUniqueId())).ifPresent(task -> {
             TASK.remove(player.getUniqueId());
             if (!task.isCancelled()) task.cancel();
         });
     }
 
-    private void sendActionBar(@NotNull Player player, @NotNull String msg) {
+    private void sendActionBar(Player player, String msg) {
         ((CraftPlayer)player).getHandle().connection.send(
                 new ClientboundSetActionBarTextPacket(Optional.ofNullable(Component.Serializer.fromJson(msg)).orElse(
                         Component.empty())));
@@ -121,8 +121,8 @@ public class ActionBarMessage extends AbstractMessage {
      * @param time    打印整个消息所需的总时间（单位：秒）
      * @param legacy  是否使用旧版的MiniMessage格式进行序列化
      */
-    private void printActionBar(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String msg,
-                                @NotNull String prefix, double time, boolean legacy) {
+    private void printActionBar(MagicRealmsPlugin plugin, Player player, String msg,
+                                String prefix, double time, boolean legacy) {
 
         /* 将消息中的标签解析为列表
          * 例如 <prefix>前缀</prefix>

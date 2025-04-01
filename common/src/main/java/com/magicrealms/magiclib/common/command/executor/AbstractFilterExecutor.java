@@ -5,7 +5,7 @@ import com.magicrealms.magiclib.common.command.enums.CommandRule;
 import com.magicrealms.magiclib.common.command.enums.PermissionType;
 import lombok.extern.slf4j.Slf4j;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 @Slf4j
 public abstract class AbstractFilterExecutor {
 
-    public Boolean filter(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args, @NotNull Annotation annotation,
+    public Boolean filter(CommandSender sender, String label, String[] args, Annotation annotation,
                           @Nullable AtomicBoolean executorFlg, @Nullable Consumer<CommandFailure> failureConsumer) {
         Class<? extends Annotation> aClass = annotation.annotationType();
         CommandRule rule = null;
@@ -40,9 +40,9 @@ public abstract class AbstractFilterExecutor {
         return abstractFilter(sender, label, args, text, permission, annotateLabel, rule, permissionType, executorFlg, failureConsumer);
     }
 
-    protected abstract Boolean abstractFilter(@NotNull CommandSender sender,
-                                       @NotNull String label,
-                                       @NotNull String[] args,
+    protected abstract Boolean abstractFilter(CommandSender sender,
+                                       String label,
+                                       String[] args,
                                        @Nullable String text,
                                        @Nullable String permission,
                                        @Nullable String annotateLabel,

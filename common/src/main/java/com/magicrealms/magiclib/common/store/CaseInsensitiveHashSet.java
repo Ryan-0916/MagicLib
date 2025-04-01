@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.common.store;
 
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -18,7 +18,7 @@ public class CaseInsensitiveHashSet {
         MAP = new HashMap<>();
     }
 
-    public CaseInsensitiveHashSet(@NotNull Collection<? extends String> values) {
+    public CaseInsensitiveHashSet(Collection<? extends String> values) {
         this.MAP = new HashMap<>(Math.max((int) (values.size()/.75f) + 1, 16));
         addAll(values);
     }

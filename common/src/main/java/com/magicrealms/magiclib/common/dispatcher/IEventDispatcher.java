@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
+
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -24,7 +24,7 @@ public interface IEventDispatcher {
      * @param callback 事件成功执行后的回调函数
      * @param <T> 事件类型，必须是 {@link Event} 的子类
      */
-    default  <T extends Event> void dispatcherEvent(@NotNull Plugin plugin, @NotNull T event, @Nullable Consumer<T> callback) {
+    default  <T extends Event> void dispatcherEvent(Plugin plugin, T event, @Nullable Consumer<T> callback) {
         if (eventIsExecute(event) && callback != null) {
             Bukkit.getScheduler().runTask(plugin, () -> callback.accept(event));
         }
@@ -36,7 +36,7 @@ public interface IEventDispatcher {
      * @return 如果事件没有被取消，返回 true；否则返回 false
      * @param <T> 事件类型，必须是 {@link Event} 的子类
      */
-    default  <T extends Event> boolean eventIsExecute(@NotNull T event) {
+    default  <T extends Event> boolean eventIsExecute(T event) {
         Bukkit.getPluginManager().callEvent(event);
         return !(event instanceof Cancellable cancellable) || !cancellable.isCancelled();
     }

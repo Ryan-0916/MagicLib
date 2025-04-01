@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.common.command.filter;
 
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -11,6 +11,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class AbstractChannelFilter implements IChannelFilter {
     @Override
-    public abstract Boolean filter(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args,
+    public abstract Boolean filter(CommandSender sender, String label, String[] args,
                                    @Nullable String text, @Nullable String permission, @Nullable String annotateLabel);
 }

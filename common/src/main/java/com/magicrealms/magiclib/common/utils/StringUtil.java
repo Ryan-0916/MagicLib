@@ -2,7 +2,7 @@ package com.magicrealms.magiclib.common.utils;
 
 import com.magicrealms.magiclib.common.enums.ParseType;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class StringUtil {
      * @return 解析后的值，如果解析失败或未找到标签，则返回 {@code defaultValue}。
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getValueBTWTags(String str, String tag, T defaultValue, @NotNull ParseType valueType) {
+    public static <T> T getValueBTWTags(String str, String tag, T defaultValue, ParseType valueType) {
         Optional<String> text = getStringBTWTags(str, tag);
         if (text.isEmpty()) {
             return defaultValue;

@@ -19,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -47,31 +48,31 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     private boolean playOpenSound;
     private boolean playCloseSound;
 
-    public BaseMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout) {
+    public BaseMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout) {
         this(plugin, player, configPath, defLayout, true);
     }
 
-    public BaseMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout,
+    public BaseMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout,
                           boolean lock) {
         this(plugin, player, configPath, defLayout, lock, null);
     }
 
-    public BaseMenuHolder(@NotNull MagicRealmsPlugin plugin,
-                          @NotNull Player player,
-                          @NotNull String configPath,
-                          @NotNull String defLayout,
+    public BaseMenuHolder(MagicRealmsPlugin plugin,
+                          Player player,
+                          String configPath,
+                          String defLayout,
                           @Nullable Runnable backMenuRunnable) {
         this(plugin, player, configPath, defLayout, true, backMenuRunnable);
     }
 
-    public BaseMenuHolder(@NotNull MagicRealmsPlugin plugin, @NotNull Player player,
-                          @NotNull String configPath, @NotNull String defLayout,
+    public BaseMenuHolder(MagicRealmsPlugin plugin, Player player,
+                          String configPath, String defLayout,
                           boolean lock, @Nullable Runnable backMenuRunnable) {
         this.plugin = plugin;
         this.player = player;
@@ -87,7 +88,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     @NotNull
-    private String setupLayout(@NotNull String defLayout) {
+    private String setupLayout(String defLayout) {
         Optional<List<String>> layout = plugin.getConfigManage().getYmlListValue(configPath, "Layout");
         if (layout.isEmpty()) {
             return defLayout;
@@ -101,7 +102,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     @Override
-    public @NotNull Inventory getInventory() {
+    public Inventory getInventory() {
         return inventory;
     }
 
@@ -111,13 +112,13 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     @Override
-    public void clickSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot) {}
+    public void clickSlotEvent(InventoryClickEvent e, int clickedSlot) {}
 
     @Override
-    public void dragEvent(@NotNull InventoryDragEvent e) {}
+    public void dragEvent(InventoryDragEvent e) {}
 
     @Override
-    public void openEvent(@NotNull InventoryOpenEvent e) {
+    public void openEvent(InventoryOpenEvent e) {
         /* 播放开启 GUI 的声音
            通常来说该声音在一个周期内只会播放一次
         */
@@ -128,7 +129,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     @Override
-    public void closeEvent(@NotNull InventoryCloseEvent e) {
+    public void closeEvent(InventoryCloseEvent e) {
         /* 播放关闭 GUI 的声音
            通常来说该声音在一个周期内只会播放一次
            一般实在主动关闭的情况下播放该声音
@@ -141,11 +142,11 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     @Override
-    public void clickBottomSlotEvent(@NotNull InventoryClickEvent e, int clickedSlot) {
+    public void clickBottomSlotEvent(InventoryClickEvent e, int clickedSlot) {
 
     }
 
-    public void playSound(@NotNull String key) {
+    public void playSound(String key) {
         if (!plugin.getConfigManage().containsYmlKey(configPath, key + ".path")) {
             return;
         }
@@ -154,7 +155,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
                 plugin.getConfigManage().getYmlValue(configPath, key + ".pitch", 1.0F, ParseType.FLOAT));
     }
 
-    public void setItemSlot(int slot, @NotNull ItemStack itemStack) {
+    public void setItemSlot(int slot, ItemStack itemStack) {
         /* 如果冷却中不存在此缓存则不替换（原因会将冷却物品替换） */
         if (!cooldownItems.containsKey(slot)) {
             inventory.setItem(slot , itemStack);
@@ -184,29 +185,13 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
                 "Icons." + slotChar + (opened ? ".openDisplay" : ".closeDisplay")));
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @NotNull
-    public Component getTitle(@NotNull Map<String, String> map) {
+    public Component getTitle(Map<String, String> map) {
         map.put("player_name", player.getName());
         return AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(title, map)));
     }
 
-    protected void updateTitle(@NotNull Map<String, String> map) {
+    protected void updateTitle(Map<String, String> map) {
         NMSDispatcher.getInstance().updateInventoryTitle(player, title);
     }
 

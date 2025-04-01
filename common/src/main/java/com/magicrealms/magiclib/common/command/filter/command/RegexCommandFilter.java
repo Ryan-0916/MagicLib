@@ -3,7 +3,7 @@ package com.magicrealms.magiclib.common.command.filter.command;
 import com.magicrealms.magiclib.common.command.filter.AbstractChannelFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
@@ -19,7 +19,7 @@ public class RegexCommandFilter extends AbstractChannelFilter {
     private RegexCommandFilter(){}
 
     @Override
-    public Boolean filter(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args,
+    public Boolean filter(CommandSender sender, String label, String[] args,
                           @Nullable String text, @Nullable String permission, @Nullable String annotateLabel) {
         return text != null && Pattern.compile(text).matcher(StringUtils.join(args, " ")).find();
     }

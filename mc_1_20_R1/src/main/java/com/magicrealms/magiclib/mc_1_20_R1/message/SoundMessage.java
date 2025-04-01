@@ -17,7 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,7 +64,7 @@ public class SoundMessage extends AbstractMessage {
      * <interval>1</interval> 消息发送间隔 （秒），默认值：1
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
         double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE);
         float volume = StringUtil.getValueBTWTags(message, "volume", 1F, ParseType.FLOAT),
@@ -90,14 +90,14 @@ public class SoundMessage extends AbstractMessage {
     }
 
     @Override
-    public void cleanMessage(@NotNull Player player) {
+    public void cleanMessage(Player player) {
         Optional.ofNullable(TASK.get(player.getUniqueId())).ifPresent(task -> {
             TASK.remove(player.getUniqueId());
             if (!task.isCancelled()) task.cancel();
         });
     }
 
-    private void sendSound(@NotNull Player player, @NotNull String path, float volume, float pitch, long speed) {
+    private void sendSound(Player player, String path, float volume, float pitch, long speed) {
         List<Packet<ClientGamePacketListener>> packetListeners = List.of(
              new ClientboundSoundPacket(Holder.direct(SoundEvent.createVariableRangeEvent(new ResourceLocation(path))),
                      SoundSource.PLAYERS, player.getLocation().getX(),

@@ -15,7 +15,7 @@ import com.magicrealms.magiclib.mc_1_20_R3.message.factory.MC_1_20_R3_MessageFac
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,9 +58,9 @@ public class MessageDispatcher implements IMessageDispatcher {
      * @param message 消息内容
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin,
-                            @NotNull CommandSender receiver,
-                            @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin,
+                            CommandSender receiver,
+                            String message) {
         if (receiver instanceof Player player) {
             Map<String, String> map = new HashMap<>();
             map.put("player_name", player.getName());
@@ -79,7 +79,7 @@ public class MessageDispatcher implements IMessageDispatcher {
     }
 
     @Override
-    public void sendBroadcast(@NotNull MagicRealmsPlugin plugin, @NotNull String msg) {
+    public void sendBroadcast(MagicRealmsPlugin plugin, String msg) {
         Bukkit.getOnlinePlayers().forEach(e -> {
             if (e == null || e.getPlayer() == null) return;
             sendMessage(plugin, e.getPlayer(), msg);
@@ -87,14 +87,14 @@ public class MessageDispatcher implements IMessageDispatcher {
     }
 
     @Override
-    public void sendBungeeMessage(@NotNull IRedisStore store,
-                                  @NotNull String channel, @NotNull String player, @NotNull String msg) {
+    public void sendBungeeMessage(IRedisStore store,
+                                  String channel, String player, String msg) {
         BungeeMessage message = new BungeeMessage(player, msg);
         store.publishValue(channel, JsonUtil.objectToJson(message));
     }
 
     @Override
-    public void sendBungeeBroadcast(@NotNull IRedisStore store, @NotNull String channel, @NotNull String msg) {
+    public void sendBungeeBroadcast(IRedisStore store, String channel, String msg) {
         BungeeMessage message = new BungeeMessage(msg);
         store.publishValue(channel, JsonUtil.objectToJson(message));
     }

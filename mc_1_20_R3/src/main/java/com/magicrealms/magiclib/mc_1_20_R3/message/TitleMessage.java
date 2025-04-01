@@ -12,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -63,7 +63,7 @@ public class TitleMessage extends AbstractMessage {
      * %times% 当前次数，如果 <desc> 属性为 true 则会倒序
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
         int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
         double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE),
@@ -92,7 +92,7 @@ public class TitleMessage extends AbstractMessage {
     }
 
     @Override
-    public void cleanMessage(@NotNull Player player) {
+    public void cleanMessage(Player player) {
         Optional.ofNullable(TASK.get(player.getUniqueId())).ifPresent(task -> {
             TASK.remove(player.getUniqueId());
             if (!task.isCancelled()) task.cancel();
@@ -100,7 +100,7 @@ public class TitleMessage extends AbstractMessage {
         player.clearTitle();
     }
 
-    private void sendTitle(@NotNull Player player,  @NotNull String title, @NotNull String subTitle, double in, double keep, double out, boolean legacy) {
+    private void sendTitle(Player player,  String title, String subTitle, double in, double keep, double out, boolean legacy) {
         sendTitle(player,
                 AdventureHelper.serializeComponent(
                         AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(title) : title)),
@@ -111,7 +111,7 @@ public class TitleMessage extends AbstractMessage {
                 (int) Math.round(out * 20));
     }
 
-    private void sendTitle(@NotNull Player player, @Nullable String title, @Nullable String subTitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+    private void sendTitle(Player player, @Nullable String title, @Nullable String subTitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         List<Packet<ClientGamePacketListener>> packetListeners = List.of(
                 new ClientboundSetTitlesAnimationPacket(fadeInTicks, stayTicks, fadeOutTicks),
                 new ClientboundSetTitleTextPacket(Optional.ofNullable(

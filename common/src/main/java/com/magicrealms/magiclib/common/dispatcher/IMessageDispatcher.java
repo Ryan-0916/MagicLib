@@ -3,7 +3,7 @@ package com.magicrealms.magiclib.common.dispatcher;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.store.IRedisStore;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+
 
 /**
  * @author Ryan-0916
@@ -19,14 +19,14 @@ public interface IMessageDispatcher {
      * @param receiver 消息的接收者，可以是玩家或控制台
      * @param msg 需要发送的消息内容
      */
-    void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull CommandSender receiver, @NotNull String msg);
+    void sendMessage(MagicRealmsPlugin plugin, CommandSender receiver, String msg);
 
     /**
      * 发送全服消息
      * @param plugin 发送消息的插件实例
      * @param msg 需要发送的消息内容
      */
-    void sendBroadcast(@NotNull MagicRealmsPlugin plugin, @NotNull String msg);
+    void sendBroadcast(MagicRealmsPlugin plugin, String msg);
 
     /**
      * 发送跨服消息至指定玩家
@@ -35,8 +35,8 @@ public interface IMessageDispatcher {
      * @param player 接收消息的玩家名称
      * @param msg 需要发送的消息内容
      */
-    void sendBungeeMessage(@NotNull IRedisStore store,
-                           @NotNull String channel, @NotNull String player, @NotNull String msg);
+    void sendBungeeMessage(IRedisStore store,
+                           String channel, String player, String msg);
 
     /**
      * 发送跨服全服消息
@@ -44,5 +44,5 @@ public interface IMessageDispatcher {
      * @param channel 渠道名称，用于标识消息的分类或目标服务器
      * @param msg 要发送的跨服播报消息内容
      */
-    void sendBungeeBroadcast(@NotNull IRedisStore store, @NotNull String channel, @NotNull String msg);
+    void sendBungeeBroadcast(IRedisStore store, String channel, String msg);
 }

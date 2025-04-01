@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.jetbrains.annotations.NotNull;
+
 
 @SuppressWarnings("unused")
 public class AdventureHelper {
@@ -49,7 +49,7 @@ public class AdventureHelper {
         return getInstance().GSON_COMPONENT_SERIALIZER;
     }
 
-    public static @NotNull String legacyToMiniMessage(@NotNull String legacy) {
+    public static String legacyToMiniMessage(String legacy) {
         StringBuilder stringBuilder = new StringBuilder();
         char[] chars = legacy.toCharArray();
         for (int i = 0; i < chars.length; i++) {
@@ -116,15 +116,15 @@ public class AdventureHelper {
         return stringBuilder.toString();
     }
 
-    public static @NotNull Component deserializeComponent(@NotNull String serializeStr) {
+    public static Component deserializeComponent(String serializeStr) {
         return getMiniMessage().deserialize(serializeStr);
     }
 
-    public static @NotNull String serializeComponent(@NotNull Component component) {
+    public static String serializeComponent(Component component) {
         return getGson().serialize(component);
     }
 
-    public static @NotNull String serializeComponentByMiniMessage(@NotNull Component component) {
+    public static String serializeComponentByMiniMessage(Component component) {
         return getMiniMessage().serialize(component);
     }
 

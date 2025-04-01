@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +90,7 @@ public class Hedgehog extends Animal {
         return SoundEvent.createVariableRangeEvent(ResourceLocation.read("entity.cow.ambient").getOrThrow());
     }
 
-    protected SoundEvent getHurtSound(@NotNull DamageSource damageSource) {
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
         return SoundEvent.createVariableRangeEvent(ResourceLocation.read("entity.cow.hurt").getOrThrow());
     }
 
@@ -97,7 +98,7 @@ public class Hedgehog extends Animal {
         return SoundEvent.createVariableRangeEvent(ResourceLocation.read("entity.cow.death").getOrThrow());
     }
 
-    protected void playStepSound(@NotNull BlockPos pos, @NotNull BlockState block) {
+    protected void playStepSound(BlockPos pos, BlockState block) {
         this.playSound(SoundEvent.createVariableRangeEvent(ResourceLocation.read("entity.cow.step").getOrThrow()), 0.15F, 1.0F); // 调整步伐声音
     }
 
@@ -105,7 +106,7 @@ public class Hedgehog extends Animal {
         return 0.2F;
     }
 
-    public @NotNull InteractionResult mobInteract(Player player, @NotNull InteractionHand hand) {
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemInHand = player.getItemInHand(hand);
         if (itemInHand.is(Items.SWEET_BERRIES) && !this.isBaby()) {
             // 如果玩家使用浆果进行互动
@@ -118,11 +119,11 @@ public class Hedgehog extends Animal {
     }
 
     @Nullable
-    public Hedgehog getBreedOffspring(@NotNull ServerLevel level, @NotNull AgeableMob otherParent) {
+    public Hedgehog getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
         return null;
     }
 
-    public @NotNull EntityDimensions getDefaultDimensions(@NotNull Pose pose) {
+    public EntityDimensions getDefaultDimensions(Pose pose) {
         return this.isBaby() ? BABY_DIMENSIONS : super.getDefaultDimensions(pose);
     }
 

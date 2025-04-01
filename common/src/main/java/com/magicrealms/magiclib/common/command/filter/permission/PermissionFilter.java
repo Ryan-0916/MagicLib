@@ -4,7 +4,7 @@ import com.magicrealms.magiclib.common.command.filter.AbstractChannelFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class PermissionFilter extends AbstractChannelFilter {
     private PermissionFilter(){}
 
     @Override
-    public Boolean filter(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args,
+    public Boolean filter(CommandSender sender, String label, String[] args,
                           @Nullable String text, @Nullable String permission, @Nullable String annotateLabel) {
 
         String[] permissions = permission == null ? null : StringUtils.split(permission, "||");

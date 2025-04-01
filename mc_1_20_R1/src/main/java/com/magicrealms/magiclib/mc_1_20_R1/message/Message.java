@@ -8,7 +8,7 @@ import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class Message extends AbstractMessage {
      * %times% 当前次数，如果 <desc> 属性为 true 则会倒序
      */
     @Override
-    public void sendMessage(@NotNull MagicRealmsPlugin plugin, @NotNull Player player, @NotNull String message) {
+    public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
         int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
         boolean desc = StringUtil.getValueBTWTags(message, "desc", false, ParseType.BOOLEAN),
@@ -86,7 +86,7 @@ public class Message extends AbstractMessage {
     }
 
     @Override
-    public void cleanMessage(@NotNull Player player) {
+    public void cleanMessage(Player player) {
         Optional.ofNullable(TASK.get(player.getUniqueId())).ifPresent(task -> {
             TASK.remove(player.getUniqueId());
             if (!task.isCancelled()) task.cancel();

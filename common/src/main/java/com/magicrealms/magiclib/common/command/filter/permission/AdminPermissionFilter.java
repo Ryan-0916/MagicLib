@@ -3,7 +3,7 @@ package com.magicrealms.magiclib.common.command.filter.permission;
 import com.magicrealms.magiclib.common.command.filter.AbstractChannelFilter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -18,7 +18,7 @@ public class AdminPermissionFilter extends AbstractChannelFilter {
     private AdminPermissionFilter(){}
 
     @Override
-    public Boolean filter(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args,
+    public Boolean filter(CommandSender sender, String label, String[] args,
                           @Nullable String text, @Nullable String permission, @Nullable String annotateLabel) {
         return sender instanceof Player && sender.isOp();
     }
