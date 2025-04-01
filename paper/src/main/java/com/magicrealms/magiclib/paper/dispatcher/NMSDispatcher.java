@@ -5,6 +5,7 @@ import com.magicrealms.magiclib.common.exception.UnsupportedVersionException;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.mc_1_20_R1.dispatcher.MC_1_20_R1_NMSDispatcher;
 import com.magicrealms.magiclib.mc_1_20_R3.dispatcher.MC_1_20_R3_NMSDispatcher;
+import com.magicrealms.magiclib.mc_1_21_R3.dispatcher.MC_1_21_R3_NMSDispatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -29,6 +30,7 @@ public class NMSDispatcher implements INMSDispatcher {
         NMS_DISPATCHER = switch (Bukkit.getServer().getBukkitVersion().split("-")[0]) {
             case "1.20.1" -> MC_1_20_R1_NMSDispatcher.getInstance();
             case "1.20.3", "1.20.4" -> MC_1_20_R3_NMSDispatcher.getInstance();
+            case "1.21.4" -> MC_1_21_R3_NMSDispatcher.getInstance();
             default -> throw new UnsupportedVersionException("您的 Minecraft 版本不兼容，请使用合适的版本");
         };
     }

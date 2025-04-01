@@ -102,7 +102,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     @Override
-    public Inventory getInventory() {
+    public @NotNull Inventory getInventory() {
         return inventory;
     }
 

@@ -12,6 +12,7 @@ import com.magicrealms.magiclib.common.utils.JsonUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_20_R1.message.factory.MC_1_20_R1_MessageFactory;
 import com.magicrealms.magiclib.mc_1_20_R3.message.factory.MC_1_20_R3_MessageFactory;
+import com.magicrealms.magiclib.mc_1_21_R3.message.factory.MC_1_21_R3_MessageFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -36,6 +37,7 @@ public class MessageDispatcher implements IMessageDispatcher {
         MESSAGE_FACTORY = switch (Bukkit.getServer().getBukkitVersion().split("-")[0]) {
             case "1.20.1" -> MC_1_20_R1_MessageFactory.getInstance();
             case "1.20.3", "1.20.4" -> MC_1_20_R3_MessageFactory.getInstance();
+            case "1.21.4" -> MC_1_21_R3_MessageFactory.getInstance();
             default -> throw new UnsupportedVersionException("您的 Minecraft 版本不兼容，请使用合适的版本");
         };
     }

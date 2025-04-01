@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.common.utils;
 
 import com.google.gson.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
@@ -13,6 +14,7 @@ import java.util.List;
  * @date 2024-04-09
  */
 @SuppressWarnings("unused")
+@Slf4j
 public class JsonUtil {
     private final static Gson gson = new Gson();
 
@@ -29,7 +31,7 @@ public class JsonUtil {
         try{
             return gson.fromJson(json, classOf);
         } catch (JsonSyntaxException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return null;
     }

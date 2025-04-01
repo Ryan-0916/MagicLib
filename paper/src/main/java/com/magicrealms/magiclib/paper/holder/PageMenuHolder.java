@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -159,7 +160,7 @@ public class PageMenuHolder extends BaseMenuHolder {
     }
 
     @Override
-    public Component getTitle(Map<String, String> placeholderMap) {
+    public @NotNull Component getTitle(Map<String, String> placeholderMap) {
         placeholderMap.put("page", String.valueOf(page));
         placeholderMap.put("max_page", String.valueOf(maxPage));
         placeholderMap.put("next_page_title", super.getPlugin().getConfigManage()

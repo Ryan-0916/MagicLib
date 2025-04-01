@@ -2,17 +2,7 @@ package com.magicrealms.magiclib.paper.controller;
 import com.magicrealms.magiclib.common.command.annotations.Command;
 import com.magicrealms.magiclib.common.command.annotations.Listener;
 import com.magicrealms.magiclib.common.command.enums.PermissionType;
-import com.magicrealms.magiclib.paper.MagicLib;
-import com.magicrealms.magiclib.paper.dispatcher.MessageDispatcher;
-import com.magicrealms.magiclib.paper.entity.InputValidatorResult;
-import com.magicrealms.magiclib.paper.menu.InputMenu;
-import org.apache.commons.lang3.StringUtils;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  * @author Ryan-0916

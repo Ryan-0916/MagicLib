@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
@@ -220,7 +221,7 @@ public class ItemUtil {
         if (emptySlot != -1) {
             playerInventory.setItem(emptySlot, itemStack);
         } else {
-            log.error("玩家 " + player.getName() + " 给予物品至背包时出现意外遗漏遗漏，物品信息（Base64）：" + serializer(itemStack));
+            log.error("玩家 {} 给予物品至背包时出现意外遗漏遗漏，物品信息（Base64）：{}", player.getName(), serializer(itemStack));
         }
         return true;
     }

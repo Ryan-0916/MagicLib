@@ -12,6 +12,7 @@ import java.util.function.Consumer;
  * @Desc 经济管理
  * @date 2024-07-23
  */
+@SuppressWarnings("unused")
 public interface IVaultManager {
 
     /**
