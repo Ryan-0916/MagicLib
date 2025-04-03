@@ -5,11 +5,10 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import net.minecraft.network.chat.Component;
+import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -110,8 +109,7 @@ public class ActionBarMessage extends AbstractMessage {
 
     private void sendActionBar(Player player, String msg) {
         ((CraftPlayer)player).getHandle().connection.send(
-                new ClientboundSetActionBarTextPacket(Optional.ofNullable(CraftChatMessage.fromJSON(msg)).orElse(
-                        Component.empty())));
+                new ClientboundSetActionBarTextPacket(ComponentUtil.getComponentOrEmpty(msg)));
     }
 
     /**

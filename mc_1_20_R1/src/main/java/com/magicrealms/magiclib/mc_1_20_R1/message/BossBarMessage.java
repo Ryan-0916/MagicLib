@@ -80,9 +80,6 @@ public class BossBarMessage extends AbstractMessage {
         BossEvent.BossBarOverlay overlay = EnumUtil.getMatchingEnum(BossEvent.BossBarOverlay.class,
                 StringUtil.getStringBTWTags(message, "overlay").orElse("PROGRESS")).orElse(BossEvent.BossBarOverlay.PROGRESS);
         float progress = StringUtil.getValueBTWTags(message, "progress", desc ? 1.0F : 0F, ParseType.FLOAT);
-
-
-
     }
 
     @Override

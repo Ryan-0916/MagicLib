@@ -68,7 +68,7 @@ public class StringUtil {
 
     /**
      * 将包含标签的字符串解析为标签和对应值的列表。
-     * @param str 需要解析的字符串，可能包含形如<tag>value</tag>的标签
+     * @param str 需要解析的字符串，可能包含形如<tag>value的标签
      * @return 解析后的标签和对应值的列表，
      * 如果包含标签则返回：tag::value
      * 如果字符串不包含标签，则返回包含"prefix::"前缀和原字符串的列表

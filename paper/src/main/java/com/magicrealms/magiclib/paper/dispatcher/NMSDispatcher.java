@@ -3,9 +3,7 @@ package com.magicrealms.magiclib.paper.dispatcher;
 import com.magicrealms.magiclib.common.dispatcher.INMSDispatcher;
 import com.magicrealms.magiclib.common.exception.UnsupportedVersionException;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
-import com.magicrealms.magiclib.mc_1_20_R1.dispatcher.MC_1_20_R1_NMSDispatcher;
-import com.magicrealms.magiclib.mc_1_20_R3.dispatcher.MC_1_20_R3_NMSDispatcher;
-import com.magicrealms.magiclib.mc_1_21_R3.dispatcher.MC_1_21_R3_NMSDispatcher;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -13,6 +11,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 
+import java.lang.reflect.Constructor;
 import java.util.Map;
 
 /**
@@ -27,12 +26,22 @@ public class NMSDispatcher implements INMSDispatcher {
     private final INMSDispatcher NMS_DISPATCHER;
 
     private NMSDispatcher() {
-        NMS_DISPATCHER = switch (Bukkit.getServer().getBukkitVersion().split("-")[0]) {
-            case "1.20.1" -> MC_1_20_R1_NMSDispatcher.getInstance();
-            case "1.20.3", "1.20.4" -> MC_1_20_R3_NMSDispatcher.getInstance();
-            case "1.21.4" -> MC_1_21_R3_NMSDispatcher.getInstance();
+        String bukkitVersion = Bukkit.getServer().getBukkitVersion().split("-")[0];
+        String packageName;
+        switch (bukkitVersion) {
+            case "1.21.4" -> packageName = "mc_1_21_R3";
+            case "1.20.3", "1.20.4" -> packageName = "mc_1_20_R3";
+            case "1.20", "1.20.1" -> packageName = "mc_1_20_R1";
             default -> throw new UnsupportedVersionException("您的 Minecraft 版本不兼容，请使用合适的版本");
-        };
+        }
+        try {
+            Class<?> clazz = Class.forName("com.magicrealms.magiclib." + packageName + ".dispatcher." + StringUtils.upperCase(packageName) + "_NMSDispatcher");
+            Constructor<?> constructor = clazz.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            NMS_DISPATCHER = (INMSDispatcher) constructor.newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("MagicLib 初始化失败", e);
+        }
     }
 
     public static NMSDispatcher getInstance() {
@@ -69,6 +78,17 @@ public class NMSDispatcher implements INMSDispatcher {
                            Map<Integer, ItemStack> anvilItems, String title) {
         NMS_DISPATCHER.setupAnvil(player, anvilItems, AdventureHelper.serializeComponent(
                 AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(title))));
+    }
+
+    @Override
+    public void test2(Player player, String value) {
+        NMS_DISPATCHER.test2(player, value);
+    }
+
+    @Override
+    public void test3(Player player, int i) {
+        NMS_DISPATCHER.test3(player, i);
+
     }
 
 

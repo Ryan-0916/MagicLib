@@ -10,14 +10,13 @@ import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.store.IRedisStore;
 import com.magicrealms.magiclib.common.utils.JsonUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import com.magicrealms.magiclib.mc_1_20_R1.message.factory.MC_1_20_R1_MessageFactory;
-import com.magicrealms.magiclib.mc_1_20_R3.message.factory.MC_1_20_R3_MessageFactory;
-import com.magicrealms.magiclib.mc_1_21_R3.message.factory.MC_1_21_R3_MessageFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +33,22 @@ public class MessageDispatcher implements IMessageDispatcher {
     private final IMessageFactory MESSAGE_FACTORY;
 
     private MessageDispatcher() {
-        MESSAGE_FACTORY = switch (Bukkit.getServer().getBukkitVersion().split("-")[0]) {
-            case "1.20.1" -> MC_1_20_R1_MessageFactory.getInstance();
-            case "1.20.3", "1.20.4" -> MC_1_20_R3_MessageFactory.getInstance();
-            case "1.21.4" -> MC_1_21_R3_MessageFactory.getInstance();
+        String bukkitVersion = Bukkit.getServer().getBukkitVersion().split("-")[0];
+        String packageName;
+        switch (bukkitVersion) {
+            case "1.21.4" -> packageName = "mc_1_21_R3";
+            case "1.20.3", "1.20.4" -> packageName = "mc_1_20_R3";
+            case "1.20", "1.20.1" -> packageName = "mc_1_20_R1";
             default -> throw new UnsupportedVersionException("您的 Minecraft 版本不兼容，请使用合适的版本");
-        };
+        }
+        try {
+            Class<?> clazz = Class.forName("com.magicrealms.magiclib." + packageName + ".message.factory" + StringUtils.upperCase(packageName) + "_MessageFactory");
+            Constructor<?> constructor = clazz.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            MESSAGE_FACTORY = (IMessageFactory) constructor.newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("MagicLib 初始化失败", e);
+        }
     }
 
     public static MessageDispatcher getInstance() {

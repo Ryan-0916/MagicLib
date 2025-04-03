@@ -1,6 +1,8 @@
 package com.magicrealms.magiclib.mc_1_20_R3.dispatcher;
 
 import com.magicrealms.magiclib.common.dispatcher.INMSDispatcher;
+import com.magicrealms.magiclib.mc_1_20_R3.utils.ComponentUtil;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -17,6 +19,8 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -86,7 +90,8 @@ public class MC_1_20_R3_NMSDispatcher implements INMSDispatcher {
         menu = CraftEventFactory.callInventoryOpenEvent(serverPlayer, menu);
         if (menu != null) {
             menu.checkReachable = false;
-            serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId, menuType, CraftChatMessage.fromJSON(title)));
+            serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId, menuType,
+                    ComponentUtil.getComponentOrEmpty(title)));
             serverPlayer.containerMenu = menu;
             serverPlayer.initMenu(menu);
         }
@@ -97,7 +102,7 @@ public class MC_1_20_R3_NMSDispatcher implements INMSDispatcher {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         AbstractContainerMenu menu = serverPlayer.containerMenu;
         serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId,
-                menu.getType(), CraftChatMessage.fromJSON(title)));
+                menu.getType(), ComponentUtil.getComponentOrEmpty(title)));
         serverPlayer.initMenu(menu);
     }
 
@@ -116,7 +121,7 @@ public class MC_1_20_R3_NMSDispatcher implements INMSDispatcher {
         serverPlayer.connection.send(new ClientboundOpenScreenPacket(
                 serverPlayer.containerMenu.containerId,
                 MenuType.ANVIL,
-                CraftChatMessage.fromJSON(title)));
+                ComponentUtil.getComponentOrEmpty(title)));
         if (!anvilItems.isEmpty() && inventoryView.getTopInventory() instanceof AnvilInventory anvilInventory) {
             anvilItems.forEach((i, e) -> {
                 switch (i) {
@@ -127,5 +132,21 @@ public class MC_1_20_R3_NMSDispatcher implements INMSDispatcher {
             });
         }
         player.updateInventory();
+    }
+
+    @Override
+    public void resetChatDialog(Player player, List<String> messageHistory) {
+        int historySize = Math.min(messageHistory.size(), 100);
+        List<Packet<ClientGamePacketListener>> packets = new ArrayList<>(historySize + 1);
+        if (historySize < 100) {
+            String emptyMessage = "\n".repeat(100 - historySize);
+            packets.add(new ClientboundSystemChatPacket(CraftChatMessage.fromJSONOrString(emptyMessage, true), false));
+        }
+        messageHistory.stream()
+                .skip(Math.max(0, messageHistory.size() - historySize))
+                .limit(historySize)
+                .map(msg -> new ClientboundSystemChatPacket(ComponentUtil.getComponentOrEmpty(msg), false))
+                .forEach(packets::add);
+        ((CraftPlayer) player).getHandle().connection.send(new ClientboundBundlePacket(packets));
     }
 }

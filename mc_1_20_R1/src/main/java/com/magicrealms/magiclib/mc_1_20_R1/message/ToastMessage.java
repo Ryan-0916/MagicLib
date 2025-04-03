@@ -5,6 +5,7 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
+import com.magicrealms.magiclib.mc_1_20_R1.utils.ComponentUtil;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.critereon.ImpossibleTrigger;
 import net.minecraft.network.chat.Component;
@@ -140,7 +141,7 @@ public class ToastMessage extends AbstractMessage {
     private void sendToast(Player player, ItemStack icon, String msg, FrameType type) {
         DisplayInfo displayInfo = new DisplayInfo(
                 CraftItemStack.asNMSCopy(icon),
-                Optional.ofNullable(Component.Serializer.fromJson(msg)).orElse(Component.empty()),
+                ComponentUtil.getComponentOrEmpty(msg),
                 Component.empty(),
                 null,
                 type, true, false, true);

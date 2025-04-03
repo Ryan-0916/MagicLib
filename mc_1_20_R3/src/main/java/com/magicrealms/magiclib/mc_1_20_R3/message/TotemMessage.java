@@ -82,7 +82,6 @@ public class TotemMessage extends AbstractMessage {
         ))))).forEach(Thread::start);
     }
 
-
     @Override
     public void cleanMessage(Player player) {
     }

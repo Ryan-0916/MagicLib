@@ -5,7 +5,10 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
+import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -63,12 +66,11 @@ public class Message extends AbstractMessage {
         boolean desc = StringUtil.getValueBTWTags(message, "desc", false, ParseType.BOOLEAN),
                 legacy = StringUtil.getValueBTWTags(message, "legacy", false, ParseType.BOOLEAN);
         double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE);
-
         String msg = StringUtil.removeTags(message, "times", "interval", "desc", "legacy");
         if (times <= 1) {
             String m = StringUtil.replacePlaceholder(msg, "times", "1");
-            player.sendMessage(AdventureHelper.deserializeComponent(
-                    legacy ? AdventureHelper.legacyToMiniMessage(m) : m));
+            sendMessage(player, AdventureHelper.serializeComponent(
+                    AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(m) : m)));
             return;
         }
         AtomicInteger index = new AtomicInteger();
@@ -78,8 +80,8 @@ public class Message extends AbstractMessage {
                 return;
             }
             String m = StringUtil.replacePlaceholder(msg, "times", String.valueOf(desc ? times - index.get() : index.get() + 1));
-            player.sendMessage(AdventureHelper.deserializeComponent(
-                    legacy ? AdventureHelper.legacyToMiniMessage(m) : m));
+            sendMessage(player, AdventureHelper.serializeComponent(
+                    AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(m) : m)));
             index.getAndIncrement();
         }, 0, Math.round(interval * 20)));
     }
@@ -90,5 +92,10 @@ public class Message extends AbstractMessage {
             TASK.remove(player.getUniqueId());
             if (!task.isCancelled()) task.cancel();
         });
+    }
+
+    private void sendMessage(Player player, String msg) {
+        ((CraftPlayer) player).getHandle().connection.send(
+                new ClientboundSystemChatPacket(ComponentUtil.getComponentOrEmpty(msg),false));
     }
 }

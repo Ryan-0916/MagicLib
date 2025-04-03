@@ -5,7 +5,7 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import net.minecraft.network.chat.Component;
+import com.magicrealms.magiclib.mc_1_20_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import org.bukkit.Bukkit;
@@ -114,10 +114,8 @@ public class TitleMessage extends AbstractMessage {
     private void sendTitle(Player player, @Nullable String title, @Nullable String subTitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         List<Packet<ClientGamePacketListener>> packetListeners = List.of(
                 new ClientboundSetTitlesAnimationPacket(fadeInTicks, stayTicks, fadeOutTicks),
-                new ClientboundSetTitleTextPacket(Optional.ofNullable(
-                        Component.Serializer.fromJson(title == null ? StringUtil.EMPTY : title)).orElse(Component.empty())),
-                new ClientboundSetSubtitleTextPacket(Optional.ofNullable(
-                        Component.Serializer.fromJson(subTitle == null ? StringUtil.EMPTY : subTitle)).orElse(Component.empty()))
+                new ClientboundSetTitleTextPacket(ComponentUtil.getComponentOrEmpty(title)),
+                new ClientboundSetSubtitleTextPacket(ComponentUtil.getComponentOrEmpty(subTitle))
         );
         ((CraftPlayer)player).getHandle().connection.send(new ClientboundBundlePacket(packetListeners));
     }

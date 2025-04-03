@@ -5,12 +5,11 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import net.minecraft.network.chat.Component;
+import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
@@ -114,10 +113,8 @@ public class TitleMessage extends AbstractMessage {
     private void sendTitle(Player player, @Nullable String title, @Nullable String subTitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         List<Packet<? super ClientGamePacketListener>> packets = List.of(
                 new ClientboundSetTitlesAnimationPacket(fadeInTicks, stayTicks, fadeOutTicks),
-                new ClientboundSetTitleTextPacket(Optional.ofNullable(
-                        CraftChatMessage.fromJSON(title == null ? StringUtil.EMPTY : title)).orElse(Component.empty())),
-                new ClientboundSetSubtitleTextPacket(Optional.ofNullable(
-                        CraftChatMessage.fromJSON(subTitle == null ? StringUtil.EMPTY : subTitle)).orElse(Component.empty()))
+                new ClientboundSetTitleTextPacket(ComponentUtil.getComponentOrEmpty(title)),
+                new ClientboundSetSubtitleTextPacket(ComponentUtil.getComponentOrEmpty(subTitle))
         );
         ((CraftPlayer)player).getHandle().connection.send(new ClientboundBundlePacket(packets));
     }

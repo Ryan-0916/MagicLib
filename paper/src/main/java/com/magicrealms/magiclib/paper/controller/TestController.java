@@ -2,7 +2,9 @@ package com.magicrealms.magiclib.paper.controller;
 import com.magicrealms.magiclib.common.command.annotations.Command;
 import com.magicrealms.magiclib.common.command.annotations.Listener;
 import com.magicrealms.magiclib.common.command.enums.PermissionType;
+import com.magicrealms.magiclib.paper.dispatcher.NMSDispatcher;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * @author Ryan-0916
@@ -14,10 +16,14 @@ import org.bukkit.command.CommandSender;
 public class TestController {
 
 
-    @Command(text = "^hello$")
+    @Command(text = "^hello\\s\\S+$")
     public void hello(CommandSender sender, String[] args) {
-        System.out.println("hello");
+        NMSDispatcher.getInstance().test2((Player) sender, args[1]);
+    }
 
+    @Command(text = "^hello2\\s\\S+$")
+    public void hello2(CommandSender sender, String[] args) {
+        NMSDispatcher.getInstance().test3((Player) sender, Integer.parseInt(args[1]));
     }
 
 
