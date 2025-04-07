@@ -138,7 +138,7 @@ public class PageMenuHolder extends BaseMenuHolder {
     @Override
     public void setItemSlot(int slot, ItemFlag... itemFlags){
         char slotChar = super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManage(),
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
                 super.getConfigPath(),
                 "Icons." + slotChar + ".display"));
     }
@@ -146,7 +146,7 @@ public class PageMenuHolder extends BaseMenuHolder {
     @Override
     public void setButtonSlot(int slot, boolean disabled, ItemFlag... itemFlags){
         char slotChar =  super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManage(),
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
                 super.getConfigPath(),
                 "Icons." + slotChar + (disabled ? ".disabledDisplay" : ".activeDisplay")));
     }
@@ -154,7 +154,7 @@ public class PageMenuHolder extends BaseMenuHolder {
     @Override
     public void setCheckBoxSlot(int slot, boolean opened, ItemFlag... itemFlags){
         char slotChar =  super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManage(),
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
                 super.getConfigPath(),
                 "Icons." + slotChar + (opened ? ".openDisplay" : ".closeDisplay")));
     }
@@ -163,10 +163,10 @@ public class PageMenuHolder extends BaseMenuHolder {
     public @NotNull Component getTitle(Map<String, String> placeholderMap) {
         placeholderMap.put("page", String.valueOf(page));
         placeholderMap.put("max_page", String.valueOf(maxPage));
-        placeholderMap.put("next_page_title", super.getPlugin().getConfigManage()
+        placeholderMap.put("next_page_title", super.getPlugin().getConfigManager()
                 .getYmlValue(super.getConfigPath(), page >= maxPage ? "PageTitle.NextPage.Disable" :
                         "PageTitle.NextPage.Active"));
-        placeholderMap.put("previous_page_title", super.getPlugin().getConfigManage()
+        placeholderMap.put("previous_page_title", super.getPlugin().getConfigManager()
                 .getYmlValue(super.getConfigPath(), page <= 1 ? "PageTitle.PreviousPage.Disable" :
                         "PageTitle.PreviousPage.Active"));
         return super.getTitle(placeholderMap);

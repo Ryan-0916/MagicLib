@@ -2,8 +2,8 @@ package com.magicrealms.magiclib.common;
 
 
 import com.magicrealms.magiclib.common.manage.CommandManager;
-import com.magicrealms.magiclib.common.manage.ConfigManage;
-import com.magicrealms.magiclib.common.manage.LoggerManage;
+import com.magicrealms.magiclib.common.manage.ConfigManager;
+import com.magicrealms.magiclib.common.manage.LoggerManager;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -22,9 +22,9 @@ import java.io.*;
 @SuppressWarnings("unused")
 public abstract class MagicRealmsPlugin extends JavaPlugin {
 
-    private ConfigManage configManage;
+    private ConfigManager configManager;
     private CommandManager commandManager;
-    private LoggerManage loggerManager;
+    private LoggerManager loggerManager;
 
     public MagicRealmsPlugin() {
 
@@ -38,16 +38,15 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
     }
 
     private void setupConfigManager() {
-        this.configManage = new ConfigManage(this);
+        this.configManager = new ConfigManager(this);
     }
 
     private void setupCommandManger() {
         this.commandManager = new CommandManager(this);
     }
 
-
     private void setupLoggerManager() {
-        this.loggerManager = new LoggerManage(this);
+        this.loggerManager = new LoggerManager(this);
     }
 
     public void dependenciesCheck(Runnable runnable, String... dependenciesName) {
@@ -109,7 +108,7 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
         }
     }
 
-    protected abstract void loadConfig(ConfigManage configManage);
+    protected abstract void loadConfig(ConfigManager configManager);
 
     protected abstract void registerCommand(CommandManager commandManager);
 

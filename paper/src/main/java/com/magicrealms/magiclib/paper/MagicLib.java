@@ -2,7 +2,7 @@ package com.magicrealms.magiclib.paper;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.manage.CommandManager;
-import com.magicrealms.magiclib.common.manage.ConfigManage;
+import com.magicrealms.magiclib.common.manage.ConfigManager;
 import com.magicrealms.magiclib.paper.dispatcher.MessageDispatcher;
 import com.magicrealms.magiclib.paper.listener.PlayerListener;
 import org.bukkit.Bukkit;
@@ -23,7 +23,7 @@ public class MagicLib extends MagicRealmsPlugin {
         super.onEnable();
         INSTANCE = this;
         dependenciesCheck(() -> {
-            loadConfig(getConfigManage());
+            loadConfig(getConfigManager());
             registerCommand(getCommandManager());
             Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         });
@@ -35,8 +35,8 @@ public class MagicLib extends MagicRealmsPlugin {
     }
 
     @Override
-    protected void loadConfig(ConfigManage configManage) {
-        configManage.loadConfig(YML_CONFIRM_MENU);
+    protected void loadConfig(ConfigManager configManager) {
+        configManager.loadConfig(YML_CONFIRM_MENU);
     }
 
     @Override

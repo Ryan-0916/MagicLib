@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.common.utils;
 
 import com.magicrealms.magiclib.common.enums.ParseType;
-import com.magicrealms.magiclib.common.manage.ConfigManage;
+import com.magicrealms.magiclib.common.manage.ConfigManager;
 import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.text.Component;
@@ -80,28 +80,28 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static ItemStack getItemStackByConfig(ConfigManage configManage, String configPath,
+    public static ItemStack getItemStackByConfig(ConfigManager configManager, String configPath,
                                                  String key, ItemFlag... itemFlags) {
-        return getItemStackByConfig(configManage, configPath, key, null, itemFlags);
+        return getItemStackByConfig(configManager, configPath, key, null, itemFlags);
     }
 
     @SuppressWarnings("DuplicatedCode")
     @NotNull
-    public static ItemStack getItemStackByConfig(ConfigManage configManage, String configPath,
+    public static ItemStack getItemStackByConfig(ConfigManager configManager, String configPath,
                                                  String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
         Optional<Material> material = Optional.ofNullable(Material.matchMaterial(
-                configManage.getYmlValue(configPath, key + ".mats")));
-        Optional<String> name = configManage.containsYmlKey(configPath, key + ".name") ?
-                Optional.of(configManage.getYmlValue(configPath, key + ".name")) : Optional.empty();
-        Optional<List<String>> lore = configManage.containsYmlKey(configPath, key + ".lore") ?
-                configManage.getYmlListValue(configPath, key + ".lore")  : Optional.empty();
+                configManager.getYmlValue(configPath, key + ".mats")));
+        Optional<String> name = configManager.containsYmlKey(configPath, key + ".name") ?
+                Optional.of(configManager.getYmlValue(configPath, key + ".name")) : Optional.empty();
+        Optional<List<String>> lore = configManager.containsYmlKey(configPath, key + ".lore") ?
+                configManager.getYmlListValue(configPath, key + ".lore")  : Optional.empty();
         if (material.isEmpty()) {
             return AIR;
         }
         Builder itemBuilder = new Builder(material.get())
                 .setItemFlag(itemFlags)
-                .setCustomModelData(configManage.getYmlValue(configPath, key + ".modelData", 0, ParseType.INTEGER));
+                .setCustomModelData(configManager.getYmlValue(configPath, key + ".modelData", 0, ParseType.INTEGER));
         if (name.isPresent()) {
             itemBuilder = itemBuilder.setName(StringUtil.replacePlaceholder(name.get(), map));
         }
@@ -112,25 +112,25 @@ public class ItemUtil {
     }
 
     @NotNull
-    public static ItemStack setItemStackByConfig(ConfigManage configManage, ItemStack itemStack,
+    public static ItemStack setItemStackByConfig(ConfigManager configManager, ItemStack itemStack,
                                                  String configPath,
                                                  String key,
                                                  ItemFlag... itemFlags) {
-       return setItemStackByConfig(configManage, itemStack, configPath, key, null, itemFlags);
+       return setItemStackByConfig(configManager, itemStack, configPath, key, null, itemFlags);
     }
 
     @SuppressWarnings("DuplicatedCode")
     @NotNull
-    public static ItemStack setItemStackByConfig(ConfigManage configManage, ItemStack itemStack,
+    public static ItemStack setItemStackByConfig(ConfigManager configManager, ItemStack itemStack,
                                                  String configPath,
                                                  String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
-        Optional<String> nameOptional = configManage.containsYmlKey(configPath, key + ".name") ?
-                Optional.of(configManage.getYmlValue(configPath, key + ".name")) : Optional.empty();
-        Optional<List<String>> loreOptional = configManage.containsYmlKey(configPath, key + ".lore") ?
-                configManage.getYmlListValue(configPath, key + ".lore") : Optional.empty();
+        Optional<String> nameOptional = configManager.containsYmlKey(configPath, key + ".name") ?
+                Optional.of(configManager.getYmlValue(configPath, key + ".name")) : Optional.empty();
+        Optional<List<String>> loreOptional = configManager.containsYmlKey(configPath, key + ".lore") ?
+                configManager.getYmlListValue(configPath, key + ".lore") : Optional.empty();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(configManage.getYmlValue(configPath, key + ".modelData", 0, ParseType.INTEGER));
+        itemMeta.setCustomModelData(configManager.getYmlValue(configPath, key + ".modelData", 0, ParseType.INTEGER));
         nameOptional.ifPresent(name -> itemMeta.displayName(UN_ITALIC.append(AdventureHelper.deserializeComponent(
                 AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholder(name, map))))));
         loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(

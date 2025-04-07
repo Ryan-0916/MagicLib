@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,15 +82,8 @@ public class NMSDispatcher implements INMSDispatcher {
     }
 
     @Override
-    public void test2(Player player, String value) {
-        NMS_DISPATCHER.test2(player, value);
+    public void resetChatDialog(Player player, List<String> messageHistory) {
+        NMS_DISPATCHER.resetChatDialog(player, messageHistory);
     }
-
-    @Override
-    public void test3(Player player, int i) {
-        NMS_DISPATCHER.test3(player, i);
-
-    }
-
 
 }

@@ -4,8 +4,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -346,7 +344,11 @@ public abstract class MixinEntity {
 //        }
 //    }
 //
-//    public static float getDamageAfterAbsorb(LivingEntity entity, float damage, DamageSource damageSource, float armorValue, float armorToughness) {
+//    public static float getDamageAfterAbsorb(LivingEntity entity,
+//                                             float damage,
+//                                             DamageSource damageSource,
+//                                             float armorValue,
+//                                             float armorToughness) {
 //        float f3;
 //        label12: {
 //            // 计算基础的伤害吸收系数

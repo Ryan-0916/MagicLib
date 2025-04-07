@@ -78,7 +78,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
         this.player = player;
         this.configPath = configPath;
         this.layout = setupLayout(defLayout);
-        this.title = plugin.getConfigManage().getYmlValue(configPath, "Title");
+        this.title = plugin.getConfigManager().getYmlValue(configPath, "Title");
         this.lock = lock;
         this.backMenuRunnable = backMenuRunnable;
         this.cooldownItems = new ConcurrentHashMap<>();
@@ -89,7 +89,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
 
     @NotNull
     private String setupLayout(String defLayout) {
-        Optional<List<String>> layout = plugin.getConfigManage().getYmlListValue(configPath, "Layout");
+        Optional<List<String>> layout = plugin.getConfigManager().getYmlListValue(configPath, "Layout");
         if (layout.isEmpty()) {
             return defLayout;
         }
@@ -147,12 +147,12 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     public void playSound(String key) {
-        if (!plugin.getConfigManage().containsYmlKey(configPath, key + ".path")) {
+        if (!plugin.getConfigManager().containsYmlKey(configPath, key + ".path")) {
             return;
         }
-        player.playSound(player, plugin.getConfigManage().getYmlValue(configPath, key + ".path"),
-                plugin.getConfigManage().getYmlValue(configPath, key + ".volume", 1.0F, ParseType.FLOAT),
-                plugin.getConfigManage().getYmlValue(configPath, key + ".pitch", 1.0F, ParseType.FLOAT));
+        player.playSound(player, plugin.getConfigManager().getYmlValue(configPath, key + ".path"),
+                plugin.getConfigManager().getYmlValue(configPath, key + ".volume", 1.0F, ParseType.FLOAT),
+                plugin.getConfigManager().getYmlValue(configPath, key + ".pitch", 1.0F, ParseType.FLOAT));
     }
 
     public void setItemSlot(int slot, ItemStack itemStack) {
@@ -166,21 +166,21 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
 
     public void setItemSlot(int slot, ItemFlag... itemFlags){
         char slotChar = layout.charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManage(),
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
                 "Icons." + slotChar + ".display"));
     }
 
     public void setButtonSlot(int slot, boolean disabled, ItemFlag... itemFlags){
         char slotChar = layout.charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManage(),
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
                 "Icons." + slotChar + (disabled ? ".disabledDisplay" : ".activeDisplay")));
     }
 
     public void setCheckBoxSlot(int slot, boolean opened, ItemFlag... itemFlags){
         char slotChar = layout.charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManage(),
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
                 "Icons." + slotChar + (opened ? ".openDisplay" : ".closeDisplay")));
     }
@@ -227,7 +227,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
         }
 
         String key = "Icons." + character + ".cooldown";
-        if (!plugin.getConfigManage().containsYmlKey(configPath, key)) {
+        if (!plugin.getConfigManager().containsYmlKey(configPath, key)) {
             return true;
         }
 
@@ -237,7 +237,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
         }
 
         /* 如果不是空气则替将它放置到槽位中 */
-        ItemStack cooldownItemStack = ItemUtil.getItemStackByConfig(plugin.getConfigManage(),
+        ItemStack cooldownItemStack = ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
                 "Icons." + character + ".cooldownDisplay");
         if (ItemUtil.isNotAirOrNull(cooldownItemStack)) {
@@ -247,7 +247,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
             ItemStack itemStack = cooldownItems.get(clickSlot);
             cooldownItems.remove(clickSlot);
             inventory.setItem(clickSlot, itemStack);
-        }, Math.round(plugin.getConfigManage().getYmlValue(configPath, key, 1.0D, ParseType.DOUBLE) * 20L));
+        }, Math.round(plugin.getConfigManager().getYmlValue(configPath, key, 1.0D, ParseType.DOUBLE) * 20L));
         return true;
     }
 }

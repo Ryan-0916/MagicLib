@@ -19,14 +19,14 @@ import java.util.function.Consumer;
  * @date 2024-05-26
  */
 @SuppressWarnings("unused")
-public class ConfigManage {
+public class ConfigManager {
 
     private final MagicRealmsPlugin PLUGIN;
 
     /* 所有以及在缓存中加载的文件 */
     private final Map<String, FileMirrorInfo> ALL_CONFIG = new HashMap<>();
 
-    public ConfigManage(MagicRealmsPlugin plugin) {
+    public ConfigManager(MagicRealmsPlugin plugin) {
         this.PLUGIN = plugin;
     }
 
@@ -36,7 +36,7 @@ public class ConfigManage {
      * @param resourcesPath 可变参数，表示需要加载的资源文件路径列表
      *                      说明：
      *                      - 遍历传入的资源文件路径列表。
-     *                      - 调用 {@link ConfigManage#getYamlConfiguration(String)} 方法获取每个资源文件的 Yaml 配置对象。
+     *                      - 调用 {@link ConfigManager#getYamlConfiguration(String)} 方法获取每个资源文件的 Yaml 配置对象。
      *                      - 如果配置对象存在，将资源路径与 {@link FileMirrorInfo} 对象存入 ALL_CONFIG。
      */
     public void loadConfig(String... resourcesPath) {
@@ -55,7 +55,7 @@ public class ConfigManage {
      *                   <p>
      *                   说明：
      *                   - 当文件夹中存在此文件时，我们将直接返回文件的配置对象，弱文件夹中不存在此文件时我们将以 sourcePath 资源为模板生成文件
-     *                   - 调用 {@link ConfigManage#getYamlConfiguration(String)} 方法获取每个资源文件的 Yaml 配置对象。
+     *                   - 调用 {@link ConfigManager#getYamlConfiguration(String)} 方法获取每个资源文件的 Yaml 配置对象。
      *                   - 如果配置对象存在，将资源路径与 {@link FileMirrorInfo} 对象存入 ALL_CONFIG。
      */
     public void loadMirrorConfig(String mirrorPath, @Nullable String sourcePath) {
@@ -120,7 +120,7 @@ public class ConfigManage {
     /**
      * 重新加载所有文件池中的文件
      * 此方法会重新获取文件池中所有资源文件，请谨慎使用
-     * 推荐使用单文件重新加载 {@link ConfigManage#reloadConfig(String, Consumer)}
+     * 推荐使用单文件重新加载 {@link ConfigManager#reloadConfig(String, Consumer)}
      */
     public void reloadAllConfig() {
         ALL_CONFIG.values().forEach(fileMirrorInfo ->

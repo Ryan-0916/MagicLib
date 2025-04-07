@@ -12,6 +12,14 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "com.gradleup.shadow")
 
+    dependencies {
+        compileOnly("org.apache.commons:commons-lang3:3.8.1")
+        compileOnly("org.projectlombok:lombok:1.18.24")
+        annotationProcessor("org.projectlombok:lombok:1.18.24")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
+        testCompileOnly("org.projectlombok:lombok:1.18.24")
+    }
+
     repositories {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")

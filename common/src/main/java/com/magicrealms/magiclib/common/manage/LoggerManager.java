@@ -10,11 +10,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @SuppressWarnings("unused")
 @Slf4j
-public class LoggerManage {
+public class LoggerManager {
 
    private final MagicRealmsPlugin PLUGIN;
 
-    public LoggerManage(MagicRealmsPlugin plugin) {
+    public LoggerManager(MagicRealmsPlugin plugin) {
         this.PLUGIN = plugin;
     }
 
