@@ -21,8 +21,10 @@ public class RedisStore implements IRedisStore{
 
     private static final String SET_INHERITANCE_TTL_SCRIPT;
     private static final String LEFT_PUSH_SCRIPT;
+    private static final String LEFT_PUSH_TRIM_SCRIPT;
     private static final String LEFT_PUSH_INHERITANCE_TTL_SCRIPT;
     private static final String RIGHT_PUSH_SCRIPT;
+    private static final String RIGHT_PUSH_TRIM_SCRIPT;
     private static final String RIGHT_PUSH_INHERITANCE_TTL_SCRIPT;
     private static final String MAP_SET_SCRIPT;
     private static final String MAP_SET_INHERITANCE_TTL_SCRIPT;
@@ -81,6 +83,21 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
+    private boolean pushValueSetMaxSizeByScript(String key, int maxSize, String script, String... values) {
+        Optional<Jedis> connectionOptional = getConnection();
+        if (connectionOptional.isEmpty()) return false;
+        try (Jedis connection = connectionOptional.get()){
+            connection.eval(script, Collections.singletonList(key), Stream.concat(
+                    Arrays.stream(values),
+                    Stream.of(String.valueOf(maxSize - 1))
+            ).collect(Collectors.toList()));
+            return true;
+        } catch (Exception e) {
+            PLUGIN.getLoggerManager().warning("Redis 查询异常请检查 Redis 服务" + e.getMessage());
+        }
+        return false;
+    }
+
     @Override
     public boolean exists(String key) {
         Optional<Jedis> connectionOptional = getConnection();
@@ -118,8 +135,24 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
+    public boolean lSetValue(String key, int maxSize, String... value) {
+        if (maxSize < 0) {
+            return lSetValue(key, -1, value);
+        }
+        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, value);
+    }
+
+    @Override
     public boolean lSetObject(String key, long expire, Object... values) {
         return lSetValue(key, expire, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+    }
+
+    @Override
+    public boolean lSetValue(String key, int maxSize, Object... values) {
+        if (maxSize < 0) {
+            return lSetValue(key, -1, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+        }
+        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
@@ -128,8 +161,24 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
+    public boolean rSetValue(String key, int maxSize, String... value) {
+        if (maxSize < 0) {
+            return rSetValue(key, -1, value);
+        }
+        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, value);
+    }
+
+    @Override
     public boolean rSetObject(String key, long expire, Object... values) {
         return rSetValue(key, expire, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+    }
+
+    @Override
+    public boolean rSetValue(String key, int maxSize, Object... values) {
+        if (maxSize < 0) {
+            return rSetValue(key, -1, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+        }
+        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
@@ -234,6 +283,25 @@ public class RedisStore implements IRedisStore{
     }
 
     @Override
+    public Optional<List<String>> getAllValue(String key) {
+        Optional<Jedis> connectionOptional = getConnection();
+        if (connectionOptional.isEmpty()) return Optional.empty();
+        try (Jedis connection = connectionOptional.get()) {
+            return connection.exists(key) ? Optional.of(connection.lrange(key, 0, -1))
+                    : Optional.empty();
+        } catch (Exception e) {
+            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public <T> Optional<List<T>> getAllObject(String key, Class<T> clazz) {
+        return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz))
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public boolean removeKey(String... key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -333,6 +401,12 @@ public class RedisStore implements IRedisStore{
                 "end " +
                 "redis.call('EXPIRE', KEYS[1], ARGV[#ARGV])";
 
+        /* Lua脚本 这个脚本用于像队列左侧侧插入数值，并且设置队列的大小 */
+        LEFT_PUSH_TRIM_SCRIPT = "for I = 1, #ARGV - 1 do " +
+                "redis.call('LPUSH', KEYS[1], ARGV[I]) " +
+                "end " +
+                "redis.call('LTRIM', KEYS[1], 0, ARGV[#ARGV])";
+
         /* Lua脚本 这个脚本首先检查键是否存在，
         如果存在则获取其TTL，
         并根据TTL值来决定是否像队列左侧插入新值以及新的过期时间 */
@@ -353,6 +427,12 @@ public class RedisStore implements IRedisStore{
                 "redis.call('RPUSH', KEYS[1], ARGV[I]) " +
                 "end " +
                 "redis.call('EXPIRE', KEYS[1], ARGV[#ARGV])";
+
+        /* Lua脚本 这个脚本用于像队列右侧插入数值，并且设置队列的大小 */
+        RIGHT_PUSH_TRIM_SCRIPT = "for I = 1, #ARGV - 1 do " +
+                "redis.call('RPUSH', KEYS[1], ARGV[I]) " +
+                "end " +
+                "redis.call('LTRIM', KEYS[1], 0, ARGV[#ARGV])";
 
         /* Lua脚本 这个脚本首先检查键是否存在，
         如果存在则获取其TTL，

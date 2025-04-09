@@ -103,6 +103,9 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
     }
 
     @Override
+    @Deprecated(
+            since = "1.21.4"
+    )
     public InventoryView openAnvil(Player player, Map<Integer, ItemStack> anvilItems, String title) {
         InventoryView inventoryView = player.openAnvil(player.getLocation(), true);
         setupAnvil(player, anvilItems, title);

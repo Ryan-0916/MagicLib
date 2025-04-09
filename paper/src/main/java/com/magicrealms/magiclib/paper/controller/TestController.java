@@ -2,7 +2,10 @@ package com.magicrealms.magiclib.paper.controller;
 import com.magicrealms.magiclib.common.command.annotations.Command;
 import com.magicrealms.magiclib.common.command.annotations.Listener;
 import com.magicrealms.magiclib.common.command.enums.PermissionType;
+import com.magicrealms.magiclib.paper.MagicLib;
+import com.magicrealms.magiclib.paper.dispatcher.MessageDispatcher;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * @author Ryan-0916
@@ -15,6 +18,10 @@ public class TestController {
 
     @Command(text = "^test$", permissionType = PermissionType.PLAYER)
     public void test(CommandSender sender, String[] args) {
+
+        MessageDispatcher.getInstance().sendMessage(MagicLib.getInstance(), ((Player) sender), "<yellow>Woo: <gradient:#5e4fa2:#f79459:red>||||||||||||||||||||||||</gradient>");
+
+
 //        Player player = ((Player) sender);
 
 

@@ -18,9 +18,13 @@ public interface IRedisStore {
     boolean setValue(String key, String value, long expire);
     boolean setObject(String key, Object value, long expire);
     boolean lSetValue(String key, long expire, String... values);
+    boolean lSetValue(String key, int maxSize, String... value);
     boolean lSetObject(String key, long expire, Object... values);
+    boolean lSetValue(String key, int maxSize, Object... values);
     boolean rSetValue(String key, long expire, String... values);
+    boolean rSetValue(String key, int maxSize, String... value);
     boolean rSetObject(String key, long expire, Object... values);
+    boolean rSetValue(String key, int maxSize, Object... values);
     boolean hSetValue(String key, LinkedHashMap<String, String> values, long expire);
     boolean hSetValue(String key, String subKey, String value, long expire);
     boolean hSetObject(String key, String subKey, Object value, long expire);
@@ -31,6 +35,8 @@ public interface IRedisStore {
     <T> Optional<T> hGetObject(String key, String subKey,  Class<T> clazz);
     Optional<List<String>> hGetAllValue(String key);
     <T> Optional<List<T>> hGetAllObject(String key,  Class<T> clazz);
+    Optional<List<String>> getAllValue(String key);
+    <T> Optional<List<T>> getAllObject(String key, Class<T> clazz);
     boolean removeKey(String... key);
     boolean removeKeyByPrefix(String... prefix);
     boolean removeHkey(String key, String... subKey);
