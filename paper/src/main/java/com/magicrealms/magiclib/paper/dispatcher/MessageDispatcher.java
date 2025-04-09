@@ -42,7 +42,7 @@ public class MessageDispatcher implements IMessageDispatcher {
             default -> throw new UnsupportedVersionException("您的 Minecraft 版本不兼容，请使用合适的版本");
         }
         try {
-            Class<?> clazz = Class.forName("com.magicrealms.magiclib." + packageName + ".message.factory" + StringUtils.upperCase(packageName) + "_MessageFactory");
+            Class<?> clazz = Class.forName("com.magicrealms.magiclib." + packageName + ".message.factory." + StringUtils.upperCase(packageName) + "_MessageFactory");
             Constructor<?> constructor = clazz.getDeclaredConstructor();
             constructor.setAccessible(true);
             MESSAGE_FACTORY = (IMessageFactory) constructor.newInstance();
