@@ -1,4 +1,4 @@
-package com.magicrealms.magiclib.common.command.processor;
+package com.magicrealms.magiclib.common.processor;
 
 import java.io.File;
 import java.io.IOException;

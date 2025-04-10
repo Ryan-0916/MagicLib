@@ -3,7 +3,6 @@ package com.magicrealms.magiclib.mc_1_21_R3.message;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
@@ -80,8 +79,7 @@ public class ActionBarMessage extends AbstractMessage {
                 printActionBar(plugin, player, m, printerPrefix, printerTime, legacy);
                 return;
             }
-            sendActionBar(player, AdventureHelper.serializeComponent(
-                    AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(m) : m)));
+            sendActionBar(player, ComponentUtil.serializeComponent(m, legacy));
             return;
         }
 
@@ -93,8 +91,7 @@ public class ActionBarMessage extends AbstractMessage {
                 return;
             }
             String m = StringUtil.replacePlaceholder(msg, "times", String.valueOf(desc ? times - index.get() : index.get() + 1));
-            sendActionBar(player, AdventureHelper.serializeComponent(
-                    AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(m) : m)));
+            sendActionBar(player, ComponentUtil.serializeComponent(m, legacy));
             index.getAndIncrement();
         }, 0, Math.round(interval * 20)));
     }
@@ -172,8 +169,7 @@ public class ActionBarMessage extends AbstractMessage {
             /* 构建完整的消息，包括前缀和当前消息内容，如果是未结束的文本拼接上省略号 */
             String m = prefix + currentText + (currentText.length() == msg.length() ? StringUtil.EMPTY : "...");
             /* 发送ActionBar消息给玩家，根据legacy标志选择适当的序列化方式 */
-            sendActionBar(player, AdventureHelper.serializeComponent(
-                    AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(m) : m)));
+            sendActionBar(player, ComponentUtil.serializeComponent(m, legacy));
         }, 0, Math.round(time / (realMessage.length() - 1) * 20)));
     }
 

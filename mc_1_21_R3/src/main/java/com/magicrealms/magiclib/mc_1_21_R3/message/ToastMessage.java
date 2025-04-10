@@ -3,7 +3,6 @@ package com.magicrealms.magiclib.mc_1_21_R3.message;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.advancements.*;
@@ -96,8 +95,7 @@ public class ToastMessage extends AbstractMessage {
                         .orElse("TASK"))).orElse(AdvancementType.TASK);
 
         /* 发送成就信息 */
-        sendToast(player, icon, StringUtil.removeTags(AdventureHelper.serializeComponent(AdventureHelper.deserializeComponent(
-                legacy ? AdventureHelper.legacyToMiniMessage(message) : message)), "material", "modelData", "type", "command", "legacy", "inValidateTime"), type);
+        sendToast(player, icon, StringUtil.removeTags(ComponentUtil.serializeComponent(message, legacy), "material", "modelData", "type", "command", "legacy", "inValidateTime"), type);
 
         commandOptional.ifPresent(command -> {
             Listener listener = new Listener() {

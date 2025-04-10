@@ -7,7 +7,7 @@ import com.magicrealms.magiclib.common.command.records.CommandFailure;
 import com.magicrealms.magiclib.common.command.enums.CommandFailureCause;
 import com.magicrealms.magiclib.common.command.executor.CommandFilterExecutor;
 import com.magicrealms.magiclib.common.command.executor.TabCompleteFilterExecutor;
-import com.magicrealms.magiclib.common.command.processor.AppContext;
+import com.magicrealms.magiclib.common.processor.AppContext;
 import org.bukkit.Bukkit;
 
 
@@ -31,10 +31,9 @@ public class CommandManager {
     private final MagicRealmsPlugin PLUGIN;
     private final AppContext APP_CONTEXT;
 
-    public CommandManager(MagicRealmsPlugin plugin) {
+    public CommandManager(MagicRealmsPlugin plugin, AppContext appContext) {
         this.PLUGIN = plugin;
-        this.APP_CONTEXT = new AppContext(plugin.getClass().getPackage().getName(),
-                plugin.getClass().getClassLoader());
+        this.APP_CONTEXT = appContext;
     }
 
     public void registerCommand(String name, Consumer<CommandFailure> failure) {
@@ -43,7 +42,7 @@ public class CommandManager {
                     /* 注册执行器 */
                     commandManager.setExecutor((sender, command, label, args) -> {
                         AtomicBoolean executorFlg = new AtomicBoolean(false);
-                        APP_CONTEXT.getMethodHashMap().forEach((k, v) -> Arrays.stream(k.getAnnotations()).filter(this::isCommandAnnotation).forEach(annotation -> {
+                        APP_CONTEXT.getCommandMethods().forEach((k, v) -> Arrays.stream(k.getAnnotations()).filter(this::isCommandAnnotation).forEach(annotation -> {
                             if (CommandFilterExecutor.INSTANCE.filter(sender, label, args, annotation, executorFlg, failure)) {
                                 try {
                                     k.setAccessible(true);
@@ -62,7 +61,7 @@ public class CommandManager {
                     /* 注册补全器 */
                     commandManager.setTabCompleter((sender, command, label, args) -> {
                         List<String> tabCompleteList = new ArrayList<>();
-                        APP_CONTEXT.getMethodHashMap().forEach((k, v) -> Arrays.stream(k.getAnnotations()).filter(this::isTabCompleteAnnotation).forEach(annotation -> {
+                        APP_CONTEXT.getCommandMethods().forEach((k, v) -> Arrays.stream(k.getAnnotations()).filter(this::isTabCompleteAnnotation).forEach(annotation -> {
                             if (TabCompleteFilterExecutor.INSTANCE.filter(sender, label, args, annotation, null, null)) {
                                 try {
                                     k.setAccessible(true);

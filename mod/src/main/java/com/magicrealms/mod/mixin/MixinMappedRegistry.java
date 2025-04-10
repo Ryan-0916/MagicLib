@@ -35,7 +35,6 @@ public abstract class MixinMappedRegistry<T> {
     )
     private void skipUnregisteredIntrusiveHoldersAssignment(MappedRegistry<?> instance, Map<T, Holder.Reference<T>> value) {
         if (instance == BuiltInRegistries.ENTITY_TYPE) {
-            System.out.println("skipUnregisteredIntrusiveHoldersAssignment");
         }else {
             this.unregisteredIntrusiveHolders = value;
         }

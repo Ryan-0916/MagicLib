@@ -3,7 +3,6 @@ package com.magicrealms.magiclib.mc_1_21_R3.message;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
@@ -69,8 +68,7 @@ public class Message extends AbstractMessage {
         String msg = StringUtil.removeTags(message, "times", "interval", "desc", "legacy");
         if (times <= 1) {
             String m = StringUtil.replacePlaceholder(msg, "times", "1");
-            sendMessage(player, AdventureHelper.serializeComponent(
-                    AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(m) : m)));
+            sendMessage(player, ComponentUtil.serializeComponent(m, legacy));
             return;
         }
         AtomicInteger index = new AtomicInteger();
@@ -80,8 +78,7 @@ public class Message extends AbstractMessage {
                 return;
             }
             String m = StringUtil.replacePlaceholder(msg, "times", String.valueOf(desc ? times - index.get() : index.get() + 1));
-            sendMessage(player, AdventureHelper.serializeComponent(
-                    AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(m) : m)));
+            sendMessage(player, ComponentUtil.serializeComponent(m, legacy));
             index.getAndIncrement();
         }, 0, Math.round(interval * 20)));
     }

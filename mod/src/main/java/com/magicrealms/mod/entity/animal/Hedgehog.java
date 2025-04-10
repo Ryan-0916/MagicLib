@@ -64,7 +64,6 @@ public class Hedgehog extends Animal {
 
     public void tick() {
         this.remove(RemovalReason.DISCARDED);
-        System.out.println("炼奶1111");
     }
 
     protected void registerGoals() {

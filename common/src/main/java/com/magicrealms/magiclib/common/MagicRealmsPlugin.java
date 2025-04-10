@@ -4,6 +4,8 @@ package com.magicrealms.magiclib.common;
 import com.magicrealms.magiclib.common.manage.CommandManager;
 import com.magicrealms.magiclib.common.manage.ConfigManager;
 import com.magicrealms.magiclib.common.manage.LoggerManager;
+import com.magicrealms.magiclib.common.manage.PacketManager;
+import com.magicrealms.magiclib.common.processor.AppContext;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -18,16 +20,23 @@ import java.io.*;
  * @Desc 抽象插件类
  * @date 2024-05-26
  */
-@Getter
+
 @SuppressWarnings("unused")
 public abstract class MagicRealmsPlugin extends JavaPlugin {
 
+    @Getter
     private ConfigManager configManager;
-    private CommandManager commandManager;
+    @Getter
     private LoggerManager loggerManager;
 
-    public MagicRealmsPlugin() {
+    protected CommandManager commandManager;
+    protected PacketManager packetManager;
 
+    private final AppContext APP_CONTEXT;
+
+    public MagicRealmsPlugin() {
+        APP_CONTEXT =  new AppContext(this.getClass().getPackage().getName(),
+                this.getClass().getClassLoader());
     }
 
     @Override
@@ -35,6 +44,7 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
         this.setupLoggerManager();
         this.setupConfigManager();
         this.setupCommandManger();
+        this.setupPacketManager();
     }
 
     private void setupConfigManager() {
@@ -42,12 +52,14 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
     }
 
     private void setupCommandManger() {
-        this.commandManager = new CommandManager(this);
+        this.commandManager = new CommandManager(this, APP_CONTEXT);
     }
 
     private void setupLoggerManager() {
         this.loggerManager = new LoggerManager(this);
     }
+
+    private void setupPacketManager() { this.packetManager = new PacketManager(this, APP_CONTEXT); }
 
     public void dependenciesCheck(Runnable runnable, String... dependenciesName) {
         for (String name : dependenciesName) {
@@ -112,4 +124,5 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
 
     protected abstract void registerCommand(CommandManager commandManager);
 
+    protected abstract void registerPacketListener(PacketManager packetManager);
 }

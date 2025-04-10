@@ -49,6 +49,10 @@ public class AdventureHelper {
         return getInstance().GSON_COMPONENT_SERIALIZER;
     }
 
+    public static LegacyComponentSerializer getLegacy() {
+        return getInstance().LEGACY_COMPONENT_SERIALIZER;
+    }
+
     public static String legacyToMiniMessage(String legacy) {
         StringBuilder stringBuilder = new StringBuilder();
         char[] chars = legacy.toCharArray();
@@ -121,10 +125,6 @@ public class AdventureHelper {
     }
 
     public static String serializeComponent(Component component) {
-        return getGson().serialize(component);
-    }
-
-    public static String serializeComponentByMiniMessage(Component component) {
         return getMiniMessage().serialize(component);
     }
 

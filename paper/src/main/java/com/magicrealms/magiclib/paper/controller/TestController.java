@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.paper.controller;
 import com.magicrealms.magiclib.common.command.annotations.Command;
-import com.magicrealms.magiclib.common.command.annotations.Listener;
+import com.magicrealms.magiclib.common.command.annotations.CommandListener;
 import com.magicrealms.magiclib.common.command.enums.PermissionType;
 import com.magicrealms.magiclib.paper.MagicLib;
 import com.magicrealms.magiclib.paper.dispatcher.MessageDispatcher;
@@ -12,15 +12,19 @@ import org.bukkit.entity.Player;
  * @Desc 说明
  * @date 2024-07-16
  */
-@Listener
+@CommandListener
 @SuppressWarnings("unused")
 public class TestController {
 
+    @Command(text = "^test\\s\\S+$", permissionType = PermissionType.PLAYER)
+    public void test2(CommandSender sender, String[] args) {
+        MessageDispatcher.getInstance().sendMessage(MagicLib.getInstance(), ((Player) sender),
+                args[1]);
+    }
+
     @Command(text = "^test$", permissionType = PermissionType.PLAYER)
     public void test(CommandSender sender, String[] args) {
-
         MessageDispatcher.getInstance().sendMessage(MagicLib.getInstance(), ((Player) sender), "<yellow>Woo: <gradient:#5e4fa2:#f79459:red>||||||||||||||||||||||||</gradient>");
-
 
 //        Player player = ((Player) sender);
 

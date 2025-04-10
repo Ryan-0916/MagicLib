@@ -20,5 +20,4 @@ public enum PermissionType {
     OP,
     /* 控制台或者拥有某项权限组 */
     CONSOLE_OR_PERMISSION
-
 }

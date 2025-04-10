@@ -3,7 +3,6 @@ package com.magicrealms.magiclib.mc_1_21_R3.message;
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.common.message.AbstractMessage;
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.Packet;
@@ -101,10 +100,8 @@ public class TitleMessage extends AbstractMessage {
 
     private void sendTitle(Player player,  String title, String subTitle, double in, double keep, double out, boolean legacy) {
         sendTitle(player,
-                AdventureHelper.serializeComponent(
-                        AdventureHelper.deserializeComponent(legacy ? AdventureHelper.legacyToMiniMessage(title) : title)),
-                AdventureHelper.serializeComponent(
-                        AdventureHelper.deserializeComponent( legacy ? AdventureHelper.legacyToMiniMessage(subTitle) : subTitle)),
+                ComponentUtil.serializeComponent(title, legacy),
+                ComponentUtil.serializeComponent(subTitle, legacy),
                 (int) Math.round(in * 20),
                 (int) Math.round(keep * 20),
                 (int) Math.round(out * 20));
