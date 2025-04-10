@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.mc_1_21_R3.dispatcher;
 
 import com.magicrealms.magiclib.common.dispatcher.INMSDispatcher;
+import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
@@ -10,7 +11,6 @@ import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.inventory.CraftContainer;
-import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.AnvilInventory;
@@ -30,6 +30,8 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
     private final static List<String> history = new ArrayList<>();
 
     private static volatile  MC_1_21_R3_NMSDispatcher INSTANCE;
+
+    private static final String DIALOG_PATH = "MAGIC_LIB_DIALOG";
 
     public static MC_1_21_R3_NMSDispatcher getInstance() {
         if (INSTANCE == null) {
@@ -137,16 +139,20 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
     public void resetChatDialog(Player player, List<String> messageHistory) {
         int historySize = Math.min(messageHistory.size(), 100);
         List<Packet<? super ClientGamePacketListener>> packets = new ArrayList<>(historySize + 1);
+        net.kyori.adventure.text.Component component = net.kyori.adventure.text.Component.text(DIALOG_PATH);
         if (historySize < 100) {
-            String emptyMessage = "\n".repeat(100 - historySize);
-            packets.add(new ClientboundSystemChatPacket(CraftChatMessage.fromJSONOrString(emptyMessage, true), false));
+            component = component.append(net.kyori.adventure.text.Component.text("\n".repeat(100 - historySize)));
         }
-        messageHistory.stream()
-                .skip(Math.max(0, messageHistory.size() - historySize))
-                .limit(historySize)
-                .map(msg -> new ClientboundSystemChatPacket(ComponentUtil.getComponentOrEmpty(msg),  false))
-                .forEach(packets::add);
-        ((CraftPlayer) player).getHandle().connection.send(new ClientboundBundlePacket(packets));
+        for (int i = Math.max(0, messageHistory.size() - historySize); i < messageHistory.size(); i++) {
+            String msg = messageHistory.get(i);
+            component = component.append(AdventureHelper.deserializeComponent(msg));
+            if(i != messageHistory.size() - 1) {
+                component = component.append(net.kyori.adventure.text.Component.text("\n"));
+            }
+        }
+        ((CraftPlayer) player).getHandle().connection.send(
+                new ClientboundSystemChatPacket(component, false)
+        );
     }
 
 }
