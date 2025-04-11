@@ -55,7 +55,7 @@ public class MagicLib extends MagicRealmsPlugin {
 
     @Override
     protected void registerPacketListener(PacketManager packetManager) {
-
+        packetManager.registerListeners();
     }
 
     public static MagicLib getInstance() { return INSTANCE; }

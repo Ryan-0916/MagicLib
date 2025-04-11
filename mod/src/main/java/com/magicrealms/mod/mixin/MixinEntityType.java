@@ -27,6 +27,7 @@ public abstract class MixinEntityType <T extends Entity> implements FeatureEleme
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void entityRegister(CallbackInfo ci) {
+        /* 注册自定义生物 */
         ResourceLocation location = ResourceLocation.fromNamespaceAndPath("magiclib", "custom");
         ResourceKey<EntityType<?>> resourceKey = ResourceKey.create(Registries.ENTITY_TYPE, location);
         EntityType<CustomEntity> hedgehogEntityType = EntityType.Builder
