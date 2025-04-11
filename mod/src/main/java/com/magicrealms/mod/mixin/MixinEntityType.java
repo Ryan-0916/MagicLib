@@ -1,6 +1,6 @@
 package com.magicrealms.mod.mixin;
 
-import com.magicrealms.mod.entity.animal.Hedgehog;
+import com.magicrealms.mod.entity.animal.CustomEntity;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -24,14 +24,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityType.class)
 @SuppressWarnings("unused")
 public abstract class MixinEntityType <T extends Entity> implements FeatureElement, EntityTypeTest<Entity, T> {
-    @Inject(method = "<clinit>", at = @At("HEAD"))
+
+    @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void entityRegister(CallbackInfo ci) {
-        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("migiclib", "hedgehog");
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath("magiclib", "custom");
         ResourceKey<EntityType<?>> resourceKey = ResourceKey.create(Registries.ENTITY_TYPE, location);
-        EntityType<Hedgehog> hedgehogEntityType = EntityType.Builder.of(Hedgehog::new, MobCategory.MISC).noLootTable().noSave()
-                .sized(0.6F, 0.6F)
-                .eyeHeight(0.4F)
-                .clientTrackingRange(10).build(resourceKey);
+        EntityType<CustomEntity> hedgehogEntityType = EntityType.Builder
+                .of(CustomEntity::new, MobCategory.MISC)
+                .noLootTable()
+                .build(resourceKey);
         Registry.register(BuiltInRegistries.ENTITY_TYPE, location, hedgehogEntityType);
     }
+
 }

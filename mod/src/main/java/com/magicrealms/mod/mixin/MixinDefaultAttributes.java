@@ -16,10 +16,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 
 /**
-* @author Ryan-0916
-* @Desc 说明
-* @date 2025-03-24
-*/
+ * @author Ryan-0916
+ * @Desc 说明
+ * @date 2025-03-24
+ */
 @Mixin(DefaultAttributes.class)
 public class MixinDefaultAttributes {
 
@@ -29,11 +29,11 @@ public class MixinDefaultAttributes {
 
     @Inject(method = "getSupplier", at = @At("HEAD"), cancellable = true)
     private static void getSupplier(EntityType<? extends LivingEntity> livingEntity,
-                                                 CallbackInfoReturnable<AttributeSupplier> cir) {
+                                    CallbackInfoReturnable<AttributeSupplier> cir) {
         if(!SUPPLIERS.containsKey(livingEntity)) {
             cir.setReturnValue(Animal.createAnimalAttributes()
-                    .add(Attributes.MAX_HEALTH, 6.0)
-                    .add(Attributes.MOVEMENT_SPEED, 0.25).build());
+                    .add(Attributes.MAX_HEALTH, 20)
+                    .add(Attributes.MOVEMENT_SPEED, 1).build());
         }
     }
 
