@@ -37,12 +37,8 @@ public class TestController {
                         result.setMessage("您为啥输入空啊");
                         return result;
                     }
-                    if (v.equals("炼奶")) {
-                        result.setMessage("你凭啥输入自己的名字啊？");
-                        return result;
-                    }
-                    if (v.equals("宁睿")) {
-                        result.setMessage("你凭啥输入我的名字啊？");
+                    if (v.equals("大家好")) {
+                        result.setMessage("你是蔡徐坤？");
                         return result;
                     }
                     result.setMessage("你输入的文字符合");

@@ -5,7 +5,6 @@ plugins {
 }
 
 val projectVersion : String by project
-val projectGroup : String by project
 
 subprojects {
     apply(plugin = "java")
@@ -22,6 +21,11 @@ subprojects {
     }
 
     repositories {
+        maven {
+            name = "myRepositories"
+            url = uri(layout.buildDirectory.dir("file://D:\\Maven\\MavenRepository"))
+        }
+        mavenLocal()
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.dmulloy2.net/repository/public/")
