@@ -25,6 +25,7 @@ import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -107,13 +108,14 @@ public class ToastMessage extends AbstractMessage {
 
         commandOptional.ifPresent(command -> {
             Listener listener = new Listener() {
-                @EventHandler
+                @EventHandler(priority = EventPriority.LOWEST)
                 public void onPlayerSwapHandItemsEvent (PlayerSwapHandItemsEvent e) {
+                    if (e.isCancelled()) return;
                     if (player.getUniqueId().equals(e.getPlayer().getUniqueId())) {
                         Bukkit.dispatchCommand(player, command);
                         cleanMessage(player);
+                        e.setCancelled(true);
                     }
-                    e.setCancelled(true);
                 }
             };
             LISTENER.put(player.getUniqueId(), listener);

@@ -82,7 +82,7 @@ public class AdventureHelper {
                 case 'd', 'D' -> stringBuilder.append("<light_purple>");
                 case 'e', 'E' -> stringBuilder.append("<yellow>");
                 case 'f', 'F' -> stringBuilder.append("<white>");
-                case 'r', 'R' -> stringBuilder.append("<r><!i>");
+                case 'r', 'R' -> stringBuilder.append("<reset>");
                 case 'l', 'L' -> stringBuilder.append("<b>");
                 case 'm', 'M' -> stringBuilder.append("<st>");
                 case 'o', 'O' -> stringBuilder.append("<i>");
