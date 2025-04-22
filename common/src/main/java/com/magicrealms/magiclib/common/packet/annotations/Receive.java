@@ -1,7 +1,8 @@
 package com.magicrealms.magiclib.common.packet.annotations;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.ListenerPriority;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.protocol.ConnectionState;
+import com.github.retrooper.packetevents.protocol.PacketSide;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,8 +17,8 @@ import java.lang.annotation.Target;
  * 可用于监听指定的协议、发送方和数据包 ID。
  * 注解用于标记一个方法是用于接收特定的 Minecraft 数据包。
  * 该注解必须在类注解 @PacketListener 中才能生效。它用于指示该方法监听特定协议、发送方和数据包 ID。
- * 该注解主要用于与 ProtocolLib 配合使用，允许开发者通过方法来处理来自 Minecraft 游戏客户端或服务器的不同类型的数据包。
- * 使用此注解时，可以指定数据包的协议类型、发送方（客户端或服务器）以及数据包的 ID。同时，还可以设置该方法的监听器优先级，
+ * 该注解主要用于与 PacketEvents 配合使用，允许开发者通过方法来处理来自 Minecraft 游戏客户端或服务器的不同类型的数据包。
+ * 使用此注解时，可以指定数据包的协议类型、发送方（客户端或服务器）以及数据包的名称。同时，还可以设置该方法的监听器优先级，
  * 以便在多个监听器处理相同数据包时，控制执行顺序。
  * @date 2025-04-10
  */
@@ -31,29 +32,29 @@ public @interface Receive {
      * 包括客户端与服务器之间的协议数据包类型。
      * @return 数据包协议类型
      */
-    PacketType.Protocol protocol();
+    ConnectionState state();
 
     /**
      * 指定数据包的发送方。
      * 可以是客户端（CLIENT）或服务器（SERVER）。
      * @return 数据包发送方
      */
-    PacketType.Sender sender();
+    PacketSide side();
 
     /**
-     * 指定数据包的 ID。
-     * 每个数据包都有唯一的 ID 用于标识该数据包类型。
-     * @return 数据包 ID
+     * 指定数据包枚举 Name
+     * 每个数据包都有唯一的 Name 用于标识该数据包类型。
+     * @return 数据包枚举 Name
      */
-    int packetId();
+    String name();
 
     /**
      * 监听器优先级
      * 该字段用于设置该方法的监听器优先级。
      * 优先级决定了在多个方法接收相同数据包时，哪个方法先处理数据包。
      * 默认为 NORMAL，表示普通优先级。
-     * @return 监听器优先级，默认值为 ListenerPriority.NORMAL
+     * @return 监听器优先级，默认值为 PacketListenerPriority.NORMAL
      */
-    ListenerPriority priority() default ListenerPriority.NORMAL;
+    PacketListenerPriority priority() default PacketListenerPriority.NORMAL;
 
 }

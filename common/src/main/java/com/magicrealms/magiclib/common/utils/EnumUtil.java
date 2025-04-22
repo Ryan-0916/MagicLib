@@ -1,5 +1,6 @@
 package com.magicrealms.magiclib.common.utils;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -19,13 +20,11 @@ public final class EnumUtil {
      * @param <T> 枚举类型的泛型参数，它必须是`Enum<T>`的一个子类型。
      */
     public static <T extends Enum<T>> Optional<T> getMatchingEnum(Class<T> enumClass, String name) {
-        for (T constant : enumClass.getEnumConstants()) {
-            if (constant.name().equals(name)) {
-                return Optional.of(constant);
-            }
-        }
-        return Optional.empty();
+        return Arrays.stream(enumClass.getEnumConstants())
+                .filter(e -> e.name().equalsIgnoreCase(name))
+                .findFirst();
     }
+
 
     /**
      * 从指定的枚举类中查找与给定名称数组匹配的所有枚举项，并返回一个包含这些枚举项的集合。

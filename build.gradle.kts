@@ -14,7 +14,7 @@ subprojects {
     dependencies {
         compileOnly("org.apache.commons:commons-lang3:3.8.1")
         compileOnly("org.projectlombok:lombok:1.18.24")
-        compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
+        compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
         annotationProcessor("org.projectlombok:lombok:1.18.24")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
         testCompileOnly("org.projectlombok:lombok:1.18.24")
@@ -27,13 +27,19 @@ subprojects {
         }
         mavenLocal()
         mavenCentral()
+        /* PaperMC */
         maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://repo.dmulloy2.net/repository/public/")
+        /* PacketEvents */
+        maven("https://repo.codemc.io/repository/maven-releases/")
+        maven("https://repo.codemc.io/repository/maven-snapshots/")
     }
+
+    // var target = file("$rootDir/target")
+    var target = file("D:\\Minecraft\\Servers\\1.21.4\\plugins")
 
     if ("paper" == project.name) {
         tasks.shadowJar {
-            destinationDirectory.set(file("$rootDir/target"))
+            destinationDirectory.set(target)
             archiveClassifier.set("")
             archiveFileName.set("${rootProject.name}-${projectVersion}.jar")
         }

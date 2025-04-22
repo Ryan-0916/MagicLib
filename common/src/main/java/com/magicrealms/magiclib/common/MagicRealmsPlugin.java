@@ -1,11 +1,13 @@
 package com.magicrealms.magiclib.common;
 
 
+import com.github.retrooper.packetevents.PacketEvents;
 import com.magicrealms.magiclib.common.manage.CommandManager;
 import com.magicrealms.magiclib.common.manage.ConfigManager;
 import com.magicrealms.magiclib.common.manage.LoggerManager;
 import com.magicrealms.magiclib.common.manage.PacketManager;
 import com.magicrealms.magiclib.common.processor.AppContext;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
@@ -40,11 +42,23 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
     }
 
     @Override
+    public void onLoad() {
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().load();
+    }
+
+    @Override
     public void onEnable() {
+        PacketEvents.getAPI().init();
         this.setupLoggerManager();
         this.setupConfigManager();
         this.setupCommandManger();
         this.setupPacketManager();
+    }
+
+    @Override
+    public void onDisable() {
+        PacketEvents.getAPI().terminate();
     }
 
     private void setupConfigManager() {

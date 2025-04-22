@@ -5,5 +5,5 @@ api-version: 1.20
 commands:
   MagicLib:
     description: '魔法领域-集成'
-softdepend:
-  - ProtocolLib
+depend:
+  - packetevents
