@@ -32,7 +32,7 @@ public class SummonListener {
     @Send(state = ConnectionState.PLAY,
             side = PacketSide.SERVER,
             name = "SYSTEM_CHAT_MESSAGE",
-            priority = PacketListenerPriority.HIGHEST)
+            priority = PacketListenerPriority.LOWEST)
     public void onSpawnEntitySystemChat(PacketSendEvent event) {
         /* summon 生成生物时拦截自定义生物 */
         WrapperPlayServerSystemChatMessage msg
@@ -54,7 +54,7 @@ public class SummonListener {
     @Send(state = ConnectionState.PLAY,
             side = PacketSide.SERVER,
             name = "SPAWN_ENTITY",
-            priority = PacketListenerPriority.HIGHEST)
+            priority = PacketListenerPriority.LOWEST)
     public void onSpawnEntity(PacketSendEvent event) {
         /* summon 生成生物时拦截自定义生物 */
         WrapperPlayServerSpawnEntity entity = new WrapperPlayServerSpawnEntity(event);

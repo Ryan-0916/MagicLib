@@ -120,6 +120,7 @@ public class AdventureHelper {
         return stringBuilder.toString();
     }
 
+
     public static Component deserializeComponent(String serializeStr) {
         return getMiniMessage().deserialize(serializeStr);
     }

@@ -269,121 +269,19 @@ public class ConfigManager {
                 .getYamlConfiguration().getStringList(key)) : generateMirrorYamlListKey(mirrorPath, key) : Optional.empty();
     }
 
+    public Optional<Set<String>> getYmlSubKeys(String mirrorPath, String key, boolean deep) {
+        return Optional.ofNullable(ALL_CONFIG.get(mirrorPath))
+                .flatMap(mirrorInfo -> Optional.ofNullable(mirrorInfo.getYamlConfiguration().getConfigurationSection(key))
+                .map(section -> section.getKeys(deep))
+                .or(() -> generateMirrorYamlConfigurationSection(mirrorPath, key, deep)));
 
+    }
 
+    private Optional<Set<String>> generateMirrorYamlConfigurationSection(String mirrorPath, String key, boolean deep) {
+        Optional<YamlConfiguration> yamlConfiguration
+                = mirrorCreateYamlKey(mirrorPath, key);
+        return yamlConfiguration.map(section -> section.getKeys(deep))
+                        .or(Optional::empty);
+    }
 
-
-
-//    public Optional<Set<String>> getYmlSubKeys(String path, String key, boolean deep) {
-//        YamlConfiguration config = ALL_CONFIG.get(path);
-//        if (config == null) {
-//            return Optional.empty();
-//        }
-//        Optional<ConfigurationSection> configurationSection = Optional.ofNullable(config.getConfigurationSection(key));
-//        if (configurationSection.isPresent()) {
-//            return Optional.of(configurationSection.get().getKeys(deep));
-//        }
-//        if (!config.contains(key)) {
-//            return createConfigurationSection(path, key, deep);
-//        }
-//        return Optional.empty();
-//    }
-//
-//    public boolean containsYmlKey(String path, String key) {
-//        YamlConfiguration config = ALL_CONFIG.get(path);
-//        return config != null && config.contains(key);
-//    }
-//
-//    public Optional<YamlConfiguration> getYamlConfiguration(String path){
-//        return getYamlConfiguration(path, null);
-//    }
-//
-//    public Optional<YamlConfiguration> getYamlConfiguration(String path, @Nullable String referencePath){
-//        path = path.endsWith(".yml") ? path : path + ".yml";
-//        referencePath = referencePath == null ? null : referencePath.endsWith(".yml") ? referencePath : referencePath + ".yml";
-//        File config = new File(PLUGIN.getDataFolder(), path);
-//        if (config.exists()) {
-//            return Optional.of(YamlConfiguration.loadConfiguration(config));
-//        }
-//        PLUGIN.getLoggerManager().info("正在生成 " + path + " 文件...");
-//        long timeMillis = System.currentTimeMillis();
-//        try {
-//            PLUGIN.saveResource(path, referencePath, false);
-//            PLUGIN.getLoggerManager().info(path + " 文件生成完毕，耗时 " + (System.currentTimeMillis() - timeMillis) + " ms");
-//            return Optional.of(YamlConfiguration.loadConfiguration(new File(PLUGIN.getDataFolder(), path)));
-//        } catch (Exception exception) {
-//            PLUGIN.getLoggerManager().error(path + " 文件生成失败", exception);
-//        }
-//        return Optional.empty();
-//    }
-//
-//    private Optional<Set<String>> createConfigurationSection(String path, String key, boolean deep) {
-//        YamlConfiguration config = ALL_CONFIG.get(path);
-//        InputStream inputStream = PLUGIN.getResource(path + ".yml");
-//        if (config == null || inputStream == null) {
-//            return Optional.empty();
-//        }
-//        try(Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-//            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(reader);
-//            if (!defConfig.contains(key)) {
-//                return Optional.empty();
-//            }
-//            config.set(key, defConfig.get(key));
-//            config.save(new File(PLUGIN.getDataFolder(), path + ".yml"));
-//            Optional<ConfigurationSection> configurationSection = Optional.ofNullable(config.getConfigurationSection(key));
-//            if (configurationSection.isPresent()) {
-//                return Optional.of(configurationSection.get().getKeys(deep));
-//            }
-//        } catch (IOException e) {
-//            PLUGIN.getLoggerManager().error("创建YML文件Key时出现未知的异常", e);
-//        }
-//        return Optional.empty();
-//
-//    }
-//
-//    private Optional<String> createYmlKey(String path, String key) {
-//        YamlConfiguration config = ALL_CONFIG.get(path);
-//        InputStream inputStream = PLUGIN.getResource(path + ".yml");
-//        if (config == null || inputStream == null) {
-//            return Optional.empty();
-//        }
-//        try(Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-//            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(reader);
-//            if (!defConfig.contains(key)) {
-//                return Optional.empty();
-//            }
-//            config.set(key, defConfig.get(key));
-//            config.save(new File(PLUGIN.getDataFolder(), path + ".yml"));
-//            if (defConfig.isString(key) || defConfig.isBoolean(key) || defConfig.isDouble(key) || defConfig.isInt(key)
-//                || defConfig.isLong(key)
-//            ) {
-//                return Optional.ofNullable(config.getString(key));
-//            }
-//        } catch (IOException e) {
-//            PLUGIN.getLoggerManager().error("创建YML文件Key时出现未知的异常", e);
-//        }
-//        return Optional.empty();
-//    }
-//
-//    private Optional<List<String>> createYmlListKey(String path, String key) {
-//        YamlConfiguration config = ALL_CONFIG.get(path);
-//        InputStream inputStream = PLUGIN.getResource(path + ".yml");
-//        if (config == null || inputStream == null) {
-//            return Optional.empty();
-//        }
-//        try(Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-//            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(reader);
-//            if (!defConfig.contains(key)) {
-//                return Optional.empty();
-//            }
-//            config.set(key, defConfig.get(key));
-//            config.save(new File(PLUGIN.getDataFolder(), path + ".yml"));
-//            if (defConfig.isList(key)) {
-//                return Optional.of(config.getStringList(key));
-//            }
-//        } catch (IOException e) {
-//            PLUGIN.getLoggerManager().error("创建YML文件Key时出现未知的异常", e);
-//        }
-//        return Optional.empty();
-//    }
 }

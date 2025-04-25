@@ -25,7 +25,6 @@ public final class EnumUtil {
                 .findFirst();
     }
 
-
     /**
      * 从指定的枚举类中查找与给定名称数组匹配的所有枚举项，并返回一个包含这些枚举项的集合。
      * @param enumClass 枚举类，用于限定查找范围。
