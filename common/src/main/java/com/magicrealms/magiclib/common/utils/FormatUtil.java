@@ -17,10 +17,15 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public class FormatUtil {
-    private static final DecimalFormat amountFormat = new DecimalFormat("#.##");
+    private static final DecimalFormat amountFormat
+            = new DecimalFormat("#.##");
+
     public static String amountFormat (BigDecimal amount) { return amountFormat.format(amount); }
+
     public static String amountFormat (double amount) { return amountFormat.format(amount); }
+
     public static String amountFormat (float amount) { return amountFormat.format(amount); }
+
     public static Map<String, String> datetimeFormat (long time, @Nullable String prefix) {
         Map<String, String> format = new HashMap<>();
         if (time <= 0) return format;
@@ -46,4 +51,5 @@ public class FormatUtil {
             return format;
         }
     }
+
 }

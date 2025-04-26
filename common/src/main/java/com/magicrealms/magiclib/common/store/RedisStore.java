@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.common.store;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
-import com.magicrealms.magiclib.common.utils.JsonUtil;
+import com.magicrealms.magiclib.common.utils.GsonUtil;
 
 import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
@@ -126,7 +126,7 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public boolean setObject(String key, Object value, long expire) {
-        return setValue(key, JsonUtil.objectToJson(value), expire);
+        return setValue(key, GsonUtil.objectToJson(value), expire);
     }
 
     @Override
@@ -144,15 +144,15 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public boolean lSetObject(String key, long expire, Object... values) {
-        return lSetValue(key, expire, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+        return lSetValue(key, expire, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
     public boolean lSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
-            return lSetValue(key, -1, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+            return lSetValue(key, -1, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
         }
-        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
@@ -170,15 +170,15 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public boolean rSetObject(String key, long expire, Object... values) {
-        return rSetValue(key, expire, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+        return rSetValue(key, expire, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
     public boolean rSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
-            return rSetValue(key, -1, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+            return rSetValue(key, -1, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
         }
-        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(JsonUtil::objectToJson).collect(Collectors.joining()));
+        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
     }
 
     @Override
@@ -223,7 +223,7 @@ public class RedisStore implements IRedisStore{
         return hSetValue(key, values.entrySet().stream().
                 collect(Collectors.toMap(
                     Map.Entry::getKey,
-                    e -> JsonUtil.objectToJson(e.getValue()),
+                    e -> GsonUtil.objectToJson(e.getValue()),
                     (oldValue, newValue) -> newValue, LinkedHashMap::new
         )), expire);
     }
@@ -242,7 +242,7 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public <T> Optional<T> getObject(String key, Class<T> clazz) {
-        return getValue(key).map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz));
+        return getValue(key).map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz));
     }
 
     @Override
@@ -259,7 +259,7 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public <T> Optional<T> hGetObject(String key, String subKey, Class<T> clazz) {
-        return hGetValue(key, subKey).map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz));
+        return hGetValue(key, subKey).map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz));
     }
 
     @Override
@@ -278,7 +278,7 @@ public class RedisStore implements IRedisStore{
     @Override
     public <T> Optional<List<T>> hGetAllObject(String key, Class<T> clazz) {
         return hGetAllValue(key).map(serializerList -> serializerList.stream().
-                map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz))
+                map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
@@ -297,7 +297,7 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public <T> Optional<List<T>> getAllObject(String key, Class<T> clazz) {
-        return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> JsonUtil.jsonToObject(serializerValue, clazz))
+        return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 

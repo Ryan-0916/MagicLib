@@ -2,7 +2,7 @@ package com.magicrealms.magiclib.common.manage;
 
 import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.message.bungee.BungeeMessage;
-import com.magicrealms.magiclib.common.utils.JsonUtil;
+import com.magicrealms.magiclib.common.utils.GsonUtil;
 import org.bukkit.Bukkit;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
@@ -80,7 +80,7 @@ public class BungeeMessageManager extends JedisPubSub {
     @Override
     public void onMessage(String channel, String message) {
         /* 取得订阅的消息后的处理 */
-        BungeeMessage bungeeMessage = JsonUtil.jsonToObject(message, BungeeMessage.class);
+        BungeeMessage bungeeMessage = GsonUtil.jsonToObject(message, BungeeMessage.class);
         MESSAGE_LISTENER.accept(bungeeMessage);
     }
 

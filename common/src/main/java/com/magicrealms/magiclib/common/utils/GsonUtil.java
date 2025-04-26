@@ -15,7 +15,7 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 @Slf4j
-public class JsonUtil {
+public class GsonUtil {
     private final static Gson gson = new Gson();
 
     /**

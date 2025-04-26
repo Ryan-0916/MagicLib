@@ -171,7 +171,10 @@ public class PacketManager {
             PacketTypeCommon packetType = Optional.ofNullable(PACKET_RESOLVER.get(packetState))
                     .map(resolver -> resolver.apply(packetSide, packetName))
                     .orElse(null);
-            if (packetType == null) return;
+            if (packetType == null) {
+                log.error("未能解析成功数据包：{}", packetName);
+                return;
+            }
             if (isReceive) {
                 storePacketMethod(receiveMethods, priority, packetType, method, object);
             } else {

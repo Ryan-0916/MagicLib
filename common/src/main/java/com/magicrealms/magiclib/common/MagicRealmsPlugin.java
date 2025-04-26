@@ -59,6 +59,7 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         PacketEvents.getAPI().terminate();
+        loggerManager.shutdown();
     }
 
     private void setupConfigManager() {
