@@ -1,8 +1,8 @@
 package com.magicrealms.magiclib.mc_1_21_R3.message;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
-import com.magicrealms.magiclib.common.message.AbstractMessage;
+import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.Packet;
@@ -65,11 +65,11 @@ public class SoundMessage extends AbstractMessage {
      */
     @Override
     public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
-        int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
-        double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE);
-        float volume = StringUtil.getValueBTWTags(message, "volume", 1F, ParseType.FLOAT),
-                pitch =  StringUtil.getValueBTWTags(message, "pitch", 1F, ParseType.FLOAT);
-        long speed = StringUtil.getValueBTWTags(message, "speed", 1L, ParseType.LONG);
+        int times = StringUtil.getValueBetweenTags(message, "times", 1, ParseType.INTEGER);
+        double interval = StringUtil.getValueBetweenTags(message, "interval", 1D, ParseType.DOUBLE);
+        float volume = StringUtil.getValueBetweenTags(message, "volume", 1F, ParseType.FLOAT),
+                pitch =  StringUtil.getValueBetweenTags(message, "pitch", 1F, ParseType.FLOAT);
+        long speed = StringUtil.getValueBetweenTags(message, "speed", 1L, ParseType.LONG);
         String path = StringUtil.removeTags(message, "volume", "pitch", "speed").trim();
         if (StringUtils.isBlank(path)) {
             return;

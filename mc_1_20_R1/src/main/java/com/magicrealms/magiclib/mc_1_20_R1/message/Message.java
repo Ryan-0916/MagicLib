@@ -1,9 +1,9 @@
 package com.magicrealms.magiclib.mc_1_20_R1.message;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
-import com.magicrealms.magiclib.common.message.AbstractMessage;
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
+import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
+import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_20_R1.utils.ComponentUtil;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
@@ -63,10 +63,10 @@ public class Message extends AbstractMessage {
     @Override
     public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
-        int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
-        boolean desc = StringUtil.getValueBTWTags(message, "desc", false, ParseType.BOOLEAN),
-                legacy = StringUtil.getValueBTWTags(message, "legacy", false, ParseType.BOOLEAN);
-        double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE);
+        int times = StringUtil.getValueBetweenTags(message, "times", 1, ParseType.INTEGER);
+        boolean desc = StringUtil.getValueBetweenTags(message, "desc", false, ParseType.BOOLEAN),
+                legacy = StringUtil.getValueBetweenTags(message, "legacy", false, ParseType.BOOLEAN);
+        double interval = StringUtil.getValueBetweenTags(message, "interval", 1D, ParseType.DOUBLE);
 
         String msg = StringUtil.removeTags(message, "times", "interval", "desc", "legacy");
         if (times <= 1) {

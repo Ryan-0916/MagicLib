@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.mc_1_21_R3.dispatcher;
 
-import com.magicrealms.magiclib.common.dispatcher.INMSDispatcher;
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
+import com.magicrealms.magiclib.bukkit.dispatcher.INMSDispatcher;
+import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;

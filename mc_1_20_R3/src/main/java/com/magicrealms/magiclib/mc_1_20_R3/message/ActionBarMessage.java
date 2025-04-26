@@ -1,9 +1,9 @@
 package com.magicrealms.magiclib.mc_1_20_R3.message;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
-import com.magicrealms.magiclib.common.message.AbstractMessage;
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
+import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
+import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_20_R3.utils.ComponentUtil;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
@@ -65,13 +65,13 @@ public class ActionBarMessage extends AbstractMessage {
     @Override
     public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
-        int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
-        boolean desc = StringUtil.getValueBTWTags(message, "desc", false, ParseType.BOOLEAN),
-                legacy = StringUtil.getValueBTWTags(message, "legacy", false, ParseType.BOOLEAN),
-                printer = StringUtil.getValueBTWTags(message, "printer", false, ParseType.BOOLEAN);
-        double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE),
-                printerTime = StringUtil.getValueBTWTags(message, "printerTime", 1D, ParseType.DOUBLE);
-        String printerPrefix = StringUtil.getStringBTWTags(message, "printerPrefix").orElse(StringUtil.EMPTY),
+        int times = StringUtil.getValueBetweenTags(message, "times", 1, ParseType.INTEGER);
+        boolean desc = StringUtil.getValueBetweenTags(message, "desc", false, ParseType.BOOLEAN),
+                legacy = StringUtil.getValueBetweenTags(message, "legacy", false, ParseType.BOOLEAN),
+                printer = StringUtil.getValueBetweenTags(message, "printer", false, ParseType.BOOLEAN);
+        double interval = StringUtil.getValueBetweenTags(message, "interval", 1D, ParseType.DOUBLE),
+                printerTime = StringUtil.getValueBetweenTags(message, "printerTime", 1D, ParseType.DOUBLE);
+        String printerPrefix = StringUtil.getStringBetweenTags(message, "printerPrefix").orElse(StringUtil.EMPTY),
                 msg = StringUtil.removeTags(message, "times", "interval", "desc", "legacy", "printer", "printerTime", "printerPrefix");
 
         if (times <= 1) {
@@ -130,7 +130,7 @@ public class ActionBarMessage extends AbstractMessage {
          * 此处的目的是为了支持 MiniMessage 的标签写法
          * 让截取出来的文本也不会失去 MiniMessage 的色彩或是其他
          */
-        List<String> labelMsg = StringUtil.getTagsToList(msg);
+        List<String> labelMsg = StringUtil.parseTagsToList(msg);
 
         /* 提取去除 MiniMessage 标签后，所显示的真实内容
          * 例如<red>我是红色</red><yellow>我是黄色</yellow>

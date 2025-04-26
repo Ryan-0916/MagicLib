@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
-public class SerializationUtils {
+public final class SerializationUtils {
 
     private SerializationUtils() {}
 

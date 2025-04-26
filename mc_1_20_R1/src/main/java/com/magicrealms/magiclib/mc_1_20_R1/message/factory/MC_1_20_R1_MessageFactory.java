@@ -1,8 +1,8 @@
 package com.magicrealms.magiclib.mc_1_20_R1.message.factory;
 
-import com.magicrealms.magiclib.common.message.AbstractMessage;
-import com.magicrealms.magiclib.common.message.enums.MessageType;
-import com.magicrealms.magiclib.common.message.factory.IMessageFactory;
+import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
+import com.magicrealms.magiclib.bukkit.message.enums.MessageType;
+import com.magicrealms.magiclib.bukkit.message.factory.IMessageFactory;
 import com.magicrealms.magiclib.mc_1_20_R1.message.*;
 
 

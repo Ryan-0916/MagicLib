@@ -1,8 +1,8 @@
 package com.magicrealms.magiclib.mc_1_20_R1.message;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
-import com.magicrealms.magiclib.common.message.AbstractMessage;
+import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.game.*;
@@ -58,7 +58,7 @@ public class TotemMessage extends AbstractMessage {
      */
     @Override
     public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
-        int modelData = StringUtil.getValueBTWTags(message, "modelData", 0, ParseType.INTEGER);
+        int modelData = StringUtil.getValueBetweenTags(message, "modelData", 0, ParseType.INTEGER);
         ItemStack totem = new ItemStack(Material.TOTEM_OF_UNDYING);
         ItemMeta itemMeta = totem.getItemMeta();
         itemMeta.setCustomModelData(modelData);

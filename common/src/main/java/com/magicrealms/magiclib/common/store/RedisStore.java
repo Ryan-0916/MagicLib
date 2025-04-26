@@ -1,8 +1,8 @@
 package com.magicrealms.magiclib.common.store;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.utils.GsonUtil;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.Jedis;
 
@@ -17,6 +17,7 @@ import java.util.stream.Stream;
  * @date 2024-05-30
  */
 @SuppressWarnings("unused")
+@Slf4j
 public class RedisStore implements IRedisStore{
 
     private static final String SET_INHERITANCE_TTL_SCRIPT;
@@ -31,13 +32,11 @@ public class RedisStore implements IRedisStore{
     private static final String DISTRIBUTED_LOCK_SCRIPT;
     private static final String RELEASED_LOCK_SCRIPT;
 
-    private final MagicRealmsPlugin PLUGIN;
     private final String HOST;
     private final int PORT;
     private final String PASSWORD;
 
-    public RedisStore(MagicRealmsPlugin plugin, String host, int port, @Nullable String password) {
-        this.PLUGIN = plugin;
+    public RedisStore(String host, int port, @Nullable String password) {
         this.HOST = host;
         this.PORT = port;
         this.PASSWORD = password;
@@ -51,7 +50,7 @@ public class RedisStore implements IRedisStore{
             }
             return Optional.of(connection);
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 连接异常请检查 Redis 服务", e);
+            log.error("Redis 连接异常请检查 Redis 服务", e);
         }
         return Optional.empty();
     }
@@ -78,7 +77,7 @@ public class RedisStore implements IRedisStore{
             else connection.eval(inheritanceScript, Collections.singletonList(key), Arrays.asList(values));
             return true;
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().warning("Redis 查询异常请检查 Redis 服务" + e.getMessage());
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
@@ -93,7 +92,7 @@ public class RedisStore implements IRedisStore{
             ).collect(Collectors.toList()));
             return true;
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().warning("Redis 查询异常请检查 Redis 服务" + e.getMessage());
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
@@ -105,7 +104,7 @@ public class RedisStore implements IRedisStore{
         try (Jedis connection = connectionOptional.get()){
             return connection.exists(key);
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
@@ -119,14 +118,14 @@ public class RedisStore implements IRedisStore{
             else connection.eval(SET_INHERITANCE_TTL_SCRIPT, Collections.singletonList(key), Collections.singletonList(value));
             return true;
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().warning("Redis 查询异常请检查 Redis 服务" + e.getMessage());
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
 
     @Override
     public boolean setObject(String key, Object value, long expire) {
-        return setValue(key, GsonUtil.objectToJson(value), expire);
+        return setValue(key, GsonUtil.toJson(value), expire);
     }
 
     @Override
@@ -144,15 +143,15 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public boolean lSetObject(String key, long expire, Object... values) {
-        return lSetValue(key, expire, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
+        return lSetValue(key, expire, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
     @Override
     public boolean lSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
-            return lSetValue(key, -1, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
+            return lSetValue(key, -1, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
         }
-        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
+        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
     @Override
@@ -170,15 +169,15 @@ public class RedisStore implements IRedisStore{
 
     @Override
     public boolean rSetObject(String key, long expire, Object... values) {
-        return rSetValue(key, expire, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
+        return rSetValue(key, expire, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
     @Override
     public boolean rSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
-            return rSetValue(key, -1, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
+            return rSetValue(key, -1, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
         }
-        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::objectToJson).collect(Collectors.joining()));
+        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
     @Override
@@ -208,7 +207,7 @@ public class RedisStore implements IRedisStore{
                     values.values().stream().toList());
             return true;
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
@@ -223,7 +222,7 @@ public class RedisStore implements IRedisStore{
         return hSetValue(key, values.entrySet().stream().
                 collect(Collectors.toMap(
                     Map.Entry::getKey,
-                    e -> GsonUtil.objectToJson(e.getValue()),
+                    e -> GsonUtil.toJson(e.getValue()),
                     (oldValue, newValue) -> newValue, LinkedHashMap::new
         )), expire);
     }
@@ -235,14 +234,14 @@ public class RedisStore implements IRedisStore{
         try (Jedis connection = connectionOptional.get()){
             return Optional.ofNullable(connection.get(key));
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return Optional.empty();
     }
 
     @Override
     public <T> Optional<T> getObject(String key, Class<T> clazz) {
-        return getValue(key).map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz));
+        return getValue(key).map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz));
     }
 
     @Override
@@ -252,14 +251,14 @@ public class RedisStore implements IRedisStore{
         try (Jedis connection = connectionOptional.get()) {
             return Optional.ofNullable(connection.hget(key, subKey));
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return Optional.empty();
     }
 
     @Override
     public <T> Optional<T> hGetObject(String key, String subKey, Class<T> clazz) {
-        return hGetValue(key, subKey).map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz));
+        return hGetValue(key, subKey).map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz));
     }
 
     @Override
@@ -270,7 +269,7 @@ public class RedisStore implements IRedisStore{
                 return connection.exists(key) ? Optional.of(new ArrayList<>(connection.hgetAll(key).values()))
                         : Optional.empty();
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return Optional.empty();
     }
@@ -278,7 +277,7 @@ public class RedisStore implements IRedisStore{
     @Override
     public <T> Optional<List<T>> hGetAllObject(String key, Class<T> clazz) {
         return hGetAllValue(key).map(serializerList -> serializerList.stream().
-                map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz))
+                map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
@@ -290,14 +289,14 @@ public class RedisStore implements IRedisStore{
             return connection.exists(key) ? Optional.of(connection.lrange(key, 0, -1))
                     : Optional.empty();
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return Optional.empty();
     }
 
     @Override
     public <T> Optional<List<T>> getAllObject(String key, Class<T> clazz) {
-        return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> GsonUtil.jsonToObject(serializerValue, clazz))
+        return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
@@ -309,7 +308,7 @@ public class RedisStore implements IRedisStore{
             connection.del(key);
             return true;
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
@@ -327,7 +326,7 @@ public class RedisStore implements IRedisStore{
             }
             return true;
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
@@ -340,7 +339,7 @@ public class RedisStore implements IRedisStore{
             connection.hdel(key, subKey);
             return true;
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 查询异常请检查 Redis 服务", e);
+            log.error("Redis 查询异常请检查 Redis 服务", e);
         }
         return false;
     }
@@ -352,7 +351,7 @@ public class RedisStore implements IRedisStore{
         try (Jedis connection = connectionOptional.get()){
             connection.publish(channel, value);
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 发布订阅发布时出现未知异常", e);
+            log.error("Redis 发布订阅发布时出现未知异常", e);
         }
     }
 
@@ -364,7 +363,7 @@ public class RedisStore implements IRedisStore{
             return connection.eval(DISTRIBUTED_LOCK_SCRIPT,
                     Collections.singletonList(lockKey), List.of(lockHolder, String.valueOf(expire))).equals(1L);
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 使用分布式锁时出现未知异常", e);
+            log.error("Redis 使用分布式锁时出现未知异常", e);
         }
         return false;
     }
@@ -376,7 +375,7 @@ public class RedisStore implements IRedisStore{
         try (Jedis connection = connectionOptional.get()){
             return connection.eval(RELEASED_LOCK_SCRIPT, Collections.singletonList(lockKey), Collections.singletonList(lockHolder)).equals(1L);
         } catch (Exception e) {
-            PLUGIN.getLoggerManager().error("Redis 解锁分布式锁时出现未知异常", e);
+            log.error("Redis 解锁分布式锁时出现未知异常", e);
         }
         return false;
     }

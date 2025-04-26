@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.common.store;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
 import java.text.MessageFormat;
@@ -14,8 +14,8 @@ import java.util.function.Consumer;
  * @date 2023-10-01
  */
 @SuppressWarnings("unused")
+@Slf4j
 public class MySqlStore {
-    private final MagicRealmsPlugin PLUGIN;
     private final String HOST;
     private final int PORT;
     private final String DATABASE;
@@ -23,8 +23,7 @@ public class MySqlStore {
     private final String USER;
     private final String PASSWORD;
 
-    public MySqlStore(MagicRealmsPlugin plugin, String host, int port, String database, boolean useSSL, String user, String password) {
-        this.PLUGIN = plugin;
+    public MySqlStore(String host, int port, String database, boolean useSSL, String user, String password) {
         this.HOST = host;
         this.PORT = port;
         this.DATABASE = database;
@@ -43,11 +42,12 @@ public class MySqlStore {
             Class.forName("com.mysql.cj.jdbc.Driver");
             return Optional.ofNullable(DriverManager.getConnection(DB_URL, USER, PASSWORD));
         } catch (ClassNotFoundException | SQLException e) {
-            PLUGIN.getLoggerManager().error("Mysql 连接异常请检查 Mysql 服务", e);
+            log.error("Mysql 连接异常请检查 Mysql 服务", e);
             return Optional.empty();
         }
     }
 
+    @SuppressWarnings("SqlSourceToSinkFlow")
     public void select(String sql, Object[] obj, Consumer<ResultSet> resultConsumer){
         Optional<Connection> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return;
@@ -56,10 +56,11 @@ public class MySqlStore {
             for (int i = 0; i < obj.length; i++) preparedStatement.setObject(i + 1,obj[i]);
             resultConsumer.accept(preparedStatement.executeQuery());
         } catch (SQLException e) {
-            PLUGIN.getLoggerManager().error("MYSQL 查询异常请检查 MYSQL 服务", e);
+            log.error("MYSQL 查询异常请检查 MYSQL 服务", e);
         }
     }
 
+    @SuppressWarnings("SqlSourceToSinkFlow")
     public int update(String sql, Object[] obj){
         Optional<Connection> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return 0;
@@ -68,7 +69,7 @@ public class MySqlStore {
             for (int i = 0; i < obj.length; i++) preparedStatement.setObject(i + 1,obj[i]);
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            PLUGIN.getLoggerManager().error("MYSQL 修改/删除异常请检查 MYSQL 服务", e);
+            log.error("MYSQL 修改/删除异常请检查 MYSQL 服务", e);
             return 0;
         }
     }
@@ -85,7 +86,7 @@ public class MySqlStore {
              ResultSet resultSet = connection.getMetaData().getTables(null, null, tableName, new String[]{"TABLE"})) {
             return resultSet.next();
         } catch (SQLException e) {
-            PLUGIN.getLoggerManager().error("MYSQL 查询是否存在表时出现未知异常", e);
+            log.error("MYSQL 查询是否存在表时出现未知异常", e);
             return false;
         }
     }
@@ -97,7 +98,7 @@ public class MySqlStore {
     public void closeResultSet(ResultSet res){
         if (res == null) return;
         try{ res.close(); } catch (Exception e){
-            PLUGIN.getLoggerManager().error("MYSQL 释放结果集时出现未知异常", e);
+            log.error("MYSQL 释放结果集时出现未知异常", e);
         }
     }
 }

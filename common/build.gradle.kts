@@ -6,7 +6,8 @@ tasks.withType<JavaCompile> {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("com.google.code.gson:gson:2.10.1")
+
     implementation("redis.clients:jedis:3.7.0")
     implementation("org.mongodb:bson:3.12.11")
     implementation("org.mongodb:mongodb-driver:3.12.11")

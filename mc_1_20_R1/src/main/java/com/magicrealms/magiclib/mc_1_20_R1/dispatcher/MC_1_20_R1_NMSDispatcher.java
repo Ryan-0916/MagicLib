@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.mc_1_20_R1.dispatcher;
 
-import com.magicrealms.magiclib.common.dispatcher.INMSDispatcher;
+import com.magicrealms.magiclib.bukkit.dispatcher.INMSDispatcher;
 import com.magicrealms.magiclib.mc_1_20_R1.utils.ComponentUtil;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;

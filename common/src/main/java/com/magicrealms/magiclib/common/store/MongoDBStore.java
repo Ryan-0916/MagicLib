@@ -1,20 +1,19 @@
 package com.magicrealms.magiclib.common.store;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 
+@Slf4j
 @SuppressWarnings("unused")
 public class MongoDBStore {
 
-    @Getter
-    private final MagicRealmsPlugin plugin;
     @Getter
     private MongoDatabase database;
     private final String HOST;
@@ -23,8 +22,7 @@ public class MongoDBStore {
     private MongoClient connection;
 
 
-    public MongoDBStore(MagicRealmsPlugin plugin, String host, int port, String database) {
-        this.plugin = plugin;
+    public MongoDBStore(String host, int port, String database) {
         this.HOST = host;
         this.PORT = port;
         this.DATABASE = database;
@@ -35,7 +33,7 @@ public class MongoDBStore {
             this.connection = new MongoClient(HOST, PORT);
             this.database = connection.getDatabase(DATABASE);
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 连接异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 连接异常请检查 MongoDB 服务", e);
         }
     }
 
@@ -51,7 +49,7 @@ public class MongoDBStore {
                 this.database = null;
             }
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 关闭连接异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 关闭连接异常请检查 MongoDB 服务", e);
         }
     }
 
@@ -68,9 +66,9 @@ public class MongoDBStore {
                 }
             }
             database.createCollection(tableName);
-            plugin.getLoggerManager().info("MongoDB 表创建完毕，表名: " + tableName);
+            log.info("MongoDB 表创建完毕，表名: {}", tableName);
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 创表异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 创表异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }
@@ -88,7 +86,7 @@ public class MongoDBStore {
             collection.insertOne(document);
             return true;
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 插入数据异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 插入数据异常请检查 MongoDB 服务", e);
             return false;
         } finally {
             this.close();
@@ -107,7 +105,7 @@ public class MongoDBStore {
             MongoCollection<Document> collection = database.getCollection(tableName);
             return collection.find(bson).iterator();
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
         }
         return null;
     }
@@ -123,7 +121,7 @@ public class MongoDBStore {
             MongoCollection<Document> collection = database.getCollection(tableName);
             return collection.find().first();
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
         }
         return null;
     }
@@ -142,7 +140,7 @@ public class MongoDBStore {
                     where,
                     value).getMatchedCount() > 0;
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }
@@ -163,7 +161,7 @@ public class MongoDBStore {
                     where,
                     value).getMatchedCount() > 0;
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }
@@ -181,7 +179,7 @@ public class MongoDBStore {
             MongoCollection<Document> collection = database.getCollection(tableName);
             return collection.deleteOne(where).getDeletedCount() > 0;
         } catch (Exception e) {
-            plugin.getLoggerManager().error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
+            log.error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
         } finally {
             this.close();
         }

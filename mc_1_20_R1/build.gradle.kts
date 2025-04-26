@@ -5,6 +5,7 @@ plugins {
 dependencies {
     paperweightDevelopmentBundle("io.papermc.paper:dev-bundle:1.20.1-R0.1-SNAPSHOT")
     compileOnly(project(":common"))
+    compileOnly(project(":bukkit"))
 }
 
 tasks.withType<JavaCompile> {

@@ -1,8 +1,8 @@
 package com.magicrealms.magiclib.mc_1_21_R3.message;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
-import com.magicrealms.magiclib.common.message.AbstractMessage;
+import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
 import com.magicrealms.magiclib.common.utils.EnumUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import net.minecraft.world.BossEvent;
@@ -67,18 +67,18 @@ public class BossBarMessage extends AbstractMessage {
     @Override
     public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
-        int times = StringUtil.getValueBTWTags(message, "times", 1, ParseType.INTEGER);
-        double interval = StringUtil.getValueBTWTags(message, "interval", 1D, ParseType.DOUBLE);
-        boolean desc = StringUtil.getValueBTWTags(message, "desc", false, ParseType.BOOLEAN),
-                legacy = StringUtil.getValueBTWTags(message, "legacy", false, ParseType.BOOLEAN);
+        int times = StringUtil.getValueBetweenTags(message, "times", 1, ParseType.INTEGER);
+        double interval = StringUtil.getValueBetweenTags(message, "interval", 1D, ParseType.DOUBLE);
+        boolean desc = StringUtil.getValueBetweenTags(message, "desc", false, ParseType.BOOLEAN),
+                legacy = StringUtil.getValueBetweenTags(message, "legacy", false, ParseType.BOOLEAN);
         List<BossEvent.BossBarColor> bossBarColors = new ArrayList<>();
-        StringUtil.getStringBTWTags(message, "color")
+        StringUtil.getStringBetweenTags(message, "color")
                 .ifPresent(e -> bossBarColors.addAll(EnumUtil.getAllMatchingEnum(BossEvent.BossBarColor.class,
                         e.split("-"))));
         if (bossBarColors.isEmpty()) bossBarColors.add(BossEvent.BossBarColor.RED);
         BossEvent.BossBarOverlay overlay = EnumUtil.getMatchingEnum(BossEvent.BossBarOverlay.class,
-                StringUtil.getStringBTWTags(message, "overlay").orElse("PROGRESS")).orElse(BossEvent.BossBarOverlay.PROGRESS);
-        float progress = StringUtil.getValueBTWTags(message, "progress", desc ? 1.0F : 0F, ParseType.FLOAT);
+                StringUtil.getStringBetweenTags(message, "overlay").orElse("PROGRESS")).orElse(BossEvent.BossBarOverlay.PROGRESS);
+        float progress = StringUtil.getValueBetweenTags(message, "progress", desc ? 1.0F : 0F, ParseType.FLOAT);
     }
 
     @Override

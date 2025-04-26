@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.mc_1_21_R3.utils;
 
-import com.magicrealms.magiclib.common.message.helper.AdventureHelper;
+import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import net.minecraft.network.chat.Component;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.jetbrains.annotations.NotNull;

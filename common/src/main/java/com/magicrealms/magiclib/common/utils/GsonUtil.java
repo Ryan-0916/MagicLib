@@ -1,12 +1,16 @@
 package com.magicrealms.magiclib.common.utils;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Gson 工具里处理一些复杂情况的 Json
@@ -15,55 +19,134 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 @Slf4j
-public class GsonUtil {
-    private final static Gson gson = new Gson();
+public final class GsonUtil {
+
+    private static final Gson GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").disableHtmlEscaping().create();
 
     /**
-     * @param json 要解析的JSON字符串
-     * @param classOf 要从JSON字符串创建的对象的类型
-     * @param <T> 返回列表的类型参数
-     * @return 从JSON字符串解析的指定类型的对象
+     * JSON转对象
+     * @param json   JSON字符串
+     * @param clazz  目标类型
+     * @return 解析后的对象，解析失败返回null
      */
-    public static <T> T jsonToObject(String json, Class<T> classOf) {
+    public static <T> T fromJson(String json, Class<T> clazz) {
         if (StringUtils.isBlank(json)) {
             return null;
         }
-        try{
-            return gson.fromJson(json, classOf);
+        try {
+            return GSON.fromJson(json, clazz);
         } catch (JsonSyntaxException e) {
-            log.error(e.getMessage());
+            log.error("JSON解析失败: {}, JSON: {}", e.getMessage(), json, e);
+            return null;
         }
-        return null;
     }
 
     /**
-     * Json 转 List
-     * @param json 要解析的JSON字符串列表
-     * @param type 要从JSON字符串创建的对象的类型
-     * @param <T> 返回列表的类型参数
-     * @return 从JSON字符串解析的指定类型的对象列表
-     * @throws JsonSyntaxException 如果在任何JSON字符串中存在语法错误
+     * JSON转对象（支持复杂类型）
+     * @param json  JSON字符串
+     * @param type  目标类型（使用TypeToken构造）
+     * @return 解析后的对象，解析失败返回null
      */
-    public static <T> List<T> jsonToList(List<String> json, Type type) throws JsonSyntaxException {
-        List<T> list = new ArrayList<>();
-        if (json == null || json.isEmpty()) {
-            return list;
+    public static <T> T fromJson(String json, Type type) {
+        if (StringUtils.isBlank(json)) {
+            return null;
         }
-        for (String oJson : json) {
-            if (oJson == null) {
-                continue;
-            }
-            list.add(gson.fromJson(oJson, type));
+        try {
+            return GSON.fromJson(json, type);
+        } catch (JsonSyntaxException e) {
+            log.error("JSON解析失败: {}, JSON: {}", e.getMessage(), json, e);
+            return null;
         }
-        return list;
     }
 
     /**
-     * 将对象转换成 Json 字符
-     * @param obj 对象
-     * @return 返回 Json 字符
+     * JSON 转 List
+     * @param json  JSON字符串
+     * @param clazz 列表元素类型
+     * @return 解析后的List，解析失败返回空List
      */
-    public static String objectToJson(Object obj) {
-        return gson.toJson(obj);
+    public static <T> List<T> toList(String json, Class<T> clazz) {
+        if (StringUtils.isBlank(json)) {
+            return Collections.emptyList();
+        }
+        try {
+            Type type = TypeToken.getParameterized(List.class, clazz).getType();
+            return GSON.fromJson(json, type);
+        } catch (JsonSyntaxException e) {
+            log.error("JSON解析失败: {}, JSON: {}", e.getMessage(), json, e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 对象转JSON
+     * @param obj 要序列化的对象
+     * @return JSON字符串，转换失败返回""
+     */
+    public static String toJson(Object obj) {
+        if (obj == null) {
+            return "";
+        }
+        try {
+            return GSON.toJson(obj);
+        } catch (JsonIOException e) {
+            log.error("JSON序列化失败: {}", e.getMessage(), e);
+            return "";
+        }
+    }
+
+    /**
+     * 对象转JSON（美化输出）
+     * @param obj 要序列化的对象
+     * @return 格式化的JSON字符串
+     */
+    public static String toPrettyJson(Object obj) {
+        if (obj == null) {
+            return "";
+        }
+        try {
+            return new GsonBuilder()
+                    .setPrettyPrinting()
+                    .create()
+                    .toJson(obj);
+        } catch (JsonIOException e) {
+            log.error("JSON序列化失败: {}", e.getMessage(), e);
+            return "";
+        }
+    }
+
+    /**
+     * 安全地将多个JSON字符串转换为对象列表
+     * @param jsonList JSON字符串列表
+     * @param clazz    目标类型
+     * @return 成功解析的对象列表（跳过失败项）
+     */
+    public static <T> List<T> safeConvertList(Collection<String> jsonList, Class<T> clazz) {
+        if (jsonList == null || jsonList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return jsonList.stream()
+                .filter(Objects::nonNull)
+                .map(json -> fromJson(json, clazz))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 判断字符串是否为有效JSON
+     * @param json 待检查字符串
+     * @return 是否为有效JSON
+     */
+    public static boolean isValidJson(String json) {
+        if (StringUtils.isBlank(json)) {
+            return false;
+        }
+        try {
+            JsonParser.parseString(json);
+            return true;
+        } catch (JsonSyntaxException e) {
+            return false;
+        }
     }
 }

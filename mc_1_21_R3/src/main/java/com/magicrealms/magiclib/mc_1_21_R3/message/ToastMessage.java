@@ -1,8 +1,8 @@
 package com.magicrealms.magiclib.mc_1_21_R3.message;
 
-import com.magicrealms.magiclib.common.MagicRealmsPlugin;
+import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
-import com.magicrealms.magiclib.common.message.AbstractMessage;
+import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.mc_1_21_R3.utils.ComponentUtil;
 import net.minecraft.advancements.*;
@@ -76,11 +76,11 @@ public class ToastMessage extends AbstractMessage {
     public void sendMessage(MagicRealmsPlugin plugin, Player player, String message) {
         cleanMessage(player);
         /* 获取消息发送的循环次数、循环间隔、图标、类型等 */
-        int modelData = StringUtil.getValueBTWTags(message, "modelData", 0, ParseType.INTEGER);
-        double inValidateTime = StringUtil.getValueBTWTags(message, "inValidateTime", 7D, ParseType.DOUBLE);
-        boolean legacy = StringUtil.getValueBTWTags(message, "legacy", false, ParseType.DOUBLE);
-        Optional<String> commandOptional = StringUtil.getStringBTWTags(message, "command");
-        ItemStack icon = new ItemStack(Optional.of(Material.valueOf(StringUtil.getStringBTWTags(message, "material")
+        int modelData = StringUtil.getValueBetweenTags(message, "modelData", 0, ParseType.INTEGER);
+        double inValidateTime = StringUtil.getValueBetweenTags(message, "inValidateTime", 7D, ParseType.DOUBLE);
+        boolean legacy = StringUtil.getValueBetweenTags(message, "legacy", false, ParseType.DOUBLE);
+        Optional<String> commandOptional = StringUtil.getStringBetweenTags(message, "command");
+        ItemStack icon = new ItemStack(Optional.of(Material.valueOf(StringUtil.getStringBetweenTags(message, "material")
                 .orElse("NAME_TAG"))).orElse(Material.NAME_TAG));
 
         /* 设置图标的材质信息 */
@@ -92,7 +92,7 @@ public class ToastMessage extends AbstractMessage {
 
         /* 拿到成就信息的类型 */
         AdvancementType type = Optional.of(
-                AdvancementType.valueOf(StringUtil.getStringBTWTags(message, "type")
+                AdvancementType.valueOf(StringUtil.getStringBetweenTags(message, "type")
                         .orElse("TASK"))).orElse(AdvancementType.TASK);
 
         /* 发送成就信息 */
