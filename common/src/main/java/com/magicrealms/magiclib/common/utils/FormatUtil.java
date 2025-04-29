@@ -19,6 +19,8 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public final class FormatUtil {
 
+    private FormatUtil() {}
+
     private static final DecimalFormat AMOUNT_FORMAT = new DecimalFormat("#,##0.##");
 
     /**

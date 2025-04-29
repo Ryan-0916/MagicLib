@@ -1,3 +1,5 @@
+val projectVersion : String by project
+
 plugins {
     id("java-library")
     id("com.gradleup.shadow") version "9.0.0-beta11"
@@ -42,7 +44,7 @@ artifacts {
 tasks {
     shadowJar {
         archiveClassifier = ""
-        archiveFileName = "${rootProject.name}-bukkit-mod-${rootProject.properties["projectVersion"]}.jar"
+        archiveFileName = "${rootProject.name}-bukkit-mod-${projectVersion}.jar"
         destinationDirectory.set(file("$rootDir/target"))
     }
 }

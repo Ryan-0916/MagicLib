@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class GsonUtil {
 
+    private GsonUtil() {}
+
     private static final Gson GSON = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").disableHtmlEscaping().create();
 
     /**

@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  */
 @SuppressWarnings("unused")
 @Slf4j
-public class RedisStore implements IRedisStore{
+public class RedisStore {
 
     private static final String SET_INHERITANCE_TTL_SCRIPT;
     private static final String LEFT_PUSH_SCRIPT;
@@ -97,7 +97,6 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
     public boolean exists(String key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -109,7 +108,6 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
     public boolean setValue(String key, String value, long expire) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -123,17 +121,29 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
     public boolean setObject(String key, Object value, long expire) {
         return setValue(key, GsonUtil.toJson(value), expire);
     }
 
-    @Override
+    public Optional<String> getValue(String key) {
+        Optional<Jedis> connectionOptional = getConnection();
+        if (connectionOptional.isEmpty()) return Optional.empty();
+        try (Jedis connection = connectionOptional.get()){
+            return Optional.ofNullable(connection.get(key));
+        } catch (Exception e) {
+            log.error("Redis 查询异常请检查 Redis 服务", e);
+        }
+        return Optional.empty();
+    }
+
+    public <T> Optional<T> getObject(String key, Class<T> clazz) {
+        return getValue(key).map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz));
+    }
+
     public boolean lSetValue(String key, long expire, String... values) {
         return pushValueByScript(key, expire, LEFT_PUSH_SCRIPT, LEFT_PUSH_INHERITANCE_TTL_SCRIPT, values);
     }
 
-    @Override
     public boolean lSetValue(String key, int maxSize, String... value) {
         if (maxSize < 0) {
             return lSetValue(key, -1, value);
@@ -141,12 +151,10 @@ public class RedisStore implements IRedisStore{
         return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, value);
     }
 
-    @Override
     public boolean lSetObject(String key, long expire, Object... values) {
         return lSetValue(key, expire, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
-    @Override
     public boolean lSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
             return lSetValue(key, -1, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
@@ -154,12 +162,10 @@ public class RedisStore implements IRedisStore{
         return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
-    @Override
     public boolean rSetValue(String key, long expire, String... values) {
         return pushValueByScript(key, expire, RIGHT_PUSH_SCRIPT, RIGHT_PUSH_INHERITANCE_TTL_SCRIPT, values);
     }
 
-    @Override
     public boolean rSetValue(String key, int maxSize, String... value) {
         if (maxSize < 0) {
             return rSetValue(key, -1, value);
@@ -167,12 +173,10 @@ public class RedisStore implements IRedisStore{
         return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, value);
     }
 
-    @Override
     public boolean rSetObject(String key, long expire, Object... values) {
         return rSetValue(key, expire, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
-    @Override
     public boolean rSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
             return rSetValue(key, -1, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
@@ -180,12 +184,23 @@ public class RedisStore implements IRedisStore{
         return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
     }
 
-    @Override
+    /* Hash 相关操作 */
+
+    public boolean hExists(String key, String subKey) {
+        Optional<Jedis> connectionOptional = getConnection();
+        if (connectionOptional.isEmpty()) return false;
+        try (Jedis connection = connectionOptional.get()){
+            return connection.hexists(key, subKey);
+        } catch (Exception e) {
+            log.error("Redis 查询异常请检查 Redis 服务", e);
+        }
+        return false;
+    }
+
     public boolean hSetValue(String key, String subKey, String value, long expire) {
         return hSetValue(key, new LinkedHashMap<>(Map.of(subKey, value)), expire);
     }
 
-    @Override
     public boolean hSetValue(String key, LinkedHashMap<String, String> values, long expire) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -212,12 +227,10 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
     public boolean hSetObject(String key, String subKey, Object value, long expire) {
         return hSetObject(key, new LinkedHashMap<>(Map.of(subKey, value)), expire);
     }
 
-    @Override
     public boolean hSetObject(String key, LinkedHashMap<String, Object> values, long expire) {
         return hSetValue(key, values.entrySet().stream().
                 collect(Collectors.toMap(
@@ -227,24 +240,6 @@ public class RedisStore implements IRedisStore{
         )), expire);
     }
 
-    @Override
-    public Optional<String> getValue(String key) {
-        Optional<Jedis> connectionOptional = getConnection();
-        if (connectionOptional.isEmpty()) return Optional.empty();
-        try (Jedis connection = connectionOptional.get()){
-            return Optional.ofNullable(connection.get(key));
-        } catch (Exception e) {
-            log.error("Redis 查询异常请检查 Redis 服务", e);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> getObject(String key, Class<T> clazz) {
-        return getValue(key).map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz));
-    }
-
-    @Override
     public Optional<String> hGetValue(String key, String subKey) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return Optional.empty();
@@ -256,12 +251,12 @@ public class RedisStore implements IRedisStore{
         return Optional.empty();
     }
 
-    @Override
     public <T> Optional<T> hGetObject(String key, String subKey, Class<T> clazz) {
-        return hGetValue(key, subKey).map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz));
+        return hGetValue(key, subKey)
+                .map(serializerValue ->
+                        GsonUtil.fromJson(serializerValue, clazz));
     }
 
-    @Override
     public Optional<List<String>> hGetAllValue(String key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return Optional.empty();
@@ -274,14 +269,12 @@ public class RedisStore implements IRedisStore{
         return Optional.empty();
     }
 
-    @Override
     public <T> Optional<List<T>> hGetAllObject(String key, Class<T> clazz) {
         return hGetAllValue(key).map(serializerList -> serializerList.stream().
                 map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
-    @Override
     public Optional<List<String>> getAllValue(String key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return Optional.empty();
@@ -294,13 +287,11 @@ public class RedisStore implements IRedisStore{
         return Optional.empty();
     }
 
-    @Override
     public <T> Optional<List<T>> getAllObject(String key, Class<T> clazz) {
         return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
-    @Override
     public boolean removeKey(String... key) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -313,7 +304,6 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
     public boolean removeKeyByPrefix(String... prefix) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -331,7 +321,6 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
     public boolean removeHkey(String key, String... subKey) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -344,7 +333,6 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
     public void publishValue(String channel, String value) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return;
@@ -355,7 +343,6 @@ public class RedisStore implements IRedisStore{
         }
     }
 
-    @Override
     public boolean tryLock(String lockKey, String lockHolder, long expire) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;
@@ -368,16 +355,14 @@ public class RedisStore implements IRedisStore{
         return false;
     }
 
-    @Override
-    public boolean releasedLock(String lockKey, String lockHolder) {
+    public void releaseLock(String lockKey, String lockHolder) {
         Optional<Jedis> connectionOptional = getConnection();
-        if (connectionOptional.isEmpty()) return false;
+        if (connectionOptional.isEmpty()) return;
         try (Jedis connection = connectionOptional.get()){
-            return connection.eval(RELEASED_LOCK_SCRIPT, Collections.singletonList(lockKey), Collections.singletonList(lockHolder)).equals(1L);
+            connection.eval(RELEASED_LOCK_SCRIPT, Collections.singletonList(lockKey), Collections.singletonList(lockHolder));
         } catch (Exception e) {
             log.error("Redis 解锁分布式锁时出现未知异常", e);
         }
-        return false;
     }
 
     static {

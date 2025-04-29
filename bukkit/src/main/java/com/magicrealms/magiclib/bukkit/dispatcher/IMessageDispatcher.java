@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.bukkit.dispatcher;
 
 import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
-import com.magicrealms.magiclib.common.store.IRedisStore;
+import com.magicrealms.magiclib.common.store.RedisStore;
 import org.bukkit.command.CommandSender;
 
 
@@ -35,7 +35,7 @@ public interface IMessageDispatcher {
      * @param player 接收消息的玩家名称
      * @param msg 需要发送的消息内容
      */
-    void sendBungeeMessage(IRedisStore store,
+    void sendBungeeMessage(RedisStore store,
                            String channel, String player, String msg);
 
     /**
@@ -44,5 +44,5 @@ public interface IMessageDispatcher {
      * @param channel 渠道名称，用于标识消息的分类或目标服务器
      * @param msg 要发送的跨服播报消息内容
      */
-    void sendBungeeBroadcast(IRedisStore store, String channel, String msg);
+    void sendBungeeBroadcast(RedisStore store, String channel, String msg);
 }

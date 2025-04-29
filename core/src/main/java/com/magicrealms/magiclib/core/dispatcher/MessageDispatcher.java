@@ -7,7 +7,7 @@ import com.magicrealms.magiclib.bukkit.message.enums.MessageType;
 import com.magicrealms.magiclib.bukkit.message.factory.IMessageFactory;
 import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.message.bungee.BungeeMessage;
-import com.magicrealms.magiclib.common.store.IRedisStore;
+import com.magicrealms.magiclib.common.store.RedisStore;
 import com.magicrealms.magiclib.common.utils.GsonUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -98,14 +98,14 @@ public class MessageDispatcher implements IMessageDispatcher {
     }
 
     @Override
-    public void sendBungeeMessage(IRedisStore store,
+    public void sendBungeeMessage(RedisStore store,
                                   String channel, String player, String msg) {
         BungeeMessage message = new BungeeMessage(player, msg);
         store.publishValue(channel, GsonUtil.toJson(message));
     }
 
     @Override
-    public void sendBungeeBroadcast(IRedisStore store, String channel, String msg) {
+    public void sendBungeeBroadcast(RedisStore store, String channel, String msg) {
         BungeeMessage message = new BungeeMessage(msg);
         store.publishValue(channel, GsonUtil.toJson(message));
     }

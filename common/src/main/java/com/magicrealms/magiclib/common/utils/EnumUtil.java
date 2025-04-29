@@ -9,6 +9,8 @@ import java.util.*;
  */
 public final class EnumUtil {
 
+    private EnumUtil() {}
+    
     /**
      * 根据名称匹配枚举项（不区分大小写）
      * @param <T> 枚举类型泛型参数

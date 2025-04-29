@@ -16,14 +16,16 @@ import java.util.regex.Pattern;
 @Slf4j
 @SuppressWarnings("unused")
 public final class StringUtil {
+
     public static final String EMPTY = "";
     private static final String PREFIX_DELIMITER = "::";
     private static final String PLACEHOLDER_FORMAT = "%%%s%%";
-
     private static final Pattern TAG_CONTENT_PATTERN
             = Pattern.compile("<([^>]+)>([^<]*)");
     private static final Pattern PLACEHOLDER_PATTERN
             = Pattern.compile("%(.+?)%");
+
+    private StringUtil() {}
 
     /**
      * 提取字符串中指定标签之间的内容

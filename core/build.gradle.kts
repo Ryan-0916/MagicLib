@@ -24,6 +24,14 @@ tasks.withType<JavaCompile> {
     options.release.set(17)
 }
 
+// val target = file("$rootDir/target")
+val target = file("D:\\Minecraft\\Servers\\1.21.4\\Lobby\\plugins")
+tasks.shadowJar {
+    destinationDirectory.set(target)
+    archiveClassifier.set("")
+    archiveFileName.set("${rootProject.name}-${projectVersion}.jar")
+}
+
 publishing {
     repositories {
         maven {
@@ -31,7 +39,6 @@ publishing {
             url = uri(layout.buildDirectory.dir("file://D:\\Maven\\MavenRepository"))
         }
     }
-
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = projectGroup
@@ -40,5 +47,4 @@ publishing {
             from(components["shadow"])
         }
     }
-
 }
