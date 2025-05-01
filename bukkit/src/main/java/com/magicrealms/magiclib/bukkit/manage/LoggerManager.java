@@ -29,7 +29,7 @@ public class LoggerManager {
     public LoggerManager(MagicRealmsPlugin plugin) {
         this.plugin = plugin;
         this.bukkitLogger = plugin.getLogger();
-        initialize();
+//        initialize();
     }
 
     private void initialize() {

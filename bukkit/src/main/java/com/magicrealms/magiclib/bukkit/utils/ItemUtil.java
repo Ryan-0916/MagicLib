@@ -1,5 +1,7 @@
 package com.magicrealms.magiclib.bukkit.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.magicrealms.magiclib.bukkit.manage.ConfigManager;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
@@ -38,19 +40,26 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemUtil {
 
+    private ItemUtil() {}
+
     public static final ItemStack AIR = new ItemStack(Material.AIR);
 
-    public static final Component UN_ITALIC = Component.text(StringUtil.EMPTY, Style.style(TextDecoration.ITALIC.withState(false)));
+    public static final Component UN_ITALIC
+            = Component.text(StringUtil.EMPTY,
+            Style.style(TextDecoration.ITALIC.withState(false)));
 
-    public static boolean isAirOrNull(@Nullable ItemStack itemStack) {
-        return itemStack == null || itemStack.getType() == Material.AIR;
+    public static final Gson GSON = new GsonBuilder()
+            .setDateFormat("yyyy-MM-dd HH:mm:ss")
+            /* 自定义处理器 */
+            .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
+            .create();
+
+    /* 序列化物品 */
+    public static Optional<String> serializer(ItemStack itemStack) {
+        return serializerUnClone(itemStack.clone());
     }
 
-    public static boolean isNotAirOrNull(@Nullable ItemStack itemStack) {
-        return !isAirOrNull(itemStack);
-    }
-
-    @NotNull
+    /* 序列化物品 */
     public static Optional<String> serializerUnClone(ItemStack itemStack) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)
@@ -63,12 +72,7 @@ public class ItemUtil {
         }
     }
 
-    @NotNull
-    public static Optional<String> serializer(ItemStack itemStack) {
-        return serializerUnClone(itemStack.clone());
-    }
-
-    @NotNull
+    /* 反序列化物品 */
     public static Optional<ItemStack> deserializer(String deserializer) {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(deserializer));
              BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)
@@ -80,7 +84,28 @@ public class ItemUtil {
         }
     }
 
-    @NotNull
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public static boolean isAirOrNull(@Nullable ItemStack itemStack) {
+        return itemStack == null || itemStack.getType() == Material.AIR;
+    }
+
+    public static boolean isNotAirOrNull(@Nullable ItemStack itemStack) {
+        return !isAirOrNull(itemStack);
+    }
+
     public static ItemStack getItemStackByConfig(ConfigManager configManager, String configPath,
                                                  String key, ItemFlag... itemFlags) {
         return getItemStackByConfig(configManager, configPath, key, null, itemFlags);

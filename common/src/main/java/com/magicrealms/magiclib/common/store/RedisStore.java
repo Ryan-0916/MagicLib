@@ -1,5 +1,6 @@
 package com.magicrealms.magiclib.common.store;
 
+import com.google.gson.Gson;
 import com.magicrealms.magiclib.common.utils.GsonUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +37,18 @@ public class RedisStore {
     private final int PORT;
     private final String PASSWORD;
 
+    /* Json 处理器 */
+    private final Gson gson;
+
     public RedisStore(String host, int port, @Nullable String password) {
+        this(GsonUtil.GSON, host, port, password);
+    }
+
+    public RedisStore(Gson gson, String host, int port, @Nullable String password) {
         this.HOST = host;
         this.PORT = port;
         this.PASSWORD = password;
+        this.gson = gson;
     }
 
     private Optional<Jedis> getConnection() {
@@ -122,7 +131,7 @@ public class RedisStore {
     }
 
     public boolean setObject(String key, Object value, long expire) {
-        return setValue(key, GsonUtil.toJson(value), expire);
+        return setValue(key, GsonUtil.toJson(gson, value), expire);
     }
 
     public Optional<String> getValue(String key) {
@@ -137,7 +146,7 @@ public class RedisStore {
     }
 
     public <T> Optional<T> getObject(String key, Class<T> clazz) {
-        return getValue(key).map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz));
+        return getValue(key).map(serializerValue -> GsonUtil.fromJson(gson, serializerValue, clazz));
     }
 
     public boolean lSetValue(String key, long expire, String... values) {
@@ -152,14 +161,14 @@ public class RedisStore {
     }
 
     public boolean lSetObject(String key, long expire, Object... values) {
-        return lSetValue(key, expire, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
+        return lSetValue(key, expire, Arrays.stream(values).map(e -> GsonUtil.toJson(gson, e)).collect(Collectors.joining()));
     }
 
     public boolean lSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
-            return lSetValue(key, -1, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
+            return lSetValue(key, -1, Arrays.stream(values).map(e -> GsonUtil.toJson(gson, e)).collect(Collectors.joining()));
         }
-        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
+        return pushValueSetMaxSizeByScript(key, maxSize, LEFT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(e -> GsonUtil.toJson(gson, e)).collect(Collectors.joining()));
     }
 
     public boolean rSetValue(String key, long expire, String... values) {
@@ -174,14 +183,14 @@ public class RedisStore {
     }
 
     public boolean rSetObject(String key, long expire, Object... values) {
-        return rSetValue(key, expire, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
+        return rSetValue(key, expire, Arrays.stream(values).map(e -> GsonUtil.toJson(gson, e)).collect(Collectors.joining()));
     }
 
     public boolean rSetValue(String key, int maxSize, Object... values) {
         if (maxSize < 0) {
-            return rSetValue(key, -1, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
+            return rSetValue(key, -1, Arrays.stream(values).map(e -> GsonUtil.toJson(gson, e)).collect(Collectors.joining()));
         }
-        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(GsonUtil::toJson).collect(Collectors.joining()));
+        return pushValueSetMaxSizeByScript(key, maxSize, RIGHT_PUSH_TRIM_SCRIPT, Arrays.stream(values).map(e -> GsonUtil.toJson(gson, e)).collect(Collectors.joining()));
     }
 
     /* Hash 相关操作 */
@@ -235,7 +244,7 @@ public class RedisStore {
         return hSetValue(key, values.entrySet().stream().
                 collect(Collectors.toMap(
                     Map.Entry::getKey,
-                    e -> GsonUtil.toJson(e.getValue()),
+                    e -> GsonUtil.toJson(gson, e.getValue()),
                     (oldValue, newValue) -> newValue, LinkedHashMap::new
         )), expire);
     }
@@ -254,7 +263,7 @@ public class RedisStore {
     public <T> Optional<T> hGetObject(String key, String subKey, Class<T> clazz) {
         return hGetValue(key, subKey)
                 .map(serializerValue ->
-                        GsonUtil.fromJson(serializerValue, clazz));
+                        GsonUtil.fromJson(gson, serializerValue, clazz));
     }
 
     public Optional<List<String>> hGetAllValue(String key) {
@@ -271,7 +280,7 @@ public class RedisStore {
 
     public <T> Optional<List<T>> hGetAllObject(String key, Class<T> clazz) {
         return hGetAllValue(key).map(serializerList -> serializerList.stream().
-                map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz))
+                map(serializerValue -> GsonUtil.fromJson(gson, serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
@@ -288,7 +297,7 @@ public class RedisStore {
     }
 
     public <T> Optional<List<T>> getAllObject(String key, Class<T> clazz) {
-        return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> GsonUtil.fromJson(serializerValue, clazz))
+        return getAllValue(key).map(strings -> strings.stream().map(serializerValue -> GsonUtil.fromJson(gson, serializerValue, clazz))
                 .collect(Collectors.toList()));
     }
 
