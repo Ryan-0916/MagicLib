@@ -86,4 +86,19 @@ public class NMSDispatcher implements INMSDispatcher {
         NMS_DISPATCHER.resetChatDialog(player, messageHistory);
     }
 
+    @Override
+    public void playSound(Player player, String namespace, float volume, float pitch, long speed) {
+        NMS_DISPATCHER.playSound(player, namespace, volume, pitch, speed);
+    }
+
+    @Override
+    public void setItemCooldown(Player player, ItemStack item, int duration) {
+        NMS_DISPATCHER.setItemCooldown(player, item, duration);
+    }
+
+    @Override
+    public void removeItemCooldown(Player player, ItemStack item) {
+        NMS_DISPATCHER.removeItemCooldown(player, item);
+    }
+
 }

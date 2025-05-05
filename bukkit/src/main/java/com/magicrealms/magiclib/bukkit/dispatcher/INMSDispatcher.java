@@ -59,4 +59,11 @@ public interface INMSDispatcher {
      * @param messageHistory 消息列表
      */
     void resetChatDialog(Player player, List<String> messageHistory);
+
+    void playSound(Player player, String namespace, float volume, float pitch, long speed);
+
+    void setItemCooldown(Player player, ItemStack item, int duration);
+
+    void removeItemCooldown(Player player, ItemStack item);
+
 }

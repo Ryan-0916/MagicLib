@@ -3,6 +3,7 @@ package com.magicrealms.magiclib.core.listener;
 import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
 import com.magicrealms.magiclib.core.holder.BaseMenuHolder;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -18,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
 @SuppressWarnings("unused")
 public class PlayerListener implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryClickEvent(InventoryClickEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             e.setCancelled(menu.isLock());
@@ -42,7 +43,7 @@ public class PlayerListener implements Listener {
 
             if (clickedSlot >= menu.getLayout().length() ||
                     clickedSlot >= e.getInventory().getSize()) {
-                menu.clickBottomSlotEvent(e, clickedSlot);
+                menu.bottomInventoryClickEvent(e, clickedSlot);
                 return;
             }
 
@@ -51,11 +52,11 @@ public class PlayerListener implements Listener {
                 return;
             }
 
-            menu.clickSlotEvent(e, clickedSlot);
+            menu.topInventoryClickEvent(e, clickedSlot);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryDragEvent(InventoryDragEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             if (menu.isLock()) {
@@ -65,14 +66,14 @@ public class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryCloseEvent(InventoryCloseEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             menu.closeEvent(e);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onInventoryOpenEvent(InventoryOpenEvent e) {
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             menu.openEvent(e);

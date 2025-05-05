@@ -2,14 +2,19 @@ package com.magicrealms.magiclib.mc_1_20_R3.dispatcher;
 
 import com.magicrealms.magiclib.bukkit.dispatcher.INMSDispatcher;
 import com.magicrealms.magiclib.mc_1_20_R3.utils.ComponentUtil;
+import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -148,5 +153,27 @@ public class MC_1_20_R3_NMSDispatcher implements INMSDispatcher {
                 .map(msg -> new ClientboundSystemChatPacket(ComponentUtil.getComponentOrEmpty(msg), false))
                 .forEach(packets::add);
         ((CraftPlayer) player).getHandle().connection.send(new ClientboundBundlePacket(packets));
+    }
+
+    @Override
+    public void playSound(Player player, String namespace, float volume, float pitch, long speed) {
+        ((CraftPlayer)player).getHandle().connection.send(new ClientboundSoundPacket(Holder.direct(SoundEvent.createVariableRangeEvent(new ResourceLocation(namespace))),
+                SoundSource.PLAYERS, player.getLocation().getX(),
+                player.getLocation().getY(), player.getLocation().getZ(),
+                volume, pitch, speed));
+    }
+
+    @Override
+    public void setItemCooldown(Player player, ItemStack item, int duration) {
+        ((CraftPlayer)player).getHandle().connection.send(new ClientboundCooldownPacket(
+                CraftItemStack.asNMSCopy(item).getItem(), duration
+        ));
+    }
+
+    @Override
+    public void removeItemCooldown(Player player, ItemStack item) {
+        ((CraftPlayer)player).getHandle().connection.send(new ClientboundCooldownPacket(
+                CraftItemStack.asNMSCopy(item).getItem(), 0
+        ));
     }
 }

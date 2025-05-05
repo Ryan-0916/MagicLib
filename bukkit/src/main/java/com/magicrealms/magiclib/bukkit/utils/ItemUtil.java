@@ -55,7 +55,7 @@ public final class ItemUtil {
             .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
             .create();
 
-    /* 序列化物品 */
+    /* 序列化物品并克隆 */
     public static Optional<String> serializer(ItemStack itemStack) {
         return serializerUnClone(itemStack.clone());
     }
@@ -85,6 +85,7 @@ public final class ItemUtil {
         }
     }
 
+    /* 获取玩家头颅 */
     public static ItemStack getPlayerHead(Player player) {
         ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
         if (itemStack.getItemMeta() instanceof SkullMeta skull) {
@@ -94,44 +95,35 @@ public final class ItemUtil {
         return itemStack;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /* 是空气或为空 */
     public static boolean isAirOrNull(@Nullable ItemStack itemStack) {
         return itemStack == null || itemStack.getType() == Material.AIR;
     }
 
+    /* 不是空气并且不为空 */
     public static boolean isNotAirOrNull(@Nullable ItemStack itemStack) {
         return !isAirOrNull(itemStack);
     }
 
-    public static ItemStack getItemStackByConfig(ConfigManager configManager, String configPath,
-                                                 String key, ItemFlag... itemFlags) {
+    public static ItemStack getItemStackByConfig(
+            ConfigManager configManager,
+            String configPath,
+            String key,
+            ItemFlag... itemFlags) {
         return getItemStackByConfig(configManager, configPath, key, null, itemFlags);
     }
 
-    @SuppressWarnings("DuplicatedCode")
-    @NotNull
+    public static ItemStack setItemStackByConfig(ItemStack itemStack, ConfigManager configManager,
+                                                 String configPath, String key, ItemFlag... itemFlags) {
+        return setItemStackByConfig(itemStack, configManager, configPath, key, null, itemFlags);
+    }
+
     public static ItemStack getItemStackByConfig(ConfigManager configManager, String configPath,
                                                  String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
-        Optional<Material> material = Optional.ofNullable(Material.matchMaterial(
-                configManager.getYmlValue(configPath, key + ".Mats")));
-        Optional<String> name = configManager.containsYmlKey(configPath, key + ".Name") ?
-                Optional.of(configManager.getYmlValue(configPath, key + ".Name")) : Optional.empty();
-        Optional<List<String>> lore = configManager.containsYmlKey(configPath, key + ".Lore") ?
-                configManager.getYmlListValue(configPath, key + ".Lore")  : Optional.empty();
+        Optional<Material> material = getMaterial(configManager, configPath, key);
+        Optional<String> name = getOptionalString(configManager, configPath, key, "Name");
+        Optional<List<String>> lore = getOptionalList(configManager, configPath, key, "Lore");
         if (material.isEmpty()) {
             return AIR;
         }
@@ -139,42 +131,50 @@ public final class ItemUtil {
                 .setItemFlag(itemFlags)
                 .setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
         if (name.isPresent()) {
-            itemBuilder = itemBuilder.setName(StringUtil.replacePlaceholders(name.get(), map));
+            itemBuilder = itemBuilder.setName(name.get());
         }
         if (lore.isPresent()) {
-            itemBuilder = itemBuilder.setLore(lore.get().stream().map(l -> StringUtil.replacePlaceholders(l, map)).collect(Collectors.toList()));
+            itemBuilder = itemBuilder.setLore(lore.get());
         }
         return itemBuilder.builder();
     }
 
     @NotNull
-    public static ItemStack setItemStackByConfig(ConfigManager configManager, ItemStack itemStack,
-                                                 String configPath,
-                                                 String key,
+    public static ItemStack setItemStackByConfig(ItemStack itemStack, ConfigManager configManager,
+                                                 String configPath, String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
-       return setItemStackByConfig(configManager, itemStack, configPath, key, null, itemFlags);
-    }
-
-    @SuppressWarnings("DuplicatedCode")
-    @NotNull
-    public static ItemStack setItemStackByConfig(ConfigManager configManager, ItemStack itemStack,
-                                                 String configPath,
-                                                 String key, @Nullable Map<String, String> map,
-                                                 ItemFlag... itemFlags) {
-        Optional<String> nameOptional = configManager.containsYmlKey(configPath, key + ".Name") ?
-                Optional.of(configManager.getYmlValue(configPath, key + ".Name")) : Optional.empty();
-        Optional<List<String>> loreOptional = configManager.containsYmlKey(configPath, key + ".Lore") ?
-                configManager.getYmlListValue(configPath, key + ".Lore") : Optional.empty();
+        Optional<String> nameOptional = getOptionalString(configManager, configPath, key, "Name");
+        Optional<List<String>> loreOptional = getOptionalList(configManager, configPath, key, "Lore");
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
         nameOptional.ifPresent(name -> itemMeta.displayName(UN_ITALIC.append(AdventureHelper.deserializeComponent(
                 AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholders(name, map))))));
-        loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(
-                AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholders(l, map)))))
+        loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream()
+                .map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(
+                        AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholders(l, map)))))
                 .collect(Collectors.toList())));
         itemMeta.addItemFlags(itemFlags);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
+    }
+
+    // Helper method to extract material
+    private static Optional<Material> getMaterial(ConfigManager configManager, String configPath, String key) {
+        return Optional.ofNullable(Material.matchMaterial(configManager.getYmlValue(configPath, key + ".Mats")));
+    }
+
+    // Helper method to extract optional string
+    private static Optional<String> getOptionalString(ConfigManager configManager, String configPath, String key, String subKey) {
+        return configManager.containsYmlKey(configPath, key + "." + subKey)
+                ? Optional.of(configManager.getYmlValue(configPath, key + "." + subKey))
+                : Optional.empty();
+    }
+
+    // Helper method to extract optional list
+    private static Optional<List<String>> getOptionalList(ConfigManager configManager, String configPath, String key, String subKey) {
+        return configManager.containsYmlKey(configPath, key + "." + subKey)
+                ? configManager.getYmlListValue(configPath, key + "." + subKey)
+                : Optional.empty();
     }
 
     public static void similarItem(@Nullable ItemStack to, @Nullable ItemStack from) {
@@ -280,6 +280,7 @@ public final class ItemUtil {
             this.name = UN_ITALIC.append(AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(name)));
             return this;
         }
+
         public Builder setComponentLore(List<Component> lore) {
             this.lore = lore;
             return this;

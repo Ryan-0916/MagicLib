@@ -2,15 +2,11 @@ package com.magicrealms.magiclib.core.menu;
 
 import com.magicrealms.magiclib.core.MagicLib;
 import com.magicrealms.magiclib.core.holder.BaseMenuHolder;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-
-
-import java.util.HashMap;
 
 import static com.magicrealms.magiclib.core.MagicLibConstant.YML_CONFIRM_MENU;
 
@@ -25,6 +21,7 @@ public class ConfirmMenu extends BaseMenuHolder {
     private final Runnable CONFIRM_RUNNABLE;
     private final Runnable CANCEL_RUNNABLE;
     private final Runnable CLOSE_RUNNABLE;
+    /* 主动关闭 */
     private boolean manualClose;
 
     private ConfirmMenu(Builder builder) {
@@ -36,13 +33,14 @@ public class ConfirmMenu extends BaseMenuHolder {
         this.CONFIRM_RUNNABLE = builder.confirmRunnable;
         this.CANCEL_RUNNABLE = builder.cancelRunnable;
         this.CLOSE_RUNNABLE = builder.closeRunnable;
-        openMenu();
+        super.asyncOpenMenu();
     }
 
-    private void setMenu() {
-        int size =  super.getLayout().length();
+    @Override
+    protected void handleMenu(String layout) {
+        int size = layout.length();
         for (int i = 0; i < size; i++){
-            if (super.getLayout().charAt(i) == 'B') {
+            if (layout.charAt(i) == 'B') {
                 super.setItemSlot(i, ITEM_STACK);
                 continue;
             }
@@ -50,29 +48,32 @@ public class ConfirmMenu extends BaseMenuHolder {
         }
     }
 
-    private void openMenu() {
-        setMenu();
-        super.getPlayer().openInventory(super.getInventory());
+    @Override
+    protected String handleTitle(String title) {
+        return title;
     }
 
     @Override
     public void openEvent(InventoryOpenEvent e) {
         super.openEvent(e);
-        e.titleOverride(super.getTitle(new HashMap<>()));
         manualClose = true;
     }
 
     @Override
     public void closeEvent(InventoryCloseEvent e) {
         super.closeEvent(e);
-        if (manualClose) Bukkit.getScheduler()
-                .runTask(MagicLib.getInstance(), CLOSE_RUNNABLE);
+        if (manualClose) {
+            CLOSE_RUNNABLE.run();
+        }
     }
 
     @Override
-    public void clickSlotEvent(InventoryClickEvent e, int clickedSlot) {
-        char c = super.getLayout().charAt(clickedSlot);
-        super.playSound("Icons." + c + ".display.sound");
+    public void topInventoryClickEvent(InventoryClickEvent e, int slot) {
+        if (!super.getCooldownManager().tryCooldown(slot)) {
+            return;
+        }
+        char c = super.getLayout().charAt(slot);
+        asyncPlaySound("Icons." + c + ".Display.Sound");
         if (c == 'A' || c == 'C') operate(c == 'A');
     }
 
@@ -82,14 +83,12 @@ public class ConfirmMenu extends BaseMenuHolder {
      */
     private void operate(boolean isConfirm) {
         manualClose = false;
-        Bukkit.getScheduler().runTask(MagicLib.getInstance(), () -> {
-            super.closeMenu();
-            if (isConfirm) {
-                CONFIRM_RUNNABLE.run();
-                return;
-            }
-            CANCEL_RUNNABLE.run();
-        });
+        asyncCloseMenu();
+        if (isConfirm) {
+            CONFIRM_RUNNABLE.run();
+            return;
+        }
+        CANCEL_RUNNABLE.run();
     }
 
     /**

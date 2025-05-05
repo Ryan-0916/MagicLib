@@ -2,17 +2,12 @@ package com.magicrealms.magiclib.core.holder;
 
 import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
+import com.magicrealms.magiclib.common.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -21,22 +16,25 @@ import java.util.function.Consumer;
  * @Desc 翻页菜单构造器
  * @date 2024-04-11
  */
+@Getter
 @SuppressWarnings("unused")
-public class PageMenuHolder extends BaseMenuHolder {
+public abstract class PageMenuHolder extends BaseMenuHolder {
 
-    private final Map<Integer, Map<Integer, ItemStack>> cacheItems;
+    /* 是否开启缓存 */
     private final boolean cache;
-    @Getter
+    /* 缓存管理器 */
+    private final CacheManager cacheManager;
+    /* 当前页数 */
     private int page;
-    @Getter @Setter
+    /* 最大页数 */
+    @Setter
     private int maxPage;
 
     public PageMenuHolder(MagicRealmsPlugin plugin,
                           Player player,
                           String configPath,
                           String defLayout) {
-        this(plugin, player, configPath,
-                defLayout, true, true, null);
+        this(plugin, player, configPath, defLayout, true, true, null);
     }
 
     public PageMenuHolder(MagicRealmsPlugin plugin,
@@ -72,103 +70,60 @@ public class PageMenuHolder extends BaseMenuHolder {
                           boolean cache,
                           @Nullable Runnable backMenuRunnable) {
         super(plugin, player, configPath, defLayout, lock, backMenuRunnable);
-        this.cacheItems = new HashMap<>();
+        this.cacheManager = new CacheManager(this);
         this.cache = cache;
         this.page = 1;
         this.maxPage = 1;
     }
 
-    /**
-     * 加载菜单当前页的物品
-     * 此方法是通过缓存去加载当前页的物品
-     * 如果您不希望您的物品通过缓存的形式添加请不要使用此方法
-     * @param consumer 加载成功/加载失败 {@link Consumer}
-     */
-    public void loadingPageItems(Consumer<Boolean> consumer) {
-        if (cache && cacheItems.containsKey(page) && cacheItems.get(page) != null) {
-            int size = super.getLayout().length();
+    protected abstract void handleMenuUnCache(String layout);
+
+    protected abstract String handleTitleMore(String layout);
+
+    @Override
+    protected void handleMenu(String layout) {
+        if (cache && cacheManager.getCache().containsKey(page) && cacheManager.getCache().get(page) != null) {
+            int size = layout.length();
             for (int i = 0; i < size; i++) {
-                super.setItemSlot(i, cacheItems.get(page).getOrDefault(i, ItemUtil.AIR));
+                super.setItemSlot(i, cacheManager.getCache().get(page).getOrDefault(i, ItemUtil.AIR));
             }
-            consumer.accept(true);
             return;
         }
-        consumer.accept(false);
+        handleMenuUnCache(layout);
     }
 
-    public boolean setCurrentPage(int page) {
+    @Override
+    protected String handleTitle(String title) {
+        return handleTitleMore(StringUtil.replacePlaceholders(title, Map.of(
+                "page", String.valueOf(page),
+                "max_page", String.valueOf(maxPage)
+        )));
+    }
+
+    protected boolean setCurrentPage(int page) {
         if (page >= 1 && page <= maxPage) {
-            super.setPlayCloseSound(false);
             this.page = page;
             return true;
         }
         return false;
     }
 
-    public boolean goToFirstPage() {
+    protected boolean goToFirstPage() {
         return setCurrentPage(1);
     }
 
-    public boolean goToLastPage() {
+    protected boolean goToLastPage() {
         return setCurrentPage(maxPage);
     }
 
-    public void changePage(int delta, Consumer<Boolean> callBack) {
+    protected void changePage(int delta, Consumer<Boolean> callBack) {
         callBack.accept(setCurrentPage(page + delta));
-    }
-
-    private void cacheItemStack(int slot, ItemStack itemStack) {
-        if (cache) {
-            Map<Integer, ItemStack> pageCache = cacheItems.getOrDefault(page, new HashMap<>());
-            pageCache.put(slot, itemStack);
-            cacheItems.put(page, pageCache);
-        }
-    }
-
-    public void cleanItemCache() {
-        cacheItems.clear();
     }
 
     @Override
     public void setItemSlot(int slot, ItemStack itemStack) {
         super.setItemSlot(slot, itemStack);
-        cacheItemStack(slot, itemStack);
+        cacheManager.cache(slot, itemStack);
     }
 
-    @Override
-    public void setItemSlot(int slot, ItemFlag... itemFlags){
-        char slotChar = super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
-                super.getConfigPath(),
-                "Icons." + slotChar + ".Display"));
-    }
-
-    @Override
-    public void setButtonSlot(int slot, boolean disabled, ItemFlag... itemFlags){
-        char slotChar =  super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
-                super.getConfigPath(),
-                "Icons." + slotChar + (disabled ? ".DisabledDisplay" : ".ActiveDisplay")));
-    }
-
-    @Override
-    public void setCheckBoxSlot(int slot, boolean opened, ItemFlag... itemFlags){
-        char slotChar =  super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
-                super.getConfigPath(),
-                "Icons." + slotChar + (opened ? ".OpenDisplay" : ".CloseDisplay")));
-    }
-
-    @Override
-    public @NotNull Component getTitle(Map<String, String> placeholderMap) {
-        placeholderMap.put("page", String.valueOf(page));
-        placeholderMap.put("max_page", String.valueOf(maxPage));
-        placeholderMap.put("next_page_title", super.getPlugin().getConfigManager()
-                .getYmlValue(super.getConfigPath(), page >= maxPage ? "PageTitle.NextPage.Disable" :
-                        "PageTitle.NextPage.Active"));
-        placeholderMap.put("previous_page_title", super.getPlugin().getConfigManager()
-                .getYmlValue(super.getConfigPath(), page <= 1 ? "PageTitle.PreviousPage.Disable" :
-                        "PageTitle.PreviousPage.Active"));
-        return super.getTitle(placeholderMap);
-    }
 }

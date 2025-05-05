@@ -4,15 +4,9 @@ import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.message.AbstractMessage;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import net.minecraft.core.Holder;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
+import com.magicrealms.magiclib.mc_1_20_R3.dispatcher.MC_1_20_R3_NMSDispatcher;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -96,13 +90,7 @@ public class SoundMessage extends AbstractMessage {
         });
     }
 
-    private void sendSound(Player player, String path, float volume, float pitch, long speed) {
-        List<Packet<ClientGamePacketListener>> packetListeners = List.of(
-                new ClientboundSoundPacket(Holder.direct(SoundEvent.createVariableRangeEvent(new ResourceLocation(path))),
-                        SoundSource.PLAYERS, player.getLocation().getX(),
-                        player.getLocation().getY(), player.getLocation().getZ(),
-                        volume, pitch, speed)
-        );
-        ((CraftPlayer)player).getHandle().connection.send(new ClientboundBundlePacket(packetListeners));
+    private void sendSound(Player player, String namespace, float volume, float pitch, long speed) {
+        MC_1_20_R3_NMSDispatcher.getInstance().playSound(player, namespace, volume, pitch, speed);
     }
 }

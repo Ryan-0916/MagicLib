@@ -143,7 +143,6 @@ public class ConfigManager {
                 );
     }
 
-
     /**
      * 重新加载单个配置文件
      * @param mirrorPath 镜像文件地址，既文件真实地址，而源库文件地址
@@ -203,9 +202,8 @@ public class ConfigManager {
         try {
             return (T) valueType.parse(value);
         } catch (Exception exception) {
-            PLUGIN.getLoggerManager().error("获取YML文件属性时出现异常，原因：无法将文本转换成 " + valueType.getType().getSimpleName() + "，Key：" + key, exception);
+            return defaultValue;
         }
-        return defaultValue;
     }
 
     /**
