@@ -63,4 +63,17 @@ public final class GsonUtil {
         }
     }
 
+    public static JsonElement jsonToElement(String json) {
+        if (StringUtils.isBlank(json)) {
+            return null;
+        }
+        try {
+            return JsonParser.parseString(json);
+        } catch (JsonSyntaxException var2) {
+            log.warn("转换Json对象时异常, 原文{}", json);
+            return null;
+        }
+    }
+
+
 }

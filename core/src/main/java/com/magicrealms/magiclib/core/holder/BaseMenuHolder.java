@@ -6,6 +6,7 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
+import com.magicrealms.magiclib.core.MagicLib;
 import com.magicrealms.magiclib.core.dispatcher.NMSDispatcher;
 import lombok.Data;
 import net.kyori.adventure.text.Component;
@@ -25,7 +26,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author Ryan-0916
@@ -36,11 +39,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
 
+    private final MagicRealmsPlugin plugin;
     private final Player player;
     private final boolean lock;
     private final String layout;
     private final String title;
-    private final MagicRealmsPlugin plugin;
     private final String configPath;
     private final Inventory inventory;
     private final Runnable backMenuRunnable;
@@ -78,7 +81,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
         this.player = player;
         this.configPath = configPath;
         this.layout = setupLayout(defLayout);
-        this.title = plugin.getConfigManager().getYmlValue(configPath, "Title");
+        this.title = setupTitle();
         this.lock = lock;
         this.backMenuRunnable = backMenuRunnable;
         this.cooldownItems = new ConcurrentHashMap<>();
@@ -87,18 +90,31 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
         this.playCloseSound = true;
     }
 
-    @NotNull
+    private String setupTitle() {
+        String titleText = "Title.%s.Text";
+        String titleOffset = "Title.%s.Offset";
+        Optional<Set<String>> titles =  plugin.getConfigManager()
+                .getYmlSubKeys(configPath, "Title", false);
+        return titles.map(strings -> strings.stream()
+                .map(s -> MagicLib.getInstance().getOffsetManager()
+                        .format(plugin.getConfigManager().getYmlValue(configPath,
+                                        String.format(titleOffset, s), 0, ParseType.INTEGER),
+                                plugin.getConfigManager().getYmlValue(configPath,
+                                        String.format(titleText, s), StringUtil.EMPTY, ParseType.STRING)
+                        )).collect(Collectors.joining())).orElse(StringUtil.EMPTY);
+    }
+
     private String setupLayout(String defLayout) {
-        Optional<List<String>> layout = plugin.getConfigManager().getYmlListValue(configPath, "Layout");
+        Optional<List<String>> layout
+                = plugin.getConfigManager().getYmlListValue(configPath, "Layout");
         if (layout.isEmpty()) {
             return defLayout;
         }
-
         if (layout.get().size() > 6) {
             return defLayout;
         }
-
-        return layout.get().stream().anyMatch(row -> row.length() != 9) ? defLayout : String.join("", layout.get());
+        return layout.get().stream()
+                .anyMatch(row -> row.length() != 9) ? defLayout : String.join("", layout.get());
     }
 
     @Override
@@ -147,12 +163,14 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     }
 
     public void playSound(String key) {
-        if (!plugin.getConfigManager().containsYmlKey(configPath, key + ".path")) {
+        if (!plugin.getConfigManager().containsYmlKey(configPath, key + ".Path")) {
             return;
         }
-        player.playSound(player, plugin.getConfigManager().getYmlValue(configPath, key + ".path"),
-                plugin.getConfigManager().getYmlValue(configPath, key + ".volume", 1.0F, ParseType.FLOAT),
-                plugin.getConfigManager().getYmlValue(configPath, key + ".pitch", 1.0F, ParseType.FLOAT));
+        player.playSound(player, plugin.getConfigManager().getYmlValue(configPath, key + ".Path"),
+                plugin.getConfigManager()
+                        .getYmlValue(configPath, key + ".Volume", 1.0F, ParseType.FLOAT),
+                plugin.getConfigManager()
+                        .getYmlValue(configPath, key + ".Pitch", 1.0F, ParseType.FLOAT));
     }
 
     public void setItemSlot(int slot, ItemStack itemStack) {
@@ -168,31 +186,34 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
         char slotChar = layout.charAt(slot);
         this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
-                "Icons." + slotChar + ".display"));
+                "Icons." + slotChar + ".Display"));
     }
 
     public void setButtonSlot(int slot, boolean disabled, ItemFlag... itemFlags){
         char slotChar = layout.charAt(slot);
         this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
-                "Icons." + slotChar + (disabled ? ".disabledDisplay" : ".activeDisplay")));
+                "Icons." + slotChar + (disabled ? ".DisabledDisplay" : ".ActiveDisplay")));
     }
 
     public void setCheckBoxSlot(int slot, boolean opened, ItemFlag... itemFlags){
         char slotChar = layout.charAt(slot);
         this.setItemSlot(slot, ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
-                "Icons." + slotChar + (opened ? ".openDisplay" : ".closeDisplay")));
+                "Icons." + slotChar + (opened ? ".OpenDisplay" : ".CloseDisplay")));
     }
 
-    @NotNull
     public Component getTitle(Map<String, String> map) {
         map.put("player_name", player.getName());
-        return AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholders(title, map)));
+        return AdventureHelper.deserializeComponent(AdventureHelper
+                .legacyToMiniMessage(StringUtil.replacePlaceholders(title, map)));
     }
 
     protected void updateTitle(Map<String, String> map) {
-        NMSDispatcher.getInstance().updateInventoryTitle(player, title);
+        map.put("player_name", player.getName());
+        NMSDispatcher.getInstance()
+                .updateInventoryTitle(player,
+                        StringUtil.replacePlaceholders(title, map));
     }
 
     public boolean hasBackMenuRunnable() {
@@ -226,7 +247,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
             return true;
         }
 
-        String key = "Icons." + character + ".cooldown";
+        String key = "Icons." + character + ".Cooldown";
         if (!plugin.getConfigManager().containsYmlKey(configPath, key)) {
             return true;
         }
@@ -239,7 +260,7 @@ public class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
         /* 如果不是空气则替将它放置到槽位中 */
         ItemStack cooldownItemStack = ItemUtil.getItemStackByConfig(plugin.getConfigManager(),
                 configPath,
-                "Icons." + character + ".cooldownDisplay");
+                "Icons." + character + ".CooldownDisplay");
         if (ItemUtil.isNotAirOrNull(cooldownItemStack)) {
             inventory.setItem(clickSlot, cooldownItemStack);
         }

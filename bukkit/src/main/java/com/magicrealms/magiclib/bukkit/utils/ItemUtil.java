@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @Slf4j
-public class ItemUtil {
+public final class ItemUtil {
 
     private ItemUtil() {}
 
@@ -84,6 +85,15 @@ public class ItemUtil {
         }
     }
 
+    public static ItemStack getPlayerHead(Player player) {
+        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+        if (itemStack.getItemMeta() instanceof SkullMeta skull) {
+            skull.setOwningPlayer(player);
+            itemStack.setItemMeta(skull);
+        }
+        return itemStack;
+    }
+
 
 
 
@@ -117,17 +127,17 @@ public class ItemUtil {
                                                  String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
         Optional<Material> material = Optional.ofNullable(Material.matchMaterial(
-                configManager.getYmlValue(configPath, key + ".mats")));
-        Optional<String> name = configManager.containsYmlKey(configPath, key + ".name") ?
-                Optional.of(configManager.getYmlValue(configPath, key + ".name")) : Optional.empty();
-        Optional<List<String>> lore = configManager.containsYmlKey(configPath, key + ".lore") ?
-                configManager.getYmlListValue(configPath, key + ".lore")  : Optional.empty();
+                configManager.getYmlValue(configPath, key + ".Mats")));
+        Optional<String> name = configManager.containsYmlKey(configPath, key + ".Name") ?
+                Optional.of(configManager.getYmlValue(configPath, key + ".Name")) : Optional.empty();
+        Optional<List<String>> lore = configManager.containsYmlKey(configPath, key + ".Lore") ?
+                configManager.getYmlListValue(configPath, key + ".Lore")  : Optional.empty();
         if (material.isEmpty()) {
             return AIR;
         }
         Builder itemBuilder = new Builder(material.get())
                 .setItemFlag(itemFlags)
-                .setCustomModelData(configManager.getYmlValue(configPath, key + ".modelData", 0, ParseType.INTEGER));
+                .setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
         if (name.isPresent()) {
             itemBuilder = itemBuilder.setName(StringUtil.replacePlaceholders(name.get(), map));
         }
@@ -151,12 +161,12 @@ public class ItemUtil {
                                                  String configPath,
                                                  String key, @Nullable Map<String, String> map,
                                                  ItemFlag... itemFlags) {
-        Optional<String> nameOptional = configManager.containsYmlKey(configPath, key + ".name") ?
-                Optional.of(configManager.getYmlValue(configPath, key + ".name")) : Optional.empty();
-        Optional<List<String>> loreOptional = configManager.containsYmlKey(configPath, key + ".lore") ?
-                configManager.getYmlListValue(configPath, key + ".lore") : Optional.empty();
+        Optional<String> nameOptional = configManager.containsYmlKey(configPath, key + ".Name") ?
+                Optional.of(configManager.getYmlValue(configPath, key + ".Name")) : Optional.empty();
+        Optional<List<String>> loreOptional = configManager.containsYmlKey(configPath, key + ".Lore") ?
+                configManager.getYmlListValue(configPath, key + ".Lore") : Optional.empty();
         ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setCustomModelData(configManager.getYmlValue(configPath, key + ".modelData", 0, ParseType.INTEGER));
+        itemMeta.setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
         nameOptional.ifPresent(name -> itemMeta.displayName(UN_ITALIC.append(AdventureHelper.deserializeComponent(
                 AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholders(name, map))))));
         loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(
@@ -190,7 +200,7 @@ public class ItemUtil {
     public static Component getItemName(ItemStack itemStack) {
         return itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName() ?
                 itemStack.getItemMeta().displayName() :
-                Component.translatable((itemStack.getType().isBlock() ? "block." : "item.") + itemStack.getType().getKey().toString().replace(':', '.'));
+                Component.translatable((itemStack.getType().isBlock() ? "Block." : "Item.") + itemStack.getType().getKey().toString().replace(':', '.'));
     }
 
     public static boolean canFitIntoInventory(Player player, @Nullable ItemStack itemStack) {

@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @SuppressWarnings("unused")
-public class DocumentUtil {
+public final class DocumentUtil {
 
     private DocumentUtil() {}
 
@@ -64,16 +64,17 @@ public class DocumentUtil {
                 }
                 field.setAccessible(true);
                 Object fieldValue = field.get(obj);
+                if (fieldValue == null) {
+                    continue;
+                }
                 if (annotation.recursive()) {
                     recursiveToDocument(document,fieldValue);
                     continue;
                 }
-                if (fieldValue != null) {
-                    String fieldName = getDocumentFieldName(field, annotation);
-                    Object documentValue =
-                            convertToDocumentValue(fieldValue, field, annotation);
-                    document.put(fieldName, documentValue);
-                }
+                String fieldName = getDocumentFieldName(field, annotation);
+                Object documentValue =
+                        convertToDocumentValue(fieldValue, field, annotation);
+                document.put(fieldName, documentValue);
             } catch (IllegalAccessException e) {
                 log.error("反射MongoDBField时出现未知异常", e);
             }
@@ -146,6 +147,7 @@ public class DocumentUtil {
         return result.toString();
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private static Object convertToDocumentValue(Object fieldValue, Field field, MongoField annotation) {
         try {
             FieldConverter converter = getConverter(annotation);
@@ -158,6 +160,7 @@ public class DocumentUtil {
         }
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private static Object convertToFieldValue(Object documentValue,
                                               Field field, MongoField annotation) {
         try {
@@ -172,6 +175,7 @@ public class DocumentUtil {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private static FieldConverter getConverter(MongoField annotation)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (annotation != null && annotation.converter() != FieldConverter.class) {

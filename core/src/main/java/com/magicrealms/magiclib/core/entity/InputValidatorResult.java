@@ -1,17 +1,24 @@
 package com.magicrealms.magiclib.core.entity;
-
-import lombok.Data;
-
 /**
  * @author Ryan-0916
- * @Desc 文本校验器返回值
+ * @Desc 文本校验器
+ * valid 是否合法
+ * message 提示
  * @date 2024-07-18
  */
-@Data
-public class InputValidatorResult {
-    private boolean validator;
-    private String message;
-    public InputValidatorResult() {
-        this.message = "暂无任何提示";
+@SuppressWarnings("unused")
+public record InputValidatorResult(boolean valid, String message) {
+
+    public static InputValidatorResult ofValid() {
+        return new InputValidatorResult(true, null);
     }
+
+    public static InputValidatorResult ofValid(String message) {
+        return new InputValidatorResult(true, message);
+    }
+
+    public static InputValidatorResult ofInvalid(String message) {
+        return new InputValidatorResult(false, message);
+    }
+
 }

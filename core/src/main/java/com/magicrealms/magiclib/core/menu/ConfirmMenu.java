@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
-import static com.magicrealms.magiclib.core.MagicLib.YML_CONFIRM_MENU;
+import static com.magicrealms.magiclib.core.MagicLibConstant.YML_CONFIRM_MENU;
 
 /**
  * @author Ryan-0916
@@ -28,7 +28,10 @@ public class ConfirmMenu extends BaseMenuHolder {
     private boolean manualClose;
 
     private ConfirmMenu(Builder builder) {
-        super(MagicLib.getInstance(), builder.player, YML_CONFIRM_MENU, "###ABC###");
+        super(MagicLib.getInstance(),
+                builder.player,
+                YML_CONFIRM_MENU,
+                "###ABC###");
         this.ITEM_STACK = builder.itemStack;
         this.CONFIRM_RUNNABLE = builder.confirmRunnable;
         this.CANCEL_RUNNABLE = builder.cancelRunnable;
@@ -62,7 +65,8 @@ public class ConfirmMenu extends BaseMenuHolder {
     @Override
     public void closeEvent(InventoryCloseEvent e) {
         super.closeEvent(e);
-        if (manualClose) Bukkit.getScheduler().runTask(MagicLib.getInstance(), CLOSE_RUNNABLE);
+        if (manualClose) Bukkit.getScheduler()
+                .runTask(MagicLib.getInstance(), CLOSE_RUNNABLE);
     }
 
     @Override

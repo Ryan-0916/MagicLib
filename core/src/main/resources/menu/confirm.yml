@@ -17,20 +17,20 @@ Layout:
 
 Icons:
   A:
-    display:
-      mats: GLASS_PANE
-      modelData: 0
-      name: '&E&L确认'
-      lore:
+    Display:
+      Mats: GLASS_PANE
+      ModelData: 0
+      Name: '&E&L确认'
+      Lore:
         - ''
         - '&6&L确认'
         - ''
   C:
-    display:
-      mats: GLASS_PANE
-      modelData: 0
-      name: '&E&L取消'
-      lore:
+    Display:
+      Mats: GLASS_PANE
+      ModelData: 0
+      Mame: '&E&L取消'
+      Lore:
         - ''
         - '&6&L取消'
         - ''

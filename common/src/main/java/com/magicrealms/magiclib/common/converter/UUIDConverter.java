@@ -8,17 +8,16 @@ import java.util.UUID;
  * @date 2025-05-01
  */
 @SuppressWarnings("unused")
-public class UUIDConverter implements FieldConverter{
+public class UUIDConverter implements FieldConverter<UUID, String> {
 
     @Override
-    public String toDocumentValue(Object fieldValue) {
-        return fieldValue instanceof UUID value ? String.valueOf(value) : null;
+    public String toDocumentValue(UUID fieldValue) {
+        return fieldValue != null ? String.valueOf(fieldValue) : null;
     }
 
     @Override
-    public UUID toFieldValue(Object documentValue) {
-        return documentValue != null ? UUID.fromString(documentValue.toString())
-                : null;
+    public UUID toFieldValue(String documentValue) {
+        return documentValue != null ? UUID.fromString(documentValue) : null;
     }
-
+    
 }

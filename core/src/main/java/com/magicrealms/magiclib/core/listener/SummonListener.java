@@ -4,13 +4,16 @@ import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.ConnectionState;
 import com.github.retrooper.packetevents.protocol.PacketSide;
+import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSystemChatMessage;
+import com.github.retrooper.packetevents.protocol.player.ClientVersion;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.bukkit.packet.PacketListener;
 import com.magicrealms.magiclib.bukkit.packet.Send;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 /**
  * @author Ryan-0916
@@ -62,5 +65,23 @@ public class SummonListener {
             event.setCancelled(true);
         }
     }
+
+    @Send(state = ConnectionState.PLAY,
+            side = PacketSide.SERVER,
+            name = "ENTITY_METADATA",
+            priority = PacketListenerPriority.LOWEST)
+    public void onBLOCK_ENTITY_DATA(PacketSendEvent event) {
+        WrapperPlayServerEntityMetadata packet = new WrapperPlayServerEntityMetadata(event);
+        List<EntityData> entityDataList = packet.getEntityMetadata();
+
+        // 过滤掉ID为1385的非法元数据项
+        entityDataList.removeIf(data -> data.getType().getId(ClientVersion.V_1_21_4) == 1385);
+
+        // 更新数据包
+        packet.setEntityMetadata(entityDataList);
+
+    }
+
+
 
 }

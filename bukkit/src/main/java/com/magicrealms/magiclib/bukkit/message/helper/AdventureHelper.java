@@ -10,14 +10,12 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 public class AdventureHelper {
     private static volatile AdventureHelper INSTANCE;
     private final MiniMessage MINE_MESSAGE;
-    private final MiniMessage MINI_MESSAGE_STRICT;
 
     private final LegacyComponentSerializer LEGACY_COMPONENT_SERIALIZER;
     private final GsonComponentSerializer GSON_COMPONENT_SERIALIZER;
 
     private AdventureHelper() {
         this.MINE_MESSAGE = MiniMessage.builder().build();
-        this.MINI_MESSAGE_STRICT = MiniMessage.builder().strict(true).build();
         this.LEGACY_COMPONENT_SERIALIZER = LegacyComponentSerializer.builder()
                 .hexColors()
                 .character('§')
@@ -39,10 +37,6 @@ public class AdventureHelper {
 
     public static MiniMessage getMiniMessage() {
         return getInstance().MINE_MESSAGE;
-    }
-
-    public static MiniMessage getStrictMiniMessage() {
-        return getInstance().MINI_MESSAGE_STRICT;
     }
 
     public static GsonComponentSerializer getGson() {

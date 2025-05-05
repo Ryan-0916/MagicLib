@@ -78,22 +78,22 @@ public class InputMenu {
                     observationTask = Bukkit.getScheduler().runTaskLater(PLUGIN, () -> {
                         InputValidatorResult result = CUSTOM_VALIDATOR.apply(renameText);
                         /* 当答案不正确时并且文本没变化时阻止 */
-                        if (!result.isValidator() && realPlaceholder.equals(result.getMessage())) {
+                        if (!result.valid() && realPlaceholder.equals(result.message())) {
                             return;
                         }
                         ItemMeta itemMeta = ITEM_STACK.getItemMeta();
                         itemMeta.displayName(Component.text(renameText));
                         ITEM_STACK.setItemMeta(itemMeta);
                         /* 如果验证成功且文本已变化，更新物品到相应槽位 */
-                        if (result.isValidator() && realPlaceholder.equals(result.getMessage())) {
+                        if (result.valid() && realPlaceholder.equals(result.message())) {
                             e.getInventory().setFirstItem(ITEM_STACK);
                             if (RESULT_SLOT == 1)  e.getInventory().setSecondItem(ITEM_STACK);
                             else  e.getInventory().setResult(ITEM_STACK);
                         } else {
-                            setupAnvil(ITEM_STACK, RESULT_SLOT == 1 && result.isValidator() ? ITEM_STACK : ItemUtil.AIR,
-                                    RESULT_SLOT == 2 && result.isValidator() ? ITEM_STACK : ItemUtil.AIR, result.getMessage());
+                            setupAnvil(ITEM_STACK, RESULT_SLOT == 1 && result.valid() ? ITEM_STACK : ItemUtil.AIR,
+                                    RESULT_SLOT == 2 && result.valid() ? ITEM_STACK : ItemUtil.AIR, result.message());
                         }
-                        realPlaceholder = result.getMessage();
+                        realPlaceholder = result.message();
                     }, OBSERVATION_TIME);
                 }
             }

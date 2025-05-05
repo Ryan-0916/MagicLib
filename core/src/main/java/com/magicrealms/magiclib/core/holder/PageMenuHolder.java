@@ -140,7 +140,7 @@ public class PageMenuHolder extends BaseMenuHolder {
         char slotChar = super.getLayout().charAt(slot);
         this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
                 super.getConfigPath(),
-                "Icons." + slotChar + ".display"));
+                "Icons." + slotChar + ".Display"));
     }
 
     @Override
@@ -148,7 +148,7 @@ public class PageMenuHolder extends BaseMenuHolder {
         char slotChar =  super.getLayout().charAt(slot);
         this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
                 super.getConfigPath(),
-                "Icons." + slotChar + (disabled ? ".disabledDisplay" : ".activeDisplay")));
+                "Icons." + slotChar + (disabled ? ".DisabledDisplay" : ".ActiveDisplay")));
     }
 
     @Override
@@ -156,7 +156,7 @@ public class PageMenuHolder extends BaseMenuHolder {
         char slotChar =  super.getLayout().charAt(slot);
         this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
                 super.getConfigPath(),
-                "Icons." + slotChar + (opened ? ".openDisplay" : ".closeDisplay")));
+                "Icons." + slotChar + (opened ? ".OpenDisplay" : ".CloseDisplay")));
     }
 
     @Override

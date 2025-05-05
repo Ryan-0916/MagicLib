@@ -4,6 +4,7 @@ import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.manage.entity.FileMirrorInfo;
 import com.magicrealms.magiclib.common.utils.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import org.jetbrains.annotations.Nullable;
@@ -127,6 +128,21 @@ public class ConfigManager {
                 getYamlConfiguration(fileMirrorInfo.getMirrorPath(), fileMirrorInfo.getSourcePath()).ifPresent(
                         fileMirrorInfo::setYamlConfiguration));
     }
+
+    /**
+     * 重新加载除特定文件之外中的全部文件
+     * 此方法会重新获取文件池中除特定文件之外所有资源文件，请谨慎使用
+     * 推荐使用单文件重新加载 {@link ConfigManager#reloadConfig(String, Consumer)}
+     */
+    public void reloadConfig(String... ignoreMirrorPath) {
+        ALL_CONFIG.values().stream().filter(e -> Arrays.stream(ignoreMirrorPath)
+                .noneMatch(p -> StringUtils.equals(p, e.getMirrorPath())))
+                .forEach(fileMirrorInfo ->
+                        getYamlConfiguration(fileMirrorInfo.getMirrorPath(), fileMirrorInfo.getSourcePath()).ifPresent(
+                            fileMirrorInfo::setYamlConfiguration)
+                );
+    }
+
 
     /**
      * 重新加载单个配置文件

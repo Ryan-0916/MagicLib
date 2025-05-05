@@ -6,14 +6,10 @@ package com.magicrealms.magiclib.common.converter;
  * @date 2025-05-01
  */
 
-public interface FieldConverter {
+public interface FieldConverter<T,U> {
 
-    default Object toDocumentValue(Object fieldValue) {
-        return fieldValue;
-    }
+    U toDocumentValue(T fieldValue);
 
-    default Object toFieldValue(Object documentValue) {
-        return documentValue;
-    }
+    T toFieldValue(U documentValue);
 
 }
