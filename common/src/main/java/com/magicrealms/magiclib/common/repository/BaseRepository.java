@@ -98,8 +98,6 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
                 cacheEntity(subKey, data);
                 return data;
             }
-        } finally {
-            mongoDBStore.close();
         }
         return null;
     }
