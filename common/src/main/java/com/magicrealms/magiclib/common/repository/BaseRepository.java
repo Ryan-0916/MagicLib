@@ -6,6 +6,7 @@ import com.magicrealms.magiclib.common.utils.MongoDBUtil;
 import com.magicrealms.magiclib.common.utils.RedissonUtil;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.jetbrains.annotations.Nullable;
@@ -21,33 +22,42 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public abstract class BaseRepository<T> implements IBaseRepository<T>{
 
-    private static final String CACHE_HKEY_TEMPLATE = "MONGO_DB_TABLE_%s";
+    private static final String cacheHkey_TEMPLATE = "MONGO_DB_TABLE_%s";
 
-    private final MongoDBStore MONGO_DB_STORE;
+    @Getter
+    private final MongoDBStore mongoDBStore;
 
-    private final RedisStore REDIS_STORE;
+    @Getter
+    private final RedisStore redisStore;
 
-    private final String TABLE_NAME;
+    @Getter
+    private final String tableName;
 
-    private final String CACHE_HKEY;
+    @Getter
+    private final String cacheHkey;
 
-    private final Class<T> CLAZZ;
-
-    private final long CACHE_EXPIRE;
+    @Getter
+    private final long cacheExpire;
 
     private final String ID_FIELD_NAME;
 
+    private final Class<T> CLAZZ;
 
-    public BaseRepository(MongoDBStore mongoDBStore, String tableName, Class<T> clazz,
-                          @Nullable RedisStore redisStore, long cacheExpire) {
-        this.MONGO_DB_STORE = mongoDBStore;
-        this.REDIS_STORE = redisStore;
-        this.TABLE_NAME = tableName;
-        this.CACHE_HKEY = String.format(CACHE_HKEY_TEMPLATE, StringUtils.upperCase(tableName));
+    public BaseRepository(MongoDBStore mongoDBStore, String tableName,
+                          @Nullable RedisStore redisStore, long cacheExpire,  Class<T> clazz) {
+        this.mongoDBStore = mongoDBStore;
+        this.redisStore = redisStore;
+        this.tableName = tableName;
+        this.cacheHkey = String.format(cacheHkey_TEMPLATE, StringUtils.upperCase(tableName));
+        this.cacheExpire = cacheExpire;
         this.CLAZZ = clazz;
-        this.CACHE_EXPIRE = cacheExpire;
         this.ID_FIELD_NAME = MongoDBUtil.getIdFieldName(CLAZZ).orElse(null);
-        MONGO_DB_STORE.createTable(TABLE_NAME);
+        mongoDBStore.createTable(tableName);
+    }
+
+    @Override
+    public void insert(T entity) {
+        mongoDBStore.insertOne(tableName, MongoDBUtil.toDocument(entity));
     }
 
     @Override
@@ -56,21 +66,21 @@ public abstract class BaseRepository<T> implements IBaseRepository<T>{
             return null;
         }
         String subKey = String.valueOf(id);
-        Optional<T> redisData = Optional.ofNullable(REDIS_STORE)
-                .flatMap(r -> r.hGetObject(CACHE_HKEY, subKey, CLAZZ));
+        Optional<T> redisData = Optional.ofNullable(redisStore)
+                .flatMap(r -> r.hGetObject(cacheHkey, subKey, CLAZZ));
         if (redisData.isPresent()) {
             return redisData.get();
         }
-        try (MongoCursor<Document> iterator = MONGO_DB_STORE
-                .select(TABLE_NAME, Filters.eq(ID_FIELD_NAME, id))) {
+        try (MongoCursor<Document> iterator = mongoDBStore
+                .select(tableName, Filters.eq(ID_FIELD_NAME, id))) {
             if (iterator.hasNext()) {
                 T data = MongoDBUtil.toObject(iterator.next(), CLAZZ);
-                Optional.ofNullable(REDIS_STORE)
-                        .ifPresent(r -> r.hSetObject(CACHE_HKEY, subKey, data, CACHE_EXPIRE));
+                Optional.ofNullable(redisStore)
+                        .ifPresent(r -> r.hSetObject(cacheHkey, subKey, data, cacheExpire));
                 return data;
             }
         } finally {
-            MONGO_DB_STORE.close();
+            mongoDBStore.close();
         }
         return null;
     }
@@ -81,8 +91,8 @@ public abstract class BaseRepository<T> implements IBaseRepository<T>{
             return;
         }
         String subKey = String.valueOf(id);
-        RedissonUtil.doAsyncWithLock(REDIS_STORE,
-                String.format(CACHE_HKEY + "_LOCK_%s", subKey),
+        RedissonUtil.doAsyncWithLock(redisStore,
+                String.format(cacheHkey + "_LOCK_%s", subKey),
                 subKey,
                 5000, () -> {
                     /* 修改表字段 */
@@ -91,14 +101,15 @@ public abstract class BaseRepository<T> implements IBaseRepository<T>{
                         return;
                     }
                     consumer.accept(data);
-                    if (!MONGO_DB_STORE.updateOne(TABLE_NAME, Filters.eq(ID_FIELD_NAME, id),
-                            MongoDBUtil.toDocument(consumer))) {
+                    if (!mongoDBStore.updateOne(tableName,
+                            Filters.eq(ID_FIELD_NAME, id),
+                            new Document("$set", MongoDBUtil.toDocument(data)))) {
                         return;
                     }
-                    REDIS_STORE.hGetObject(CACHE_HKEY, subKey, CLAZZ).ifPresent(
+                    redisStore.hGetObject(cacheHkey, subKey, CLAZZ).ifPresent(
                             e -> {
                                 consumer.accept(e);
-                                REDIS_STORE.hSetObject(CACHE_HKEY, subKey, data, CACHE_EXPIRE);
+                                redisStore.hSetObject(cacheHkey, subKey, data, cacheExpire);
                             }
                     );
                 });
@@ -107,8 +118,8 @@ public abstract class BaseRepository<T> implements IBaseRepository<T>{
     @Override
     public void deleteById(Object id) {
         String subKey = String.valueOf(id);
-        if (MONGO_DB_STORE.deleteOne(TABLE_NAME, Filters.eq(ID_FIELD_NAME, id))) {
-            REDIS_STORE.removeHkey(CACHE_HKEY, subKey);
+        if (mongoDBStore.deleteOne(tableName, Filters.eq(ID_FIELD_NAME, id))) {
+            redisStore.removeHkey(cacheHkey, subKey);
         }
     }
 }
