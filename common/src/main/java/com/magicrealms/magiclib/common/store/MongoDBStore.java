@@ -1,189 +1,150 @@
 package com.magicrealms.magiclib.common.store;
 
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
+import com.magicrealms.magiclib.common.exception.DataAccessException;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.*;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @SuppressWarnings("unused")
 public class MongoDBStore {
+    private static final String CONNECTION_ERROR = "MongoDB operation failed - {}";
+
+    private final String databaseName;
+    private final MongoClientSettings clientSettings;
+    private MongoClient mongoClient;
 
     @Getter
     private MongoDatabase database;
-    private final String HOST;
-    private final int PORT;
-    private final String DATABASE;
-    private MongoClient connection;
 
-
-    public MongoDBStore(String host, int port, String database) {
-        this.HOST = host;
-        this.PORT = port;
-        this.DATABASE = database;
+    public MongoDBStore(String host, int port, String databaseName) {
+        Objects.requireNonNull(host, "Host cannot be null");
+        this.databaseName = Objects.requireNonNull(databaseName, "Database name cannot be null");
+        this.clientSettings = MongoClientSettings.builder()
+                .applyToClusterSettings(builder ->
+                        builder.hosts(List.of(new ServerAddress(host, port))))
+                .build();
+        initializeConnection();
     }
 
-    public void getConnection(){
+    private void initializeConnection() {
         try {
-            this.connection = new MongoClient(HOST, PORT);
-            this.database = connection.getDatabase(DATABASE);
-        } catch (Exception e) {
-            log.error("MongoDB 连接异常请检查 MongoDB 服务", e);
+            this.mongoClient = MongoClients.create(clientSettings);
+            this.database = mongoClient.getDatabase(databaseName);
+        } catch (MongoException e) {
+            log.error("Failed to initialize MongoDB connection", e);
+            throw new IllegalStateException("MongoDB connection failed", e);
         }
     }
 
-    /**
-     * 关闭连接池
-     */
-    public void close(){
+    public void destroy() {
         try {
-            if (connection != null){
-                this.connection.close();
-            }
-            if (database != null){
-                this.database = null;
+            if (mongoClient != null) {
+                mongoClient.close();
             }
         } catch (Exception e) {
-            log.error("MongoDB 关闭连接异常请检查 MongoDB 服务", e);
+            log.warn("Error closing MongoDB connection", e);
         }
     }
 
-    /**
-     * 创建表
-     * @param tableName 表名
-     */
-    public void createTable(String tableName) {
-        this.getConnection();
+    public void createCollection(String collectionName) {
+        Objects.requireNonNull(collectionName, "Collection name cannot be null");
         try {
-            for (String collectionName : database.listCollectionNames()) {
-                if (collectionName.equals(tableName)) {
-                    return;
-                }
+            if (!collectionExists(collectionName)) {
+                database.createCollection(collectionName);
+                log.info("Created MongoDB collection: {}", collectionName);
             }
-            database.createCollection(tableName);
-            log.info("MongoDB 表创建完毕，表名: {}", tableName);
-        } catch (Exception e) {
-            log.error("MongoDB 创表异常请检查 MongoDB 服务", e);
-        } finally {
-            this.close();
+        } catch (MongoException e) {
+            log.error(CONNECTION_ERROR, "create collection", e);
+            throw new DataAccessException("Failed to create collection", e);
         }
     }
 
-    /**
-     * 插入数据
-     * @param tableName 表名
-     * @param document 数据
-     */
-    public boolean insertOne(String tableName, Document document) {
-        this.getConnection();
+    private boolean collectionExists(String collectionName) {
+        return database.listCollectionNames()
+                .into(new ArrayList<>())
+                .contains(collectionName);
+    }
+
+    public void insertOne(String collectionName, Document document) {
+        Objects.requireNonNull(collectionName, "Collection name cannot be null");
+        Objects.requireNonNull(document, "Document cannot be null");
         try {
-            MongoCollection<Document> collection = database.getCollection(tableName);
-            collection.insertOne(document);
-            return true;
-        } catch (Exception e) {
-            log.error("MongoDB 插入数据异常请检查 MongoDB 服务", e);
+            getCollection(collectionName).insertOne(document);
+        } catch (MongoException e) {
+            log.error(CONNECTION_ERROR, "insert document", e);
+        }
+    }
+
+    public MongoCursor<Document> find(String collectionName, Bson filter) {
+        Objects.requireNonNull(collectionName, "Collection name cannot be null");
+        try {
+            return getCollection(collectionName)
+                    .find(filter).iterator();
+        } catch (MongoException e) {
+            log.error(CONNECTION_ERROR, "find documents", e);
+            throw new DataAccessException("Failed to query documents", e);
+        }
+    }
+
+    public Optional<Document> findFirst(String collectionName) {
+        Objects.requireNonNull(collectionName, "Collection name cannot be null");
+
+        try {
+            return Optional.ofNullable(getCollection(collectionName).find().first());
+        } catch (MongoException e) {
+            log.error(CONNECTION_ERROR, "find first document", e);
+            return Optional.empty();
+        }
+    }
+
+    public boolean updateOne(String collectionName, Bson filter, Bson update) {
+        Objects.requireNonNull(collectionName, "Collection name cannot be null");
+
+        try {
+            UpdateResult result = getCollection(collectionName).updateOne(filter, update);
+            return result.getMatchedCount() > 0;
+        } catch (MongoException e) {
+            log.error(CONNECTION_ERROR, "update document", e);
             return false;
-        } finally {
-            this.close();
         }
     }
 
-    /**
-     * 查询
-     * @param tableName 表名
-     * @param bson 条件
-     * @return {@link MongoCursor<Document>}
-     */
-    public MongoCursor<Document> select(String tableName, Bson bson){
-        this.getConnection();
+    public boolean updateMany(String collectionName, Bson filter, Bson update) {
+        Objects.requireNonNull(collectionName, "Collection name cannot be null");
         try {
-            MongoCollection<Document> collection = database.getCollection(tableName);
-            return collection.find(bson).iterator();
-        } catch (Exception e) {
-            log.error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
+            UpdateResult result = getCollection(collectionName).updateMany(filter, update);
+            return result.getMatchedCount() > 0;
+        } catch (MongoException e) {
+            log.error(CONNECTION_ERROR, "update documents", e);
+            return false;
         }
-        return null;
     }
 
-
-    /**
-     * 查询首条数据
-     * @param tableName 表名
-     */
-    public Document selectFirst(String tableName){
-        this.getConnection();
+    public boolean deleteOne(String collectionName, Bson filter) {
+        Objects.requireNonNull(collectionName, "Collection name cannot be null");
         try {
-            MongoCollection<Document> collection = database.getCollection(tableName);
-            return collection.find().first();
-        } catch (Exception e) {
-            log.error("MongoDB 查询数据异常请检查 MongoDB 服务", e);
+            DeleteResult result = getCollection(collectionName).deleteOne(filter);
+            return result.getDeletedCount() > 0;
+        } catch (MongoException e) {
+            log.error(CONNECTION_ERROR, "delete document", e);
+            return false;
         }
-        return null;
     }
 
-    /**
-     * 修改
-     * @param tableName 表名
-     * @param where 条件
-     * @param value 修改项
-     */
-    public boolean updateOne(String tableName, Bson where, Bson value) {
-        this.getConnection();
-        try {
-            MongoCollection<Document> collection = database.getCollection(tableName);
-            return collection.updateOne(
-                    where,
-                    value).getMatchedCount() > 0;
-        } catch (Exception e) {
-            log.error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
-        } finally {
-            this.close();
-        }
-        return false;
+    private MongoCollection<Document> getCollection(String collectionName) {
+        return database.getCollection(collectionName);
     }
-
-    /**
-     * 修改全部
-     * @param tableName 表名
-     * @param where 条件
-     * @param value 修改项
-     */
-    public boolean updateAll(String tableName, Bson where, Bson value) {
-        this.getConnection();
-        try {
-            MongoCollection<Document> collection = database.getCollection(tableName);
-            return collection.updateMany(
-                    where,
-                    value).getMatchedCount() > 0;
-        } catch (Exception e) {
-            log.error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
-        } finally {
-            this.close();
-        }
-        return false;
-    }
-
-    /**
-     * 删除
-     * @param tableName 表名
-     * @param where 条件
-     */
-    public boolean deleteOne(String tableName, Bson where) {
-        this.getConnection();
-        try {
-            MongoCollection<Document> collection = database.getCollection(tableName);
-            return collection.deleteOne(where).getDeletedCount() > 0;
-        } catch (Exception e) {
-            log.error("MongoDB 修改数据异常请检查 MongoDB 服务", e);
-        } finally {
-            this.close();
-        }
-        return false;
-    }
-
 }

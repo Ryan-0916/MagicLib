@@ -51,7 +51,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
         this.cacheExpire = cacheExpire;
         this.entityClass = clazz;
         this.idFieldName = MongoDBUtil.getIdFieldName(clazz).orElse(null);
-        this.mongoDBStore.createTable(tableName);
+        this.mongoDBStore.createCollection(tableName);
     }
 
     public boolean isCacheEnabled() {
@@ -92,7 +92,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
                 return cachedData.get();
             }
         }
-        try (MongoCursor<Document> cursor = mongoDBStore.select(tableName, getIdFilter(id))) {
+        try (MongoCursor<Document> cursor = mongoDBStore.find(tableName, getIdFilter(id))) {
             if (cursor.hasNext()) {
                 T data = MongoDBUtil.toObject(cursor.next(), entityClass);
                 cacheEntity(subKey, data);
