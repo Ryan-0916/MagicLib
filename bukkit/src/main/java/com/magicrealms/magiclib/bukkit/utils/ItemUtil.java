@@ -2,6 +2,7 @@ package com.magicrealms.magiclib.bukkit.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.magicrealms.magiclib.bukkit.adapt.ItemStackGsonAdapter;
 import com.magicrealms.magiclib.bukkit.manage.ConfigManager;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
@@ -52,7 +53,7 @@ public final class ItemUtil {
     public static final Gson GSON = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd HH:mm:ss")
             /* 自定义处理器 */
-            .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackAdapter())
+            .registerTypeHierarchyAdapter(ItemStack.class, new ItemStackGsonAdapter())
             .create();
 
     /* 序列化物品并克隆 */
