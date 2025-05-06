@@ -4,55 +4,74 @@ import com.magicrealms.magiclib.common.store.MongoDBStore;
 import com.magicrealms.magiclib.common.store.RedisStore;
 import com.magicrealms.magiclib.common.utils.MongoDBUtil;
 import com.magicrealms.magiclib.common.utils.RedissonUtil;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Filters;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
-import org.jetbrains.annotations.Nullable;
-
+import org.bson.conversions.Bson;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Filters;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * @author Ryan-0916
- * @Desc 说明
- * @date 2025-05-06
- */
 @SuppressWarnings("unused")
-public abstract class BaseRepository<T> implements IBaseRepository<T>{
+public abstract class BaseRepository<T> implements IBaseRepository<T> {
 
-    private static final String cacheHkey_TEMPLATE = "MONGO_DB_TABLE_%s";
+    private static final String CACHE_HKEY_TEMPLATE = "MONGO_DB_TABLE_%s";
+    private static final String LOCK_KEY_TEMPLATE = "%s_LOCK_%s";
+    private static final long DEFAULT_LOCK_TIMEOUT = 5000L;
 
     @Getter
     private final MongoDBStore mongoDBStore;
-
     @Getter
     private final RedisStore redisStore;
-
     @Getter
     private final String tableName;
-
     @Getter
     private final String cacheHkey;
-
     @Getter
     private final long cacheExpire;
-
-    private final String ID_FIELD_NAME;
-
-    private final Class<T> CLAZZ;
+    private final boolean cacheEnabled;
+    private final String idFieldName;
+    private final Class<T> entityClass;
 
     public BaseRepository(MongoDBStore mongoDBStore, String tableName,
-                          @Nullable RedisStore redisStore, long cacheExpire,  Class<T> clazz) {
+                          RedisStore redisStore, Class<T> clazz) {
+        this(mongoDBStore, tableName, redisStore, false, 0L, clazz);
+    }
+
+    public BaseRepository(MongoDBStore mongoDBStore, String tableName,
+                          RedisStore redisStore, boolean cacheEnabled,
+                          long cacheExpire, Class<T> clazz) {
         this.mongoDBStore = mongoDBStore;
         this.redisStore = redisStore;
         this.tableName = tableName;
-        this.cacheHkey = String.format(cacheHkey_TEMPLATE, StringUtils.upperCase(tableName));
+        this.cacheHkey = String.format(CACHE_HKEY_TEMPLATE, StringUtils.upperCase(tableName));
+        this.cacheEnabled = cacheEnabled;
         this.cacheExpire = cacheExpire;
-        this.CLAZZ = clazz;
-        this.ID_FIELD_NAME = MongoDBUtil.getIdFieldName(CLAZZ).orElse(null);
-        mongoDBStore.createTable(tableName);
+        this.entityClass = clazz;
+        this.idFieldName = MongoDBUtil.getIdFieldName(clazz).orElse(null);
+        this.mongoDBStore.createTable(tableName);
+    }
+
+    public boolean isCacheEnabled() {
+        return cacheEnabled && cacheExpire > 0;
+    }
+
+    protected void cacheEntity(String subKey, T entity) {
+        if (!isCacheEnabled()) {
+            return;
+        }
+        redisStore.hSetObject(cacheHkey, subKey, entity, cacheExpire);
+    }
+
+    protected void invalidateCache(String subKey) {
+        if (isCacheEnabled()) {
+            redisStore.removeHkey(cacheHkey, subKey);
+        }
+    }
+
+    protected Bson getIdFilter(Object id) {
+        return Filters.eq(idFieldName, id);
     }
 
     @Override
@@ -62,21 +81,20 @@ public abstract class BaseRepository<T> implements IBaseRepository<T>{
 
     @Override
     public T queryById(Object id) {
-        if (id == null || StringUtils.isBlank(ID_FIELD_NAME)) {
+        if (id == null || StringUtils.isBlank(idFieldName)) {
             return null;
         }
         String subKey = String.valueOf(id);
-        Optional<T> redisData = Optional.ofNullable(redisStore)
-                .flatMap(r -> r.hGetObject(cacheHkey, subKey, CLAZZ));
-        if (redisData.isPresent()) {
-            return redisData.get();
+        if (isCacheEnabled()) {
+            Optional<T> cachedData = redisStore.hGetObject(cacheHkey, subKey, entityClass);
+            if (cachedData.isPresent()) {
+                return cachedData.get();
+            }
         }
-        try (MongoCursor<Document> iterator = mongoDBStore
-                .select(tableName, Filters.eq(ID_FIELD_NAME, id))) {
-            if (iterator.hasNext()) {
-                T data = MongoDBUtil.toObject(iterator.next(), CLAZZ);
-                Optional.ofNullable(redisStore)
-                        .ifPresent(r -> r.hSetObject(cacheHkey, subKey, data, cacheExpire));
+        try (MongoCursor<Document> cursor = mongoDBStore.select(tableName, getIdFilter(id))) {
+            if (cursor.hasNext()) {
+                T data = MongoDBUtil.toObject(cursor.next(), entityClass);
+                cacheEntity(subKey, data);
                 return data;
             }
         } finally {
@@ -86,40 +104,45 @@ public abstract class BaseRepository<T> implements IBaseRepository<T>{
     }
 
     @Override
-    public void updateById(Object id, Consumer<T> consumer) {
-        if (id == null || StringUtils.isBlank(ID_FIELD_NAME)) {
+    public void updateById(Object id, Consumer<T> updater) {
+        if (id == null || StringUtils.isBlank(idFieldName)) {
             return;
         }
         String subKey = String.valueOf(id);
-        RedissonUtil.doAsyncWithLock(redisStore,
-                String.format(cacheHkey + "_LOCK_%s", subKey),
-                subKey,
-                5000, () -> {
-                    /* 修改表字段 */
+        String lockKey = String.format(LOCK_KEY_TEMPLATE, cacheHkey, subKey);
+        RedissonUtil.doAsyncWithLock(redisStore, lockKey, subKey,
+                DEFAULT_LOCK_TIMEOUT, () -> {
                     T data = queryById(id);
                     if (data == null) {
                         return;
                     }
-                    consumer.accept(data);
-                    if (!mongoDBStore.updateOne(tableName,
-                            Filters.eq(ID_FIELD_NAME, id),
-                            new Document("$set", MongoDBUtil.toDocument(data)))) {
+                    updater.accept(data);
+                    boolean updateSuccess = mongoDBStore.updateOne(
+                            tableName,
+                            getIdFilter(id),
+                            new Document("$set", MongoDBUtil.toDocument(data))
+                    );
+                    if (!updateSuccess) {
                         return;
                     }
-                    redisStore.hGetObject(cacheHkey, subKey, CLAZZ).ifPresent(
-                            e -> {
-                                consumer.accept(e);
-                                redisStore.hSetObject(cacheHkey, subKey, data, cacheExpire);
-                            }
-                    );
+                    if (isCacheEnabled()) {
+                        redisStore.hGetObject(cacheHkey, subKey, entityClass)
+                                .ifPresent(cachedEntity -> {
+                                    updater.accept(cachedEntity);
+                                    cacheEntity(subKey, cachedEntity);
+                                });
+                    }
                 });
     }
 
     @Override
     public void deleteById(Object id) {
+        if (id == null || StringUtils.isBlank(idFieldName)) {
+            return;
+        }
         String subKey = String.valueOf(id);
-        if (mongoDBStore.deleteOne(tableName, Filters.eq(ID_FIELD_NAME, id))) {
-            redisStore.removeHkey(cacheHkey, subKey);
+        if (mongoDBStore.deleteOne(tableName, getIdFilter(id))) {
+            invalidateCache(subKey);
         }
     }
 }
