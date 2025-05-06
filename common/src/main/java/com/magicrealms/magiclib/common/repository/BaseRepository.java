@@ -30,6 +30,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
     private final String cacheHkey;
     @Getter
     private final long cacheExpire;
+
     private final boolean cacheEnabled;
     private final String idFieldName;
     private final Class<T> entityClass;
@@ -57,16 +58,16 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
         return cacheEnabled && cacheExpire > 0;
     }
 
-    protected void cacheEntity(String subKey, T entity) {
+    protected void cacheEntity(String id, T entity) {
         if (!isCacheEnabled()) {
             return;
         }
-        redisStore.hSetObject(cacheHkey, subKey, entity, cacheExpire);
+        redisStore.hSetObject(cacheHkey, id, entity, cacheExpire);
     }
 
-    protected void invalidateCache(String subKey) {
+    protected void invalidateCache(String id) {
         if (isCacheEnabled()) {
-            redisStore.removeHkey(cacheHkey, subKey);
+            redisStore.removeHkey(cacheHkey, id);
         }
     }
 
