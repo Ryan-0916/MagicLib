@@ -1,6 +1,6 @@
-package com.magicrealms.magiclib.bukkit.adapt;
+package com.magicrealms.magiclib.core.adapt;
 
-import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
+import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.common.adapt.FieldAdapter;
 import org.bukkit.inventory.ItemStack;
 

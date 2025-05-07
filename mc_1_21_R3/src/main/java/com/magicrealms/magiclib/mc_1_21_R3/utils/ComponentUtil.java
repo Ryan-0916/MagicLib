@@ -14,9 +14,19 @@ import java.util.Optional;
  */
 public class ComponentUtil {
 
+    public static Component getComponentOrEmpty(String json) {
+        return Optional.ofNullable(CraftChatMessage.fromJSONOrNull(json)).orElse(Component.empty());
+    }
+
+
     @NotNull
-    public static Component getComponentOrEmpty(String content) {
-        return Optional.ofNullable(CraftChatMessage.fromJSONOrNull(content)).orElse(Component.empty());
+    public static Component formMiniMessage(String miniMessage) {
+        return formMiniMessage(miniMessage, false);
+    }
+
+    @NotNull
+    public static Component formMiniMessage(String miniMessage, boolean legacy) {
+        return getComponentOrEmpty(serializeComponent(miniMessage, legacy));
     }
 
     @NotNull

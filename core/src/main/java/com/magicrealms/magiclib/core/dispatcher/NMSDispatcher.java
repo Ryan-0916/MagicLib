@@ -2,7 +2,6 @@ package com.magicrealms.magiclib.core.dispatcher;
 
 import com.magicrealms.magiclib.bukkit.dispatcher.INMSDispatcher;
 import com.magicrealms.magiclib.common.exception.UnsupportedVersionException;
-import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -63,22 +62,19 @@ public class NMSDispatcher implements INMSDispatcher {
 
     @Override
     public void updateInventoryTitle(Player player, String title) {
-        NMS_DISPATCHER.updateInventoryTitle(player, AdventureHelper.serializeComponent(
-                AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(title))));
+        NMS_DISPATCHER.updateInventoryTitle(player, title);
     }
 
     @Override
     public InventoryView openAnvil(Player player,
                                    Map<Integer, ItemStack> anvilItems, String title) {
-        return NMS_DISPATCHER.openAnvil(player, anvilItems, AdventureHelper.serializeComponent(
-                AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(title))));
+        return NMS_DISPATCHER.openAnvil(player, anvilItems, title);
     }
 
     @Override
     public void setupAnvil(Player player,
                            Map<Integer, ItemStack> anvilItems, String title) {
-        NMS_DISPATCHER.setupAnvil(player, anvilItems, AdventureHelper.serializeComponent(
-                AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(title))));
+        NMS_DISPATCHER.setupAnvil(player, anvilItems, title);
     }
 
     @Override

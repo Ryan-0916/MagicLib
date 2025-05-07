@@ -15,5 +15,7 @@ pluginManagement {
         /* PacketEvents */
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
+        /* PlaceholderApi */
+        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     }
 }

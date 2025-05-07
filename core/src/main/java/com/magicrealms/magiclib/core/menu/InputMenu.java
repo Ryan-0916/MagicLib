@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.core.menu;
 
 import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
-import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
+import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.core.dispatcher.NMSDispatcher;
 import com.magicrealms.magiclib.core.entity.InputValidatorResult;
@@ -19,6 +19,7 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.view.AnvilView;
 import org.bukkit.scheduler.BukkitTask;
 
 import org.jetbrains.annotations.Nullable;
@@ -63,14 +64,16 @@ public class InputMenu {
         this.INVENTORY_VIEW = NMSDispatcher.getInstance().openAnvil(PLAYER, Map.of(0, ITEM_STACK), realPlaceholder);
         this.OBSERVATION_TIME = 5;
         Bukkit.getPluginManager().registerEvents(new Listener() {
+
             /* 铁砧改名事件 */
+            @SuppressWarnings("UnstableApiUsage")
             @EventHandler
             public void onPrepareInventoryResultEvent(PrepareAnvilEvent e) {
                 if (e.getView() != INVENTORY_VIEW) return;
                 /* 双方不一致并且有一方不为空的情况下就应该进入*/
-                if (!StringUtils.equals(renameText, e.getInventory().getRenameText()) &&
-                        (StringUtils.isNotBlank(renameText) || StringUtils.isNotBlank(e.getInventory().getRenameText()))) {
-                    renameText = e.getInventory().getRenameText();
+                if (!StringUtils.equals(renameText, e.getView().getRenameText()) &&
+                        (StringUtils.isNotBlank(renameText) || StringUtils.isNotBlank(e.getView().getRenameText()))) {
+                    renameText = e.getView().getRenameText();
                     e.setResult(ItemUtil.AIR);
                     if (observationTask != null && !observationTask.isCancelled()) {
                         observationTask.cancel();
@@ -98,10 +101,11 @@ public class InputMenu {
                 }
             }
             /* 铁砧点击事件 */
+            @SuppressWarnings("UnstableApiUsage")
             @EventHandler
             public void onInventoryClickEvent(InventoryClickEvent e) {
                 if (e.getView() != INVENTORY_VIEW) return;
-                if (e.getInventory() instanceof AnvilInventory anvilInventory) {
+                if (e.getView() instanceof AnvilView anvilInventory) {
                     e.setCancelled(true);
                     if (ItemUtil.isAirOrNull(e.getCurrentItem()) || e.getSlot() != RESULT_SLOT) return;
                     Bukkit.getScheduler().runTask(PLUGIN, () -> {

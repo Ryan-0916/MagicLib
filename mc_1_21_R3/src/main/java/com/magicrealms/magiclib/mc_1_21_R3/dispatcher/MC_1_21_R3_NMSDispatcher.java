@@ -95,7 +95,7 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
         if (menu != null) {
             menu.checkReachable = false;
             serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId, menuType,
-                    ComponentUtil.getComponentOrEmpty(title)));
+                    ComponentUtil.formMiniMessage(title)));
             serverPlayer.containerMenu = menu;
             serverPlayer.initMenu(menu);
         }
@@ -106,7 +106,7 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         AbstractContainerMenu menu = serverPlayer.containerMenu;
         serverPlayer.connection.send(new ClientboundOpenScreenPacket(menu.containerId,
-                menu.getType(), ComponentUtil.getComponentOrEmpty(title)));
+                menu.getType(), ComponentUtil.formMiniMessage(title)));
         serverPlayer.initMenu(menu);
     }
 
@@ -128,7 +128,7 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
         serverPlayer.connection.send(new ClientboundOpenScreenPacket(
                 serverPlayer.containerMenu.containerId,
                 MenuType.ANVIL,
-                ComponentUtil.getComponentOrEmpty(title)));
+                ComponentUtil.formMiniMessage(title)));
         if (!anvilItems.isEmpty() && inventoryView.getTopInventory() instanceof AnvilInventory anvilInventory) {
             anvilItems.forEach((i, e) -> {
                 switch (i) {

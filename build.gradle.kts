@@ -13,10 +13,10 @@ subprojects {
         compileOnly("org.apache.commons:commons-lang3:3.8.1")
         compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
 
-        compileOnly("org.projectlombok:lombok:1.18.24")
-        annotationProcessor("org.projectlombok:lombok:1.18.24")
-        testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
-        testCompileOnly("org.projectlombok:lombok:1.18.24")
+        compileOnly("org.projectlombok:lombok:1.18.32")
+        annotationProcessor("org.projectlombok:lombok:1.18.32")
+        testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
+        testCompileOnly("org.projectlombok:lombok:1.18.32")
     }
 
     repositories {
@@ -31,6 +31,8 @@ subprojects {
         /* PacketEvents */
         maven("https://repo.codemc.io/repository/maven-releases/")
         maven("https://repo.codemc.io/repository/maven-snapshots/")
+        /* PlaceholderApi */
+        maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     }
 
     tasks.processResources {

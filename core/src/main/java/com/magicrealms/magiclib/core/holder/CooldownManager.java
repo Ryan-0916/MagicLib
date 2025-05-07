@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.core.holder;
 
-import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
+import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.core.dispatcher.NMSDispatcher;
 import lombok.Getter;

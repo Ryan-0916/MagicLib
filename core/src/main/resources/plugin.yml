@@ -1,9 +1,11 @@
 name: MagicLib
 version: ${projectVersion}
 main: com.magicrealms.magiclib.core.MagicLib
-api-version: 1.20
+api-version: 1.21
 commands:
   MagicLib:
     description: '魔法领域-集成'
 depend:
   - packetevents
+softDepend:
+  - PlaceholderAPI

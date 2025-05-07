@@ -5,23 +5,21 @@ val projectArtifactId : String by project
 dependencies {
     implementation(project(":common"))
     implementation(project(":bukkit"))
-    implementation(project(mapOf("path" to ":mc_1_21_R3", "configuration" to "reobf")))
-    implementation(project(mapOf("path" to ":mc_1_20_R3", "configuration" to "reobf")))
-    implementation(project(mapOf("path" to ":mc_1_20_R1", "configuration" to "reobf")))
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.6")
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.release.set(17)
+    options.release.set(21)
 }
 
 // val target = file("$rootDir/target")

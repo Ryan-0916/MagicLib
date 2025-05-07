@@ -1,6 +1,6 @@
 package com.magicrealms.magiclib.core.listener;
 
-import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
+import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.core.holder.BaseMenuHolder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

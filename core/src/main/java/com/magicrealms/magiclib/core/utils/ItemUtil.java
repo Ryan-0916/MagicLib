@@ -1,8 +1,8 @@
-package com.magicrealms.magiclib.bukkit.utils;
+package com.magicrealms.magiclib.core.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.magicrealms.magiclib.bukkit.adapt.ItemStackGsonAdapter;
+import com.magicrealms.magiclib.core.adapt.ItemStackGsonAdapter;
 import com.magicrealms.magiclib.bukkit.manage.ConfigManager;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -111,17 +112,63 @@ public final class ItemUtil {
             String configPath,
             String key,
             ItemFlag... itemFlags) {
-        return getItemStackByConfig(configManager, configPath, key, null, itemFlags);
+        return getItemStackByConfig(configManager, configPath, key, null, null, itemFlags);
     }
 
-    public static ItemStack setItemStackByConfig(ItemStack itemStack, ConfigManager configManager,
-                                                 String configPath, String key, ItemFlag... itemFlags) {
-        return setItemStackByConfig(itemStack, configManager, configPath, key, null, itemFlags);
+    public static ItemStack getItemStackByConfig(
+            ConfigManager configManager,
+            String configPath,
+            String key,
+            Map<String, String> map,
+            ItemFlag... itemFlags) {
+        return getItemStackByConfig(configManager, configPath, key, map, null, itemFlags);
     }
 
-    public static ItemStack getItemStackByConfig(ConfigManager configManager, String configPath,
-                                                 String key, @Nullable Map<String, String> map,
-                                                 ItemFlag... itemFlags) {
+    public static ItemStack getItemStackByConfig(
+            ConfigManager configManager,
+            String configPath,
+            String key,
+            OfflinePlayer player,
+            ItemFlag... itemFlags) {
+        return getItemStackByConfig(configManager, configPath, key, null, player, itemFlags);
+    }
+
+    public static ItemStack setItemStackByConfig(
+            ItemStack itemStack,
+            ConfigManager configManager,
+            String configPath,
+            String key,
+            ItemFlag... itemFlags) {
+        return setItemStackByConfig(itemStack, configManager, configPath, key, null, null, itemFlags);
+    }
+
+    public static ItemStack setItemStackByConfig(
+            ItemStack itemStack,
+            ConfigManager configManager,
+            String configPath,
+            String key,
+            Map<String, String> map,
+            ItemFlag... itemFlags) {
+        return setItemStackByConfig(itemStack, configManager, configPath, key, map, null, itemFlags);
+    }
+
+    public static ItemStack setItemStackByConfig(
+            ItemStack itemStack,
+            ConfigManager configManager,
+            String configPath,
+            String key,
+            OfflinePlayer player,
+            ItemFlag... itemFlags) {
+        return setItemStackByConfig(itemStack, configManager, configPath, key, null, player, itemFlags);
+    }
+
+    public static ItemStack getItemStackByConfig(
+            ConfigManager configManager,
+            String configPath,
+            String key,
+            @Nullable Map<String, String> map,
+            @Nullable OfflinePlayer player,
+            ItemFlag... itemFlags) {
         Optional<Material> material = getMaterial(configManager, configPath, key);
         Optional<String> name = getOptionalString(configManager, configPath, key, "Name");
         Optional<List<String>> lore = getOptionalList(configManager, configPath, key, "Lore");
@@ -131,28 +178,37 @@ public final class ItemUtil {
         Builder itemBuilder = new Builder(material.get())
                 .setItemFlag(itemFlags)
                 .setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
+
         if (name.isPresent()) {
-            itemBuilder = itemBuilder.setName(name.get());
+            itemBuilder = itemBuilder.setName(PlaceholderUtil
+                    .replacePlaceholders(name.get(), map, player));
         }
+
         if (lore.isPresent()) {
-            itemBuilder = itemBuilder.setLore(lore.get());
+            itemBuilder = itemBuilder.setLore(lore.get().stream().map(e ->
+                PlaceholderUtil.replacePlaceholders(e, map, player)
+            ).collect(Collectors.toList()));
         }
         return itemBuilder.builder();
     }
 
     @NotNull
-    public static ItemStack setItemStackByConfig(ItemStack itemStack, ConfigManager configManager,
-                                                 String configPath, String key, @Nullable Map<String, String> map,
-                                                 ItemFlag... itemFlags) {
+    public static ItemStack setItemStackByConfig(
+            ItemStack itemStack,
+            ConfigManager configManager,
+            String configPath, String key,
+            @Nullable Map<String, String> map,
+            @Nullable OfflinePlayer player,
+            ItemFlag... itemFlags) {
         Optional<String> nameOptional = getOptionalString(configManager, configPath, key, "Name");
         Optional<List<String>> loreOptional = getOptionalList(configManager, configPath, key, "Lore");
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
         nameOptional.ifPresent(name -> itemMeta.displayName(UN_ITALIC.append(AdventureHelper.deserializeComponent(
-                AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholders(name, map))))));
+                AdventureHelper.legacyToMiniMessage(PlaceholderUtil.replacePlaceholders(name, map, player))))));
         loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream()
                 .map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(
-                        AdventureHelper.legacyToMiniMessage(StringUtil.replacePlaceholders(l, map)))))
+                        AdventureHelper.legacyToMiniMessage(PlaceholderUtil.replacePlaceholders(l, map, player)))))
                 .collect(Collectors.toList())));
         itemMeta.addItemFlags(itemFlags);
         itemStack.setItemMeta(itemMeta);

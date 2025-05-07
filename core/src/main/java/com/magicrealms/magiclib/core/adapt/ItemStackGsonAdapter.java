@@ -1,9 +1,9 @@
-package com.magicrealms.magiclib.bukkit.adapt;
+package com.magicrealms.magiclib.core.adapt;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
+import com.magicrealms.magiclib.core.utils.ItemUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;

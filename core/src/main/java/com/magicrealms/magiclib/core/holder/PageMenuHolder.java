@@ -1,7 +1,7 @@
 package com.magicrealms.magiclib.core.holder;
 
 import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
-import com.magicrealms.magiclib.bukkit.utils.ItemUtil;
+import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
