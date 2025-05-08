@@ -30,6 +30,14 @@ public final class Base64Util {
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
+    public static String stringToBase64(String text) {
+        if (text == null || text.isEmpty()) {
+            return null;
+        }
+        byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
+        return ENCODER.encodeToString(textBytes);
+    }
+
     public static String imageUrlToBase64(String url) throws IOException {
         if (StringUtils.isBlank(url)) {
             return null;

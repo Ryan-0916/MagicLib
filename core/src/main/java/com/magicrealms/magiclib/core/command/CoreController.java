@@ -27,6 +27,9 @@ public class CoreController {
         MagicLib.getInstance().getConfigManager().reloadAllConfig();
         /* 重置 Offset 部分 */
         MagicLib.getInstance().setupOffset();
+        /* 重置 Advance 部分 */
+        MagicLib.getInstance().getAdvanceManager().clearCache();
+        MagicLib.getInstance().setupAdvance();
         MessageDispatcher.getInstance()
                 .sendMessage(MagicLib.getInstance(), sender,
                         MagicLib.getInstance().getConfigManager()
@@ -40,6 +43,9 @@ public class CoreController {
     public void reloadAll(CommandSender sender, String[] args){
         /* 重置 Offset 部分 */
         MagicLib.getInstance().setupOffset();
+        /* 重置 Advance 部分 */
+        MagicLib.getInstance().getAdvanceManager().clearCache();
+        MagicLib.getInstance().setupAdvance();
         MessageDispatcher.getInstance()
                 .sendMessage(MagicLib.getInstance(), sender,
                         MagicLib.getInstance().getConfigManager()
@@ -58,8 +64,13 @@ public class CoreController {
                                 "PlayerMessage.Error.ReloadFile"));
                 return;
             }
-            if (args[1].toLowerCase(Locale.ROOT).equals("offset")) {
-                MagicLib.getInstance().setupOffset();
+            switch (args[1].toLowerCase(Locale.ROOT)) {
+                case "offset" -> MagicLib.getInstance().setupOffset();
+                case "advance" -> {
+                    /* 重置 Advance 部分 */
+                    MagicLib.getInstance().getAdvanceManager().clearCache();
+                    MagicLib.getInstance().setupAdvance();
+                }
             }
             MessageDispatcher.getInstance().sendMessage(MagicLib.getInstance(), sender,
                     MagicLib.getInstance().getConfigManager()
@@ -67,4 +78,5 @@ public class CoreController {
                             "PlayerMessage.Success.ReloadFile"));
         });
     }
+
 }

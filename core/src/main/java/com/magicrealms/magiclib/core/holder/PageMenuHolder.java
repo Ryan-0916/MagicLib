@@ -1,6 +1,7 @@
 package com.magicrealms.magiclib.core.holder;
 
 import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
+import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import lombok.Getter;
@@ -8,8 +9,11 @@ import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author Ryan-0916
@@ -78,7 +82,7 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
 
     protected abstract void handleMenuUnCache(String layout);
 
-    protected abstract String handleTitleMore(String layout);
+    protected abstract Map<String, String> handleTitleMore(Map<String, String> title);
 
     @Override
     protected void handleMenu(String layout) {
@@ -93,11 +97,24 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
     }
 
     @Override
-    protected String handleTitle(String title) {
-        return handleTitleMore(StringUtil.replacePlaceholders(title, Map.of(
+    protected Map<String, String> handleTitle(Map<String, String> title) {
+        Map<String, String> placeholder = Map.of(
                 "page", String.valueOf(page),
-                "max_page", String.valueOf(maxPage)
-        )));
+                "max_page", String.valueOf(maxPage),
+                "pre_page", (page != 1 ? super.getConfigValue("CustomPapi.PrePage.Enable", StringUtil.EMPTY, ParseType.STRING)
+                        : super.getConfigValue("CustomPapi.PrePage.UnEnable", StringUtil.EMPTY, ParseType.STRING)),
+                "next_page", (page != maxPage ? super.getConfigValue("CustomPapi.NextPage.Enable", StringUtil.EMPTY, ParseType.STRING)
+                        : super.getConfigValue("CustomPapi.NextPage.UnEnable", StringUtil.EMPTY, ParseType.STRING))
+        );
+        return handleTitleMore(
+                title.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> StringUtil.replacePlaceholders(entry.getValue(), placeholder),
+                                (oldVal, newVal) -> oldVal,  // 合并函数
+                                LinkedHashMap::new            // 保证顺序
+                        ))
+        );
     }
 
     protected boolean setCurrentPage(int page) {

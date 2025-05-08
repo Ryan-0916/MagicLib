@@ -4,6 +4,7 @@ import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.bukkit.manage.CommandManager;
 import com.magicrealms.magiclib.bukkit.manage.ConfigManager;
 import com.magicrealms.magiclib.bukkit.manage.PacketManager;
+import com.magicrealms.magiclib.core.advance.AdvanceManager;
 import com.magicrealms.magiclib.core.dispatcher.MessageDispatcher;
 import com.magicrealms.magiclib.core.listener.PlayerListener;
 import com.magicrealms.magiclib.core.offset.OffsetManager;
@@ -24,6 +25,8 @@ public class MagicLib extends MagicRealmsPlugin {
 
     private OffsetManager offsetManager;
 
+    private AdvanceManager advanceManager;
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -33,8 +36,13 @@ public class MagicLib extends MagicRealmsPlugin {
             registerCommand(commandManager);
             registerPacketListener(packetManager);
             setupOffset();
+            setupAdvance();
             Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
         });
+    }
+
+    public void setupAdvance() {
+        this.advanceManager = new AdvanceManager(this);
     }
 
     public void setupOffset() {
@@ -44,11 +52,15 @@ public class MagicLib extends MagicRealmsPlugin {
     @Override
     public void onDisable() {
         super.onDisable();
+        advanceManager.clearCache();
     }
 
     @Override
     protected void loadConfig(ConfigManager configManager) {
-        configManager.loadConfig(YML_LANGUAGE, YML_CONFIRM_MENU, YML_OFFSET);
+        configManager.loadConfig(YML_LANGUAGE,
+                YML_CONFIRM_MENU,
+                YML_OFFSET,
+                YML_ADVANCE);
     }
 
     @Override

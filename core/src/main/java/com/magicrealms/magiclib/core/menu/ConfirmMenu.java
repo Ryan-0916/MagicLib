@@ -8,6 +8,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Map;
+
 import static com.magicrealms.magiclib.core.MagicLibConstant.YML_CONFIRM_MENU;
 
 /**
@@ -49,7 +51,7 @@ public class ConfirmMenu extends BaseMenuHolder {
     }
 
     @Override
-    protected String handleTitle(String title) {
+    protected Map<String, String> handleTitle(Map<String, String> title) {
         return title;
     }
 

@@ -32,8 +32,6 @@ public class OffsetLoader {
                 .getYmlValue(YML_OFFSET, "Offset.Font", "minecraft:default",
                         ParseType.STRING);
         String formatTag = String.format("<font:%s>", font) + "%s</font>";
-
-
         for (int i = 1; i <= 256; i *= 2) {
             String positive
                     = configManager.getYmlValue(YML_OFFSET, "Offset." + i, StringUtil.EMPTY, ParseType.STRING);

@@ -7,6 +7,7 @@ import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -169,6 +170,7 @@ public class ConfigManager {
      * @param key 配置文件中的键下级键请用.衔接
      * @return 配置文件值
      */
+    @Subst("")
     public String getYmlValue(String mirrorPath, String key) {
         Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
         return fileMirrorInfo.isPresent() ? fileMirrorInfo.get()

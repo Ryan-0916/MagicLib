@@ -7,6 +7,12 @@ dependencies {
     implementation(project(":bukkit"))
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
+    implementation("com.saicone.rtag:rtag:1.5.9")
+    implementation("com.saicone.rtag:rtag-item:1.5.9")
+    implementation(project(mapOf("path" to ":mc_1_21_R3", "configuration" to "reobf")))
+    implementation(project(mapOf("path" to ":mc_1_20_R3", "configuration" to "reobf")))
+    implementation(project(mapOf("path" to ":mc_1_20_R1", "configuration" to "reobf")))
+
 }
 
 java {

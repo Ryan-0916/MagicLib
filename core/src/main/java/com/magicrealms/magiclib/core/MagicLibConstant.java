@@ -13,5 +13,6 @@ public class MagicLibConstant {
     /** 配置文件部分常量 */
     public static final String YML_LANGUAGE = "language";
     public static final String YML_OFFSET = "offset";
+    public static final String YML_ADVANCE = "advance";
     public static final String YML_CONFIRM_MENU = "menu/confirm";
 }

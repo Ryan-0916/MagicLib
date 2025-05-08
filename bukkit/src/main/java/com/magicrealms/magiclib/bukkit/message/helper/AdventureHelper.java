@@ -8,6 +8,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 @SuppressWarnings("unused")
 public class AdventureHelper {
+
+    public static boolean legacySupport = false;
     private static volatile AdventureHelper INSTANCE;
     private final MiniMessage MINE_MESSAGE;
 

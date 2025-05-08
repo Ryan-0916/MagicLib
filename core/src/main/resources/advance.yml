@@ -1,0 +1,9 @@
+Advance:
+  Template:
+    Font: 'minecraft:default:'
+    Default: 8
+    Character:
+      # Char
+      A:  4
+      B:  4
+

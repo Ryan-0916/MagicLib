@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class CoreTabController {
 
     private static final Supplier<Stream<String>> fileNames
-            = () -> Stream.of("all", "language", "offset", "confirm");
+            = () -> Stream.of("all", "language", "offset", "confirm", "advance");
 
     @TabComplete(text = "^\\s?$", permissionType = PermissionType.CONSOLE_OR_PERMISSION,
             permission = "magic.command.magicchat.all||magic.command.magicchat.reload")
