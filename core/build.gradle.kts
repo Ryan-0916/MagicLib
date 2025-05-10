@@ -7,12 +7,11 @@ dependencies {
     implementation(project(":bukkit"))
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    implementation("com.saicone.rtag:rtag:1.5.9")
-    implementation("com.saicone.rtag:rtag-item:1.5.9")
+    implementation("com.saicone.rtag:rtag:1.5.10")
+    implementation("com.saicone.rtag:rtag-item:1.5.10")
     implementation(project(mapOf("path" to ":mc_1_21_R3", "configuration" to "reobf")))
     implementation(project(mapOf("path" to ":mc_1_20_R3", "configuration" to "reobf")))
     implementation(project(mapOf("path" to ":mc_1_20_R1", "configuration" to "reobf")))
-
 }
 
 java {
@@ -34,6 +33,18 @@ tasks.shadowJar {
     destinationDirectory.set(target)
     archiveClassifier.set("")
     archiveFileName.set("${rootProject.name}-${projectVersion}.jar")
+    relocate("redis.clients.jedis", "com.magicrealms.magiclib.libraries.jedis")
+
+
+
+//    relocate("com.mysql", "com.magicrealms.magiclib.libraries.mysql")
+//    relocate("com.mongodb", "com.magicrealms.magiclib.libraries.mongodb")
+//    relocate("com.google", "com.magicrealms.magiclib.libraries.google")
+//    relocate("com.saicone.rtag", "com.magicrealms.magiclib.libraries.saicone.rtag")
+//    relocate("org.apache.commons.pool2", "com.magicrealms.magiclib.libraries.commons.pool2")
+//    relocate("org.bson", "com.magicrealms.magiclib.libraries.libraries.bson")
+//    relocate("org.jspecify.annotations", "com.magicrealms.magiclib.libraries.libraries.jspecify.annotations")
+//    relocate("org.slf4j", "com.magicrealms.magiclib.libraries.libraries.jspecify.slf4j")
 }
 
 publishing {

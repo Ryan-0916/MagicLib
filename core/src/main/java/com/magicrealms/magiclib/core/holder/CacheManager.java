@@ -38,4 +38,12 @@ public class CacheManager {
         cache.clear();
     }
 
+
+    public boolean hasCachedPage(int page) {
+        return cache.containsKey(page);
+    }
+
+    public Map<Integer, ItemStack> getCachedPage(int page) {
+        return cache.getOrDefault(page, new HashMap<>());
+    }
 }

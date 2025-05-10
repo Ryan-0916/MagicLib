@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     private final String configPath;
     private final Player player;
     private final String layout;
-    private final Map<String, String> title;
+    private final LinkedHashMap<String, String> title;
     private final boolean lock;
     private final Runnable backMenuRunnable;
     private final CooldownManager cooldownManager;
@@ -98,7 +97,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     }
 
     // 初始化标题
-    private Map<String, String> initTitle() {
+    private LinkedHashMap<String, String> initTitle() {
         return plugin.getConfigManager()
                 .getYmlSubKeys(configPath, "Title", false)
                 .map(keys -> keys.stream()
@@ -114,7 +113,8 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
 
     // 抽象方法
     protected abstract void handleMenu(String layout);
-    protected abstract Map<String, String> handleTitle(Map<String, String> title);
+
+    protected abstract LinkedHashMap<String, String> handleTitle(LinkedHashMap<String, String> title);
 
     // 异步操作方法
     protected void asyncCloseMenu() {
@@ -141,7 +141,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
         MagicLib magicLib = MagicLib.getInstance();
         OffsetManager offsetManager = magicLib.getOffsetManager();
         AdvanceManager advanceManager = magicLib.getAdvanceManager();
-        StringBuilder builder = new StringBuilder(); // Add capacity estimation if possible
+        StringBuilder builder = new StringBuilder();
         handleTitle(title).forEach((key, value) -> {
             int offset = getConfigValue(OFFSET_PATH, key, 0, ParseType.INTEGER);
             int textOffset = advanceManager.getAdvance(value);

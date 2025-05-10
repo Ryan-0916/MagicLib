@@ -20,5 +20,4 @@ public class TestController {
         System.out.println(MagicLib.getInstance().getAdvanceManager().getAdvance(args[1]));
     }
 
-
 }

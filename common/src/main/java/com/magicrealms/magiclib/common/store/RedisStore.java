@@ -236,6 +236,7 @@ public class RedisStore {
         return false;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean hSetObject(String key, String subKey, Object value, long expire) {
         return hSetObject(key, new LinkedHashMap<>(Map.of(subKey, value)), expire);
     }
@@ -330,6 +331,18 @@ public class RedisStore {
         return false;
     }
 
+    public Set<String> getKeyByPrefix(String prefix) {
+        Optional<Jedis> connectionOptional = getConnection();
+        if (connectionOptional.isEmpty()) return Set.of();
+        try (Jedis connection = connectionOptional.get()){
+            return connection.keys(prefix + "*");
+        } catch (Exception e) {
+            log.error("Redis 查询异常请检查 Redis 服务", e);
+        }
+        return Set.of();
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
     public boolean removeHkey(String key, String... subKey) {
         Optional<Jedis> connectionOptional = getConnection();
         if (connectionOptional.isEmpty()) return false;

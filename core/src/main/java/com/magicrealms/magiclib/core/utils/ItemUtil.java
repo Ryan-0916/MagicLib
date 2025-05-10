@@ -2,13 +2,11 @@ package com.magicrealms.magiclib.core.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.magicrealms.magiclib.common.utils.Base64Util;
 import com.magicrealms.magiclib.core.adapt.ItemStackGsonAdapter;
 import com.magicrealms.magiclib.bukkit.manage.ConfigManager;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.message.helper.AdventureHelper;
 import com.magicrealms.magiclib.common.utils.StringUtil;
-import com.saicone.rtag.item.ItemTagStream;
 import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
@@ -21,9 +19,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,8 +46,6 @@ public final class ItemUtil {
 
     public static final ItemStack AIR = new ItemStack(Material.AIR);
 
-    public static final ItemTagStream tag = ItemTagStream.INSTANCE;
-
     public static final Component UN_ITALIC
             = Component.text(StringUtil.EMPTY,
             Style.style(TextDecoration.ITALIC.withState(false)));
@@ -61,13 +62,30 @@ public final class ItemUtil {
     }
 
     /* 序列化物品 */
+    @SuppressWarnings("deprecation")
     public static Optional<String> serializerUnClone(ItemStack itemStack) {
-        return Optional.ofNullable(Base64Util.stringToBase64(tag.toString(itemStack)));
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)
+        ){
+            dataOutput.writeObject(itemStack);
+            return Optional.of(Base64Coder.encodeLines(outputStream.toByteArray()));
+        } catch (Exception exception) {
+            log.error("尝试反序列化物品时出现未知异常", exception);
+            return Optional.empty();
+        }
     }
 
     /* 反序列化物品 */
+    @SuppressWarnings("deprecation")
     public static Optional<ItemStack> deserializer(String deserializer) {
-        return Optional.ofNullable(tag.fromString(Base64Util.base64ToString(deserializer)));
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(deserializer));
+             BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)
+        ){
+            return Optional.of((ItemStack) dataInput.readObject());
+        } catch (Exception exception) {
+            log.error("尝试反序列化物品时出现未知异常", exception);
+            return Optional.empty();
+        }
     }
 
     /* 获取玩家头颅 */

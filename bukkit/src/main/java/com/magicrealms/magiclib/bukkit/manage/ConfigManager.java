@@ -7,7 +7,6 @@ import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -136,8 +135,10 @@ public class ConfigManager {
      * 推荐使用单文件重新加载 {@link ConfigManager#reloadConfig(String, Consumer)}
      */
     public void reloadConfig(String... ignoreMirrorPath) {
-        ALL_CONFIG.values().stream().filter(e -> Arrays.stream(ignoreMirrorPath)
-                .noneMatch(p -> StringUtils.equals(p, e.getMirrorPath())))
+        ALL_CONFIG.values()
+                .stream()
+                .filter(e -> Arrays.stream(ignoreMirrorPath)
+                .noneMatch(p -> StringUtils.endsWith(e.getMirrorPath(), p)))
                 .forEach(fileMirrorInfo ->
                         getYamlConfiguration(fileMirrorInfo.getMirrorPath(), fileMirrorInfo.getSourcePath()).ifPresent(
                             fileMirrorInfo::setYamlConfiguration)
@@ -150,14 +151,18 @@ public class ConfigManager {
      * @param callBack 回调函数，用于返回操作结果（成功或失败）
      */
     public void reloadConfig(String mirrorPath, Consumer<Boolean> callBack) {
-        Optional<FileMirrorInfo> fileMirrorInfoOptional = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
-        if (fileMirrorInfoOptional.isEmpty()) {
+        List<FileMirrorInfo> matchConfig = ALL_CONFIG.values()
+                .stream()
+                .filter(e -> StringUtils.endsWith(e.getMirrorPath(), mirrorPath))
+                .toList();
+        if (matchConfig.isEmpty()) {
             callBack.accept(false);
             return;
         }
-        FileMirrorInfo fileMirrorInfo = fileMirrorInfoOptional.get();
-        getYamlConfiguration(fileMirrorInfo.getMirrorPath(), fileMirrorInfo.getSourcePath())
-                .ifPresent(fileMirrorInfo::setYamlConfiguration);
+        matchConfig
+                .forEach(fileMirrorInfo ->
+                getYamlConfiguration(fileMirrorInfo.getMirrorPath(), fileMirrorInfo.getSourcePath()).ifPresent(
+                        fileMirrorInfo::setYamlConfiguration));
         callBack.accept(true);
     }
 
@@ -170,7 +175,6 @@ public class ConfigManager {
      * @param key 配置文件中的键下级键请用.衔接
      * @return 配置文件值
      */
-    @Subst("")
     public String getYmlValue(String mirrorPath, String key) {
         Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
         return fileMirrorInfo.isPresent() ? fileMirrorInfo.get()

@@ -24,15 +24,99 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public abstract class PageMenuHolder extends BaseMenuHolder {
 
-    /* 是否开启缓存 */
+    private static final ItemStack AIR = ItemUtil.AIR;
+
     private final boolean cache;
-    /* 缓存管理器 */
     private final CacheManager cacheManager;
-    /* 当前页数 */
     private int page;
-    /* 最大页数 */
-    @Setter
-    private int maxPage;
+    @Setter private int maxPage;
+
+    protected abstract void handleMenuUnCache(String layout);
+
+
+    protected abstract LinkedHashMap<String, String> processHandTitle(LinkedHashMap<String, String> title);
+
+    @Override
+    protected final void handleMenu(String layout) {
+        if (shouldUseCache()) {
+            restoreCachedLayout(layout.length());
+            return;
+        }
+        handleMenuUnCache(layout);
+    }
+
+    private boolean shouldUseCache() {
+        return cache && cacheManager.hasCachedPage(page);
+    }
+
+    private void restoreCachedLayout(int layoutSize) {
+        Map<Integer, ItemStack> cachedPage = cacheManager.getCachedPage(page);
+        for (int slot = 0; slot < layoutSize; slot++) {
+            super.setItemSlot(slot, cachedPage.getOrDefault(slot, AIR));
+        }
+    }
+
+    @Override
+    protected LinkedHashMap<String, String> handleTitle(LinkedHashMap<String, String> title) {
+        return processHandTitle(handeTitlePlaceholders(title));
+    }
+
+    private LinkedHashMap<String, String> handeTitlePlaceholders(LinkedHashMap<String, String> title) {
+        Map<String, String> placeholders = createPlaceholders();
+        return title.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> StringUtil.replacePlaceholders(entry.getValue(), placeholders),
+                        (oldVal, newVal) -> oldVal,
+                        LinkedHashMap::new
+                ));
+    }
+
+    private Map<String, String> createPlaceholders() {
+        return Map.of(
+                "page", String.valueOf(page),
+                "max_page", String.valueOf(maxPage),
+                "pre_page", getPageNavigationText("PrePage", page != 1),
+                "next_page", getPageNavigationText("NextPage", page != maxPage)
+        );
+    }
+
+    private String getPageNavigationText(String pageType, boolean enabled) {
+        String path = String.format("CustomPapi.%s.%s", pageType, enabled ? "Enable" : "UnEnable");
+        return super.getConfigValue(path, StringUtil.EMPTY, ParseType.STRING);
+    }
+
+    protected boolean setCurrentPage(int page) {
+        if (isValidPage(page)) {
+            this.page = page;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValidPage(int page) {
+        return page >= 1 && page <= maxPage;
+    }
+
+    protected boolean goToFirstPage() {
+        return setCurrentPage(1);
+    }
+
+    protected boolean goToLastPage() {
+        return setCurrentPage(maxPage);
+    }
+
+    protected void changePage(int delta, Consumer<Boolean> callBack) {
+        callBack.accept(setCurrentPage(page + delta));
+    }
+
+    @Override
+    public final void setItemSlot(int slot, ItemStack itemStack) {
+        super.setItemSlot(slot, itemStack);
+        if (cache) {
+            cacheManager.cache(slot, itemStack);
+        }
+    }
 
     public PageMenuHolder(MagicRealmsPlugin plugin,
                           Player player,
@@ -78,69 +162,6 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
         this.cache = cache;
         this.page = 1;
         this.maxPage = 1;
-    }
-
-    protected abstract void handleMenuUnCache(String layout);
-
-    protected abstract Map<String, String> handleTitleMore(Map<String, String> title);
-
-    @Override
-    protected void handleMenu(String layout) {
-        if (cache && cacheManager.getCache().containsKey(page) && cacheManager.getCache().get(page) != null) {
-            int size = layout.length();
-            for (int i = 0; i < size; i++) {
-                super.setItemSlot(i, cacheManager.getCache().get(page).getOrDefault(i, ItemUtil.AIR));
-            }
-            return;
-        }
-        handleMenuUnCache(layout);
-    }
-
-    @Override
-    protected Map<String, String> handleTitle(Map<String, String> title) {
-        Map<String, String> placeholder = Map.of(
-                "page", String.valueOf(page),
-                "max_page", String.valueOf(maxPage),
-                "pre_page", (page != 1 ? super.getConfigValue("CustomPapi.PrePage.Enable", StringUtil.EMPTY, ParseType.STRING)
-                        : super.getConfigValue("CustomPapi.PrePage.UnEnable", StringUtil.EMPTY, ParseType.STRING)),
-                "next_page", (page != maxPage ? super.getConfigValue("CustomPapi.NextPage.Enable", StringUtil.EMPTY, ParseType.STRING)
-                        : super.getConfigValue("CustomPapi.NextPage.UnEnable", StringUtil.EMPTY, ParseType.STRING))
-        );
-        return handleTitleMore(
-                title.entrySet().stream()
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                entry -> StringUtil.replacePlaceholders(entry.getValue(), placeholder),
-                                (oldVal, newVal) -> oldVal,  // 合并函数
-                                LinkedHashMap::new            // 保证顺序
-                        ))
-        );
-    }
-
-    protected boolean setCurrentPage(int page) {
-        if (page >= 1 && page <= maxPage) {
-            this.page = page;
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean goToFirstPage() {
-        return setCurrentPage(1);
-    }
-
-    protected boolean goToLastPage() {
-        return setCurrentPage(maxPage);
-    }
-
-    protected void changePage(int delta, Consumer<Boolean> callBack) {
-        callBack.accept(setCurrentPage(page + delta));
-    }
-
-    @Override
-    public void setItemSlot(int slot, ItemStack itemStack) {
-        super.setItemSlot(slot, itemStack);
-        cacheManager.cache(slot, itemStack);
     }
 
 }
