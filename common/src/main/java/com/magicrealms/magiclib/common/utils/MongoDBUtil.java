@@ -3,6 +3,7 @@ package com.magicrealms.magiclib.common.utils;
 import com.magicrealms.magiclib.common.adapt.DefaultFieldAdapter;
 import com.magicrealms.magiclib.common.annotations.MongoField;
 import com.magicrealms.magiclib.common.adapt.FieldAdapter;
+import com.magicrealms.magiclib.common.annotations.MongoId;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -67,17 +68,18 @@ public final class MongoDBUtil {
         }
     }
 
-    public static <T> Optional<String> getIdFieldName(Class<T> targetClass) {
+    public static <T> Optional<MongoId> getFiledId(Class<T> targetClass) {
         try {
             T target = targetClass.getDeclaredConstructor().newInstance();
             for (Field field : getCachedFields(targetClass)) {
                 MongoField annotation = field.getAnnotation(MongoField.class);
                 /* 如果获取不到注解或者注解被忽视 */
                 if (annotation == null || annotation.ignore()) { continue; }
-                if (!annotation.id()) {
+                if (!annotation.id().enable()) {
                     continue;
                 }
-                return Optional.of(getDocumentFieldName(field, annotation));
+                return Optional.of(MongoId.of(getDocumentFieldName(field, annotation),
+                        annotation.id().ignoreCase()));
             }
         } catch (Exception e) {
             throw new RuntimeException("获取 MongoDB 主键时出现未知异常，对象：" + targetClass, e);

@@ -1,5 +1,6 @@
 package com.magicrealms.magiclib.common.repository;
 
+import com.magicrealms.magiclib.common.annotations.MongoId;
 import com.magicrealms.magiclib.common.store.MongoDBStore;
 import com.magicrealms.magiclib.common.store.RedisStore;
 import com.magicrealms.magiclib.common.utils.MongoDBUtil;
@@ -12,6 +13,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public abstract class BaseRepository<T> implements IBaseRepository<T> {
@@ -32,7 +34,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
     private final long cacheExpire;
 
     private final boolean cacheEnabled;
-    private final String idFieldName;
+    private final MongoId filedId;
     private final Class<T> entityClass;
 
     public BaseRepository(MongoDBStore mongoDBStore, String tableName,
@@ -50,7 +52,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
         this.cacheEnabled = cacheEnabled;
         this.cacheExpire = cacheExpire;
         this.entityClass = clazz;
-        this.idFieldName = MongoDBUtil.getIdFieldName(clazz).orElse(null);
+        this.filedId = MongoDBUtil.getFiledId(clazz).orElse(null);
         this.mongoDBStore.createCollection(tableName);
     }
 
@@ -72,7 +74,9 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
     }
 
     protected Bson getIdFilter(Object id) {
-        return Filters.eq(idFieldName, id);
+        return filedId.ignoreCase() ? Filters.regex(filedId.filedName(),
+                "^" + Pattern.quote(id.toString()) + "$", "i")
+                : Filters.eq(filedId.filedName(), id);
     }
 
     @Override
@@ -82,10 +86,11 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
 
     @Override
     public T queryById(Object id) {
-        if (id == null || StringUtils.isBlank(idFieldName)) {
+        if (id == null || filedId == null) {
             return null;
         }
-        String subKey = String.valueOf(id);
+        String subKey = filedId.ignoreCase() ? StringUtils.upperCase(id.toString())
+                : id.toString();
         if (isCacheEnabled()) {
             Optional<T> cachedData = redisStore.hGetObject(cacheHkey, subKey, entityClass);
             if (cachedData.isPresent()) {
@@ -104,10 +109,11 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
 
     @Override
     public void updateById(Object id, Consumer<T> updater) {
-        if (id == null || StringUtils.isBlank(idFieldName)) {
+        if (id == null || filedId == null) {
             return;
         }
-        String subKey = String.valueOf(id);
+        String subKey = filedId.ignoreCase() ? StringUtils.upperCase(id.toString())
+                : id.toString();
         String lockKey = String.format(LOCK_KEY_TEMPLATE, cacheHkey, subKey);
         RedissonUtil.doAsyncWithLock(redisStore, lockKey, subKey,
                 DEFAULT_LOCK_TIMEOUT, () -> {
@@ -136,10 +142,11 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
 
     @Override
     public void deleteById(Object id) {
-        if (id == null || StringUtils.isBlank(idFieldName)) {
+        if (id == null || filedId == null) {
             return;
         }
-        String subKey = String.valueOf(id);
+        String subKey = filedId.ignoreCase() ? StringUtils.upperCase(id.toString())
+                : id.toString();
         if (mongoDBStore.deleteOne(tableName, getIdFilter(id))) {
             invalidateCache(subKey);
         }
