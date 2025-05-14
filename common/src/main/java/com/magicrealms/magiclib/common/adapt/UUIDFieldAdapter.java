@@ -14,7 +14,6 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public class UUIDFieldAdapter extends FieldAdapter<UUID, String> {
 
-
     @Override
     public String write(UUID writer) {
         return Optional.ofNullable(writer).map(UUID::toString).orElse(null);

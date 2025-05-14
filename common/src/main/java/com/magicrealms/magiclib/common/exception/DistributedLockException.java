@@ -6,6 +6,7 @@ package com.magicrealms.magiclib.common.exception;
  * @date 2025-04-29
  */
 public class DistributedLockException extends Exception {
+
     public DistributedLockException(String message) {
         super(message);
     }

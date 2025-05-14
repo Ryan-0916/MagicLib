@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -27,7 +26,7 @@ public class CoreTabController {
             permission = "magic.command.magicchat.all||magic.command.magicchat.reload")
     public List<String> first(CommandSender sender, String[] args) {
         return Stream.of("reload")
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @TabComplete(text = "^\\S+$", permissionType = PermissionType.CONSOLE_OR_PERMISSION,
@@ -36,19 +35,21 @@ public class CoreTabController {
         return Stream.of("reload")
                 .filter(e ->
                         StringUtils.startsWithIgnoreCase(e, args[0]))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @TabComplete(text = "^Reload\\s$", permissionType = PermissionType.CONSOLE_OR_PERMISSION,
             permission = "magic.command.magicchat.all||magic.command.magicchat.reload")
     public List<String> reload(CommandSender sender, String[] args) {
-        return fileNames.get().collect(Collectors.toList());
+        return fileNames.get()
+                .toList();
     }
 
     @TabComplete(text = "^Reload\\s\\S+$", permissionType = PermissionType.CONSOLE_OR_PERMISSION,
             permission = "magic.command.magicchat.all||magic.command.magicchat.reload")
     public List<String> reloadTab(CommandSender sender, String[] args) {
         return fileNames.get().filter(e ->
-                StringUtils.startsWithIgnoreCase(e, args[1])).collect(Collectors.toList());
+                StringUtils.startsWithIgnoreCase(e, args[1]))
+                .toList();
     }
 }

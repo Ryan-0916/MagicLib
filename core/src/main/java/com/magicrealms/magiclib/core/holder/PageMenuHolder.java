@@ -7,9 +7,11 @@ import com.magicrealms.magiclib.common.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,8 +35,31 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
 
     protected abstract void handleMenuUnCache(String layout);
 
-
     protected abstract LinkedHashMap<String, String> processHandTitle(LinkedHashMap<String, String> title);
+
+    protected boolean setCurrentPage(int page) {
+        if (isValidPage(page)) {
+            this.page = page;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isValidPage(int page) {
+        return page >= 1 && page <= maxPage;
+    }
+
+    protected boolean goToFirstPage() {
+        return setCurrentPage(1);
+    }
+
+    protected boolean goToLastPage() {
+        return setCurrentPage(maxPage);
+    }
+
+    protected void changePage(int delta, Consumer<Boolean> callBack) {
+        callBack.accept(setCurrentPage(page + delta));
+    }
 
     @Override
     protected final void handleMenu(String layout) {
@@ -86,37 +111,49 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
         return super.getConfigValue(path, StringUtil.EMPTY, ParseType.STRING);
     }
 
-    protected boolean setCurrentPage(int page) {
-        if (isValidPage(page)) {
-            this.page = page;
-            return true;
+    private void cacheItemStack(int slot, ItemStack itemStack) {
+        if (cache) {
+            Map<Integer, ItemStack> pageCache = cacheManager.getCache()
+                    .getOrDefault(page, new HashMap<>());
+            pageCache.put(slot, itemStack);
+            cacheManager.getCache().put(page, pageCache);
         }
-        return false;
     }
 
-    private boolean isValidPage(int page) {
-        return page >= 1 && page <= maxPage;
-    }
-
-    protected boolean goToFirstPage() {
-        return setCurrentPage(1);
-    }
-
-    protected boolean goToLastPage() {
-        return setCurrentPage(maxPage);
-    }
-
-    protected void changePage(int delta, Consumer<Boolean> callBack) {
-        callBack.accept(setCurrentPage(page + delta));
+    public void cleanItemCache() {
+        cacheManager.destroy();
     }
 
     @Override
-    public final void setItemSlot(int slot, ItemStack itemStack) {
+    public void setItemSlot(int slot, ItemStack itemStack) {
         super.setItemSlot(slot, itemStack);
-        if (cache) {
-            cacheManager.cache(slot, itemStack);
-        }
+        cacheItemStack(slot, itemStack);
     }
+
+    @Override
+    public void setItemSlot(int slot, ItemFlag... itemFlags){
+        char slotChar = super.getLayout().charAt(slot);
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
+                super.getConfigPath(),
+                "Icons." + slotChar + ".Display"));
+    }
+
+    @Override
+    public void setButtonSlot(int slot, boolean disabled, ItemFlag... itemFlags){
+        char slotChar =  super.getLayout().charAt(slot);
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
+                super.getConfigPath(),
+                "Icons." + slotChar + (disabled ? ".DisabledDisplay" : ".ActiveDisplay")));
+    }
+
+    @Override
+    public void setCheckBoxSlot(int slot, boolean opened, ItemFlag... itemFlags){
+        char slotChar =  super.getLayout().charAt(slot);
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
+                super.getConfigPath(),
+                "Icons." + slotChar + (opened ? ".OpenDisplay" : ".CloseDisplay")));
+    }
+
 
     public PageMenuHolder(MagicRealmsPlugin plugin,
                           Player player,

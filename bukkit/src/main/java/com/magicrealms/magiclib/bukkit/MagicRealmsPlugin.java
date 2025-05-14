@@ -29,10 +29,9 @@ import java.io.*;
 public abstract class MagicRealmsPlugin extends JavaPlugin {
 
     @Getter
-    private ConfigManager configManager;
+    protected ConfigManager configManager;
     @Getter
-    private LoggerManager loggerManager;
-
+    protected LoggerManager loggerManager;
     protected CommandManager commandManager;
     protected PacketManager packetManager;
 

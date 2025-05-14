@@ -13,10 +13,7 @@ import org.bukkit.Bukkit;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -66,7 +63,7 @@ public class CommandManager {
                                 try {
                                     k.setAccessible(true);
                                     Object obj = k.invoke(v, sender, args);
-                                    if (obj instanceof ArrayList<?> objs) {
+                                    if (obj instanceof Collection<?> objs) {
                                         for (Object o : objs) {
                                             tabCompleteList.add((String) o);
                                         }

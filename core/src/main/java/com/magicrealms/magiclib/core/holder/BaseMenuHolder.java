@@ -3,11 +3,13 @@ package com.magicrealms.magiclib.core.holder;
 import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
 import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.core.advance.AdvanceManager;
+import com.magicrealms.magiclib.core.dispatcher.MessageDispatcher;
 import com.magicrealms.magiclib.core.offset.OffsetManager;
 import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import com.magicrealms.magiclib.core.MagicLib;
 import com.magicrealms.magiclib.core.dispatcher.NMSDispatcher;
+import com.magicrealms.magiclib.core.utils.PlaceholderUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -34,7 +36,7 @@ import java.util.stream.Collectors;
 @Getter
 public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
     // 配置路径常量
-    private static final String TITLE_TEXT_PATH = "Title.%s.Text";
+    protected static final String TITLE_TEXT_PATH = "Title.%s.Text";
     private static final String OFFSET_PATH = "Title.%s.Offset";
     private static final String CENTER_PATH = "Title.%s.Center";
     private static final String LEFT_PATH = "Title.%s.Left";
@@ -47,7 +49,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     private final String configPath;
     private final Player player;
     private final String layout;
-    private final LinkedHashMap<String, String> title;
+    private LinkedHashMap<String, String> title;
     private final boolean lock;
     private final Runnable backMenuRunnable;
     private final CooldownManager cooldownManager;
@@ -80,7 +82,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
         this.configPath = configPath;
         this.player = player;
         this.layout = initLayout(defLayout);
-        this.title = initTitle();
+//        this.title = initTitle();
         this.lock = lock;
         this.backMenuRunnable = backMenuRunnable;
         this.cooldownManager = new CooldownManager(this);
@@ -88,7 +90,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     }
 
     // 初始化布局
-    private String initLayout(String defLayout) {
+    protected String initLayout(String defLayout) {
         return plugin.getConfigManager()
                 .getYmlListValue(configPath, "Layout")
                 .filter(l -> l.size() <= 6 && l.stream().allMatch(row -> row.length() == 9))
@@ -97,14 +99,17 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     }
 
     // 初始化标题
-    private LinkedHashMap<String, String> initTitle() {
+    protected LinkedHashMap<String, String> initTitle() {
         return plugin.getConfigManager()
                 .getYmlSubKeys(configPath, "Title", false)
                 .map(keys -> keys.stream()
                         .collect(Collectors.toMap(
                                 key -> key,
-                                key -> plugin.getConfigManager()
-                                        .getYmlValue(configPath, String.format(TITLE_TEXT_PATH, key)),
+                                key -> PlaceholderUtil.replacePlaceholders(
+                                        plugin.getConfigManager()
+                                                .getYmlValue(configPath, String.format(TITLE_TEXT_PATH, key)),
+                                        player
+                                ),
                                 (oldVal, newVal) -> oldVal,  // 合并函数（避免重复键冲突）
                                 LinkedHashMap::new           // 指定使用 LinkedHashMap
                         )))
@@ -138,6 +143,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
 
     // 构建格式化标题
     private String buildFormattedTitle() {
+        if (title == null) { title = initTitle(); }
         MagicLib magicLib = MagicLib.getInstance();
         OffsetManager offsetManager = magicLib.getOffsetManager();
         AdvanceManager advanceManager = magicLib.getAdvanceManager();
@@ -148,7 +154,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
             boolean center = getConfigValue(CENTER_PATH, key, false, ParseType.BOOLEAN);
             boolean left = getConfigValue(LEFT_PATH, key, false, ParseType.BOOLEAN);
             if (center) {
-                int halfOffset = -(textOffset / 2);
+                int halfOffset = - (textOffset / 2);
                 builder.append(offsetManager.format(halfOffset, StringUtil.EMPTY))
                         .append(offsetManager.format(offset, value))
                         .append(offsetManager.format(-(offset + halfOffset + textOffset), StringUtil.EMPTY));
@@ -179,6 +185,15 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
         }
         this.disabledCloseSound = true;
         backMenuRunnable.run();
+    }
+
+    public boolean tryCooldown(int slot, String msg) {
+        if (!cooldownManager.tryCooldown(slot)) {
+            MessageDispatcher.getInstance().sendMessage(plugin,
+                    player, msg);
+            return false;
+        }
+        return true;
     }
 
     // 播放声音

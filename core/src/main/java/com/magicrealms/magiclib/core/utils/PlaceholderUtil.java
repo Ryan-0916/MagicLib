@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +54,23 @@ public final class PlaceholderUtil {
             return StringUtil.replacePlaceholders(text, placeholders);
         }
         return replacePlaceholders(StringUtil.replacePlaceholders(text, placeholders), player);
+    }
+
+    public static List<String> replacePlaceholders(List<String> text, OfflinePlayer player) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        text.forEach(e -> replacePlaceholders(e, player));
+        return text;
+    }
+
+    public static List<String> replacePlaceholders(List<String> text, Map<String, String> placeholders,
+                                                   OfflinePlayer player) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        text.forEach(e -> replacePlaceholders(e, placeholders, player));
+        return text;
     }
 
 }

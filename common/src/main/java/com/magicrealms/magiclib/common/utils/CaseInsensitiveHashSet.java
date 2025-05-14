@@ -1,4 +1,4 @@
-package com.magicrealms.magiclib.common.store;
+package com.magicrealms.magiclib.common.utils;
 
 
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +10,7 @@ import java.util.*;
  * @Desc 不区分大小写的 Set
  * @date 2024-05-30
  */
+@Deprecated
 @SuppressWarnings("unused")
 public class CaseInsensitiveHashSet {
     private final HashMap<String, String> MAP;
