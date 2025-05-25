@@ -33,10 +33,7 @@ tasks.shadowJar {
     destinationDirectory.set(target)
     archiveClassifier.set("")
     archiveFileName.set("${rootProject.name}-${projectVersion}.jar")
-    relocate("redis.clients.jedis", "com.magicrealms.magiclib.libraries.jedis")
-
-
-
+//    relocate("redis.clients.jedis", "com.magicrealms.magiclib.libraries.jedis")
 //    relocate("com.mysql", "com.magicrealms.magiclib.libraries.mysql")
 //    relocate("com.mongodb", "com.magicrealms.magiclib.libraries.mongodb")
 //    relocate("com.google", "com.magicrealms.magiclib.libraries.google")

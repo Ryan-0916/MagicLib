@@ -12,6 +12,7 @@ import org.bson.conversions.Bson;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -33,7 +34,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
     @Getter
     private final long cacheExpire;
 
-    private final boolean cacheEnabled;
+    private final boolean autoCache;
     private final MongoId filedId;
     private final Class<T> entityClass;
 
@@ -43,32 +44,32 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
     }
 
     public BaseRepository(MongoDBStore mongoDBStore, String tableName,
-                          RedisStore redisStore, boolean cacheEnabled,
+                          RedisStore redisStore, boolean autoCache,
                           long cacheExpire, Class<T> clazz) {
         this.mongoDBStore = mongoDBStore;
         this.redisStore = redisStore;
         this.tableName = tableName;
         this.cacheHkey = String.format(CACHE_HKEY_TEMPLATE, StringUtils.upperCase(tableName));
-        this.cacheEnabled = cacheEnabled;
+        this.autoCache = autoCache;
         this.cacheExpire = cacheExpire;
         this.entityClass = clazz;
         this.filedId = MongoDBUtil.getFiledId(clazz).orElse(null);
         this.mongoDBStore.createCollection(tableName);
     }
 
-    public boolean isCacheEnabled() {
-        return cacheEnabled && cacheExpire > 0;
+    public boolean isAutoCache() {
+        return autoCache && cacheExpire > 0;
     }
 
     protected void cacheEntity(String id, T entity) {
-        if (!isCacheEnabled()) {
+        if (!isAutoCache()) {
             return;
         }
         redisStore.hSetObject(cacheHkey, id, entity, cacheExpire);
     }
 
     protected void invalidateCache(String id) {
-        if (isCacheEnabled()) {
+        if (isAutoCache()) {
             redisStore.removeHkey(cacheHkey, id);
         }
     }
@@ -91,7 +92,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
         }
         String subKey = filedId.ignoreCase() ? StringUtils.upperCase(id.toString())
                 : id.toString();
-        if (isCacheEnabled()) {
+        if (isAutoCache()) {
             Optional<T> cachedData = redisStore.hGetObject(cacheHkey, subKey, entityClass);
             if (cachedData.isPresent()) {
                 return cachedData.get();
@@ -108,6 +109,11 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
     }
 
     @Override
+    public void asyncUpdateById(Object id, Consumer<T> updater) {
+        CompletableFuture.runAsync(() -> updateById(id, updater));
+    }
+
+
     public void updateById(Object id, Consumer<T> updater) {
         if (id == null || filedId == null) {
             return;
@@ -115,7 +121,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
         String subKey = filedId.ignoreCase() ? StringUtils.upperCase(id.toString())
                 : id.toString();
         String lockKey = String.format(LOCK_KEY_TEMPLATE, cacheHkey, subKey);
-        RedissonUtil.doAsyncWithLock(redisStore, lockKey, subKey,
+        RedissonUtil.doWithLock(redisStore, lockKey, subKey,
                 DEFAULT_LOCK_TIMEOUT, () -> {
                     T data = queryById(id);
                     if (data == null) {
@@ -130,7 +136,7 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
                     if (!updateSuccess) {
                         return;
                     }
-                    if (isCacheEnabled()) {
+                    if (isAutoCache()) {
                         redisStore.hGetObject(cacheHkey, subKey, entityClass)
                                 .ifPresent(cachedEntity -> {
                                     updater.accept(cachedEntity);

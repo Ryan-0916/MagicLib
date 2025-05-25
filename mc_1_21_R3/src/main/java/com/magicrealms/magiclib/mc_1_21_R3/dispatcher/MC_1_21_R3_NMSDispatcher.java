@@ -145,7 +145,8 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
     public void resetChatDialog(Player player, List<String> messageHistory) {
         int historySize = Math.min(messageHistory.size(), 100);
         List<Packet<? super ClientGamePacketListener>> packets = new ArrayList<>(historySize + 1);
-        net.kyori.adventure.text.Component component = net.kyori.adventure.text.Component.text(DIALOG_PATH);
+        net.kyori.adventure.text.Component component
+                = net.kyori.adventure.text.Component.text(DIALOG_PATH + "\n");
         if (historySize < 100) {
             component = component.append(net.kyori.adventure.text.Component.text("\n".repeat(100 - historySize)));
         }

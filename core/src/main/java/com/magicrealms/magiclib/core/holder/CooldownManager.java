@@ -37,6 +37,7 @@ public class CooldownManager {
      * @param clickSlot 点击槽点
      * @return 返回是否添加冷却成功 {@link Boolean}
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean tryCooldown(int clickSlot) {
         /* 如果点击槽点无效，提前返回 */
         if (isInvalidSlot(clickSlot)) {

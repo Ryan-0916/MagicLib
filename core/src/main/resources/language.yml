@@ -91,6 +91,7 @@ PlayerMessage:
     NotConsole: "此命令仅控制台可用"
     UnknownCommand: "未知的指令"
     ReloadFile: "重载文件异常"
+    ButtonCooldown: "按钮正在冷却中"
   Success:
     ReloadFile: "重载文件成功"
 ConsoleMessage:

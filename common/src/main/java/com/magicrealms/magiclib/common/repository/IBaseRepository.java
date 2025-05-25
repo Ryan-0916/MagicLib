@@ -9,6 +9,8 @@ public interface IBaseRepository<T> {
 
     T queryById(Object id);
 
+    void asyncUpdateById(Object id, Consumer<T> entity);
+
     void updateById(Object id, Consumer<T> entity);
 
     void deleteById(Object id);

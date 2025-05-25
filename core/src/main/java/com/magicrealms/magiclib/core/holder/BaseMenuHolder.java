@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     @Setter
     private boolean disabledCloseSound;
 
+
     // 构造方法链
     public BaseMenuHolder(MagicRealmsPlugin plugin, Player player,
                           String configPath, String defLayout) {
@@ -82,7 +84,6 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
         this.configPath = configPath;
         this.player = player;
         this.layout = initLayout(defLayout);
-//        this.title = initTitle();
         this.lock = lock;
         this.backMenuRunnable = backMenuRunnable;
         this.cooldownManager = new CooldownManager(this);
@@ -105,11 +106,8 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
                 .map(keys -> keys.stream()
                         .collect(Collectors.toMap(
                                 key -> key,
-                                key -> PlaceholderUtil.replacePlaceholders(
-                                        plugin.getConfigManager()
-                                                .getYmlValue(configPath, String.format(TITLE_TEXT_PATH, key)),
-                                        player
-                                ),
+                                key -> plugin.getConfigManager()
+                                        .getYmlValue(configPath, String.format(TITLE_TEXT_PATH, key)),
                                 (oldVal, newVal) -> oldVal,  // 合并函数（避免重复键冲突）
                                 LinkedHashMap::new           // 指定使用 LinkedHashMap
                         )))
@@ -131,6 +129,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
         Bukkit.getScheduler().runTask(plugin, () -> {
             handleMenu(layout);
             NMSDispatcher.getInstance().openCustomInventory(player, inventory, formattedTitle);
+            asyncUpdateTitle();
         });
     }
 
@@ -141,6 +140,16 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
         });
     }
 
+    protected LinkedHashMap<String, String> buildTitle(LinkedHashMap<String, String> title) {
+        return title.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> PlaceholderUtil.replacePlaceholders(entry.getValue(), player),
+                        (oldVal, newVal) -> newVal,  // 处理 key 冲突（可选）
+                        LinkedHashMap::new            // 保持顺序
+                ));
+    }
+
     // 构建格式化标题
     private String buildFormattedTitle() {
         if (title == null) { title = initTitle(); }
@@ -148,7 +157,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
         OffsetManager offsetManager = magicLib.getOffsetManager();
         AdvanceManager advanceManager = magicLib.getAdvanceManager();
         StringBuilder builder = new StringBuilder();
-        handleTitle(title).forEach((key, value) -> {
+        handleTitle(buildTitle(title)).forEach((key, value) -> {
             int offset = getConfigValue(OFFSET_PATH, key, 0, ParseType.INTEGER);
             int textOffset = advanceManager.getAdvance(value);
             boolean center = getConfigValue(CENTER_PATH, key, false, ParseType.BOOLEAN);

@@ -65,8 +65,17 @@ public class AdvanceLoader {
                                     0,
                                     ParseType.INTEGER
                             );
+                            /* key 转换 Unicode*/
                             if (key != null && !key.isEmpty()) {
-                                charMap.put((int) key.charAt(0), width);
+                                char ch;
+                                try {
+                                     ch = key.startsWith("\\u")
+                                            ? (char) Integer.parseInt(key.substring(2), 16)
+                                            : key.charAt(0);
+                                } catch (Exception e) {
+                                    ch = key.charAt(0);
+                                }
+                                charMap.put((int) ch, width);
                             }
                         }
                 ));
