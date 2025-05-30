@@ -1,7 +1,10 @@
 package com.magicrealms.magiclib.core.listener;
 
+import com.magicrealms.magiclib.core.MagicLib;
 import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.core.holder.BaseMenuHolder;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -70,6 +73,14 @@ public class PlayerListener implements Listener {
     public void onInventoryCloseEvent(InventoryCloseEvent e){
         if (e.getInventory().getHolder() instanceof BaseMenuHolder menu) {
             menu.closeEvent(e);
+            HumanEntity player = e.getPlayer();
+            Bukkit.getScheduler().runTask(MagicLib.getInstance(), () -> {
+                /* 防止客户端延迟接收导致的 UpdateTitle 再次开启了容器，因此需要二次关闭菜单 */
+                if (e.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) {
+                    return;
+                }
+                player.closeInventory();
+            });
         }
     }
 
