@@ -109,12 +109,12 @@ public abstract class MagicRealmsPlugin extends JavaPlugin {
             throw new IllegalArgumentException("资源文件生成路径为空");
         }
         referencePath = (referencePath != null ? referencePath : resourcePath).replace('\\', '/');
-        InputStream in = super.getResource(referencePath);
+        InputStream in = getResource(referencePath);
         if (in == null) {
             throw new IllegalArgumentException("参照路径或者资源路径的文件找不到，导致没有生成模板参考");
         }
-        File outFile = new File(super.getDataFolder(), resourcePath);
-        File outDir = new File(super.getDataFolder(), resourcePath.substring(0,
+        File outFile = new File(getDataFolder(), resourcePath);
+        File outDir = new File(getDataFolder(), resourcePath.substring(0,
                 Math.max(resourcePath.lastIndexOf('/'), 0)));
         if (!outDir.exists()) {
             outDir.mkdirs();

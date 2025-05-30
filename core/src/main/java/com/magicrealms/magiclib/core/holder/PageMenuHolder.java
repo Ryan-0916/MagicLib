@@ -108,7 +108,7 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
 
     private String getPageNavigationText(String pageType, boolean enabled) {
         String path = String.format("CustomPapi.%s.%s", pageType, enabled ? "Enable" : "UnEnable");
-        return super.getConfigValue(path, StringUtil.EMPTY, ParseType.STRING);
+        return getConfigValue(path, StringUtil.EMPTY, ParseType.STRING);
     }
 
     private void cacheItemStack(int slot, ItemStack itemStack) {
@@ -132,25 +132,25 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
 
     @Override
     public void setItemSlot(int slot, ItemFlag... itemFlags){
-        char slotChar = super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
-                super.getConfigPath(),
+        char slotChar = getLayout().charAt(slot);
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(getPlugin().getConfigManager(),
+                getConfigPath(),
                 "Icons." + slotChar + ".Display"));
     }
 
     @Override
     public void setButtonSlot(int slot, boolean disabled, ItemFlag... itemFlags){
-        char slotChar =  super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
-                super.getConfigPath(),
+        char slotChar =  getLayout().charAt(slot);
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(getPlugin().getConfigManager(),
+                getConfigPath(),
                 "Icons." + slotChar + (disabled ? ".DisabledDisplay" : ".ActiveDisplay")));
     }
 
     @Override
     public void setCheckBoxSlot(int slot, boolean opened, ItemFlag... itemFlags){
-        char slotChar =  super.getLayout().charAt(slot);
-        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(super.getPlugin().getConfigManager(),
-                super.getConfigPath(),
+        char slotChar =  getLayout().charAt(slot);
+        this.setItemSlot(slot, ItemUtil.getItemStackByConfig(getPlugin().getConfigManager(),
+                getConfigPath(),
                 "Icons." + slotChar + (opened ? ".OpenDisplay" : ".CloseDisplay")));
     }
 

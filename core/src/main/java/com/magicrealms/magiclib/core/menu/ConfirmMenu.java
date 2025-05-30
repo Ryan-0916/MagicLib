@@ -35,7 +35,7 @@ public class ConfirmMenu extends BaseMenuHolder {
         this.CONFIRM_RUNNABLE = builder.confirmRunnable;
         this.CANCEL_RUNNABLE = builder.cancelRunnable;
         this.CLOSE_RUNNABLE = builder.closeRunnable;
-        super.asyncOpenMenu();
+        asyncOpenMenu();
     }
 
     @Override
@@ -43,10 +43,10 @@ public class ConfirmMenu extends BaseMenuHolder {
         int size = layout.length();
         for (int i = 0; i < size; i++){
             if (layout.charAt(i) == 'B') {
-                super.setItemSlot(i, ITEM_STACK);
+                setItemSlot(i, ITEM_STACK);
                 continue;
             }
-            super.setItemSlot(i);
+            setItemSlot(i);
         }
     }
 
@@ -71,10 +71,10 @@ public class ConfirmMenu extends BaseMenuHolder {
 
     @Override
     public void topInventoryClickEvent(InventoryClickEvent e, int slot) {
-        if (!super.getCooldownManager().tryCooldown(slot)) {
+        if (!getCooldownManager().tryCooldown(slot)) {
             return;
         }
-        char c = super.getLayout().charAt(slot);
+        char c = getLayout().charAt(slot);
         asyncPlaySound("Icons." + c + ".Display.Sound");
         if (c == 'A' || c == 'C') operate(c == 'A');
     }

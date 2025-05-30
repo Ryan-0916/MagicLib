@@ -67,7 +67,7 @@ public class BungeeMessageManager extends JedisPubSub {
         if (taskId != -1 && Bukkit.getScheduler().isCurrentlyRunning(taskId)) {
             Bukkit.getScheduler().cancelTask(taskId);
         }
-        if (super.isSubscribed()) {
+        if (isSubscribed()) {
             super.unsubscribe();
         }
     }
