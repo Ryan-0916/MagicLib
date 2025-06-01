@@ -76,7 +76,8 @@ public class PlayerListener implements Listener {
             HumanEntity player = e.getPlayer();
             Bukkit.getScheduler().runTask(MagicLib.getInstance(), () -> {
                 /* 防止客户端延迟接收导致的 UpdateTitle 再次开启了容器，因此需要二次关闭菜单 */
-                if (e.getReason() == InventoryCloseEvent.Reason.OPEN_NEW) {
+                if (e.getReason() == InventoryCloseEvent.Reason.OPEN_NEW ||
+                    player.getOpenInventory().getTopInventory().getHolder() instanceof BaseMenuHolder) {
                     return;
                 }
                 player.closeInventory();

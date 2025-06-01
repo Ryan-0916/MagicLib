@@ -1,7 +1,6 @@
 package com.magicrealms.magiclib.core.holder;
 
 import com.magicrealms.magiclib.bukkit.MagicRealmsPlugin;
-import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.core.utils.ItemUtil;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import lombok.Getter;
@@ -87,11 +86,11 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
     }
 
     private LinkedHashMap<String, String> handeTitlePlaceholders(LinkedHashMap<String, String> title) {
-        Map<String, String> placeholders = createPlaceholders();
+        Map<String, String> map = createPlaceholders();
         return title.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> StringUtil.replacePlaceholders(entry.getValue(), placeholders),
+                        entry -> StringUtil.replacePlaceholders(entry.getValue(), map),
                         (oldVal, newVal) -> oldVal,
                         LinkedHashMap::new
                 ));
@@ -101,14 +100,9 @@ public abstract class PageMenuHolder extends BaseMenuHolder {
         return Map.of(
                 "page", String.valueOf(page),
                 "max_page", String.valueOf(maxPage),
-                "pre_page", getPageNavigationText("PrePage", page != 1),
-                "next_page", getPageNavigationText("NextPage", page != maxPage)
+                "pre_page", getCustomPapiText("PrePage", page != 1),
+                "next_page", getCustomPapiText("NextPage", page != maxPage)
         );
-    }
-
-    private String getPageNavigationText(String pageType, boolean enabled) {
-        String path = String.format("CustomPapi.%s.%s", pageType, enabled ? "Enable" : "UnEnable");
-        return getConfigValue(path, StringUtil.EMPTY, ParseType.STRING);
     }
 
     private void cacheItemStack(int slot, ItemStack itemStack) {

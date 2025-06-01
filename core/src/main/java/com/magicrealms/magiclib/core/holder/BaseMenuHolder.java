@@ -141,13 +141,25 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     }
 
     protected LinkedHashMap<String, String> buildTitle(LinkedHashMap<String, String> title) {
+        Map<String, String> map = createPlaceholders();
         return title.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> PlaceholderUtil.replacePlaceholders(entry.getValue(), player),
+                        entry -> PlaceholderUtil.replacePlaceholders(entry.getValue(), map, player),
                         (oldVal, newVal) -> newVal,  // 处理 key 冲突（可选）
                         LinkedHashMap::new            // 保持顺序
                 ));
+    }
+
+    private Map<String, String> createPlaceholders() {
+        return Map.of(
+                "back_menu", getCustomPapiText("BackMenu", backMenuRunnable != null)
+        );
+    }
+
+    public String getCustomPapiText(String path, boolean enabled) {
+        return getConfigValue(String.format("CustomPapi.%s.%s", path, enabled ? "Enable" : "UnEnable")
+                , StringUtil.EMPTY, ParseType.STRING);
     }
 
     // 构建格式化标题
@@ -182,7 +194,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
 
     // 辅助方法：获取配置值
     @SuppressWarnings("SameParameterValue")
-    private <T> T getConfigValue(String pathFormat, String key, T defaultValue, ParseType parseType) {
+    public <T> T getConfigValue(String pathFormat, String key, T defaultValue, ParseType parseType) {
         return getConfigValue(String.format(pathFormat, key), defaultValue, parseType);
     }
 
