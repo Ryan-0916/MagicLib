@@ -27,11 +27,10 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Ryan-0916
@@ -45,6 +44,9 @@ public final class ItemUtil {
     private ItemUtil() {}
 
     public static final ItemStack AIR = new ItemStack(Material.AIR);
+
+    /* 玩家背包最大容量 */
+    public static final int MAX_STORAGE_SIZE = 36;
 
     public static final Component UN_ITALIC
             = Component.text(StringUtil.EMPTY,
@@ -173,18 +175,18 @@ public final class ItemUtil {
         Optional<Material> material = getMaterial(configManager, configPath, key);
         Optional<String> name = getOptionalString(configManager, configPath, key, "Name");
         Optional<List<String>> lore = getOptionalList(configManager, configPath, key, "Lore");
+        boolean hideTooltip = configManager.getYmlValue(configPath, key + ".HideTooltip", false, ParseType.BOOLEAN);
         if (material.isEmpty()) {
             return AIR;
         }
         Builder itemBuilder = new Builder(material.get())
                 .setItemFlag(itemFlags)
-                .setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
-
+                .setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER))
+                .setHideTooltip(hideTooltip);
         if (name.isPresent()) {
             itemBuilder = itemBuilder.setName(PlaceholderUtil
                     .replacePlaceholders(name.get(), map, player));
         }
-
         if (lore.isPresent()) {
             itemBuilder = itemBuilder.setLore(lore.get().stream().map(e ->
                 PlaceholderUtil.replacePlaceholders(e, map, player)
@@ -203,14 +205,24 @@ public final class ItemUtil {
             ItemFlag... itemFlags) {
         Optional<String> nameOptional = getOptionalString(configManager, configPath, key, "Name");
         Optional<List<String>> loreOptional = getOptionalList(configManager, configPath, key, "Lore");
+        boolean hideTooltip = configManager.getYmlValue(configPath, key + ".HideTooltip", false, ParseType.BOOLEAN);
         ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.setHideTooltip(hideTooltip);
         itemMeta.setCustomModelData(configManager.getYmlValue(configPath, key + ".ModelData", 0, ParseType.INTEGER));
         nameOptional.ifPresent(name -> itemMeta.displayName(UN_ITALIC.append(AdventureHelper.deserializeComponent(
                 AdventureHelper.legacyToMiniMessage(PlaceholderUtil.replacePlaceholders(name, map, player))))));
-        loreOptional.ifPresent(lore -> itemMeta.lore(lore.stream()
-                .map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(
-                        AdventureHelper.legacyToMiniMessage(PlaceholderUtil.replacePlaceholders(l, map, player)))))
-                .collect(Collectors.toList())));
+        loreOptional.ifPresent(lore ->
+                itemMeta.lore(lore.stream()
+                        .flatMap(line -> Arrays.stream(line.split("<newline>")))
+                        .map(splitLine -> UN_ITALIC.append(
+                                                AdventureHelper.deserializeComponent(
+                                                        AdventureHelper.legacyToMiniMessage(
+                                                                PlaceholderUtil.replacePlaceholders(splitLine, map, player)
+                                                        )
+                                                )
+                                        )
+                        ).toList()
+                ));
         itemMeta.addItemFlags(itemFlags);
         itemStack.setItemMeta(itemMeta);
         return itemStack;
@@ -307,7 +319,8 @@ public final class ItemUtil {
             return false;
         }
         if (itemStack.getAmount() != itemStack.getMaxStackSize()) {
-            playerInventory.all(itemStack.getType()).forEach((index, inventoryItem) ->
+            playerInventory.all(itemStack.getType())
+                    .forEach((index, inventoryItem) ->
                     similarItem(inventoryItem, itemStack));
         }
         if (itemStack.getAmount() == 0) {
@@ -322,16 +335,85 @@ public final class ItemUtil {
         return true;
     }
 
+    /**
+     * 将物品列表中的相同类型物品合并堆叠到最大堆叠数
+     * @param items 要处理的物品列表
+     * @return 堆叠优化后的新物品列表
+     */
+    public static List<ItemStack> mergeSimilarItemStacks(List<ItemStack> items) {
+        Objects.requireNonNull(items);
+        /* 返回物品集 */
+        List<ItemStack> result = new ArrayList<>();
+        /* 预处理物品集 */
+        List<ItemStack> remainingItems = items.stream()
+                .filter(ItemUtil::isNotAirOrNull)
+                .map(ItemStack::clone).collect(Collectors
+                        .toCollection(ArrayList::new));
+        /* 处理物品 */
+        while (!remainingItems.isEmpty()) {
+            ItemStack current = remainingItems.removeFirst();
+            /* 如果物品堆叠数量达到上限 */
+            if (current.getAmount() == current.getMaxStackSize()) {
+                result.add(current);
+                continue;
+            }
+            /* 如果物品堆叠数量未达到上限 */
+            for (int i = 0; i < remainingItems.size(); i++) {
+                ItemStack other = remainingItems.get(i);
+                ItemStack toMerge = current.clone();
+                ItemStack formMerge = other.clone();
+                /* 尝试合并 Clone 物品 */
+                similarItem(toMerge, formMerge);
+                /* 如果有变更 */
+                if (toMerge.getAmount() > current.getAmount()) {
+                    similarItem(current, other);
+                    if (other.getAmount() == 0) {
+                        remainingItems.remove(i);
+                        i--;
+                    }
+                    if (current.getAmount() == current.getMaxStackSize()) {
+                        break;
+                    }
+                }
+            }
+            result.add(current);
+        }
+        return result;
+    }
+
+    /**
+     * 检查物品列表能否全部放入玩家背包
+     * @param player 玩家对象
+     * @param items 待检查的物品列表
+     * @return 是否能全部放入背包
+     */
+    public static boolean canFitIntoInventory(Player player, List<ItemStack> items) {
+        Objects.requireNonNull(items);
+        /* 预堆叠物品列表 */
+        List<ItemStack> mergedItems = mergeSimilarItemStacks(items);
+        /* 预堆叠背包物品 - 排除副手与装备栏 */
+        List<ItemStack> mergedInventory = mergeSimilarItemStacks(new
+                ArrayList<>(Arrays.asList(player.getInventory()
+                .getStorageContents())));
+        /* 将两者预堆叠 */
+        List<ItemStack> mergedAll = mergeSimilarItemStacks(Stream
+                .concat(mergedItems.stream(), mergedInventory.stream())
+                .toList());
+        return mergedAll.size() <= MAX_STORAGE_SIZE;
+    }
+
     public static class Builder {
         private final Material MATERIAL;
         private Component name;
         private List<Component> lore;
         private int customModelData;
         private ItemFlag[] itemFlags;
+        private boolean hideTooltip;
 
         public Builder(Material material) {
             this.MATERIAL = material;
         }
+
         public Builder setComponentName(Component name) {
             this.name = name;
             return this;
@@ -347,7 +429,11 @@ public final class ItemUtil {
         }
 
         public Builder setLore(List<String> lore) {
-            this.lore = lore.stream().map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(AdventureHelper.legacyToMiniMessage(l)))).collect(Collectors.toList());
+            this.lore = lore.stream()
+                    .flatMap(s -> Arrays.stream(s.split("<newline>")))
+                    .map(l -> UN_ITALIC.append(AdventureHelper.deserializeComponent(
+                            AdventureHelper.legacyToMiniMessage(l))))
+                    .toList();
             return this;
         }
 
@@ -361,6 +447,11 @@ public final class ItemUtil {
             return this;
         }
 
+        public Builder setHideTooltip(boolean hideTooltip) {
+            this.hideTooltip = hideTooltip;
+            return this;
+        }
+
         public ItemStack builder() {
             ItemStack itemStack = new ItemStack(MATERIAL);
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -368,6 +459,7 @@ public final class ItemUtil {
             itemMeta.displayName(name);
             itemMeta.lore(lore);
             itemMeta.addItemFlags(itemFlags);
+            itemMeta.setHideTooltip(hideTooltip);
             itemStack.setItemMeta(itemMeta);
             return itemStack;
         }

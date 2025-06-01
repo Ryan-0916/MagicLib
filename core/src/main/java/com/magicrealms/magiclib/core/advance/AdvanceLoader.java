@@ -9,10 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.key.Key;
 import org.bukkit.NamespacedKey;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.magicrealms.magiclib.core.MagicLibConstant.YML_ADVANCE;
 
@@ -50,9 +49,18 @@ public class AdvanceLoader {
     private void loadAdvanceConfig(String configKey) {
         String basePath = "Advance." + configKey;
         // 1. 加载 Font Key，并验证格式
-        String fontValue = configManager.getYmlValue(YML_ADVANCE, basePath + ".Font");
-        Key fontKey = Optional.ofNullable(NamespacedKey.fromString(fontValue))
-                .orElse(NamespacedKey.minecraft("default"));
+        Set<NamespacedKey> fontValue = configManager.getYmlListValue(YML_ADVANCE, basePath + ".Font")
+                .map(list -> list.stream()
+                        .map(f -> Optional.ofNullable(NamespacedKey.fromString(f)))
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .collect(Collectors.toCollection(HashSet::new)))
+                        .orElseGet(() -> new HashSet<>(Collections.singleton(NamespacedKey.minecraft("default"))));
+
+        if (fontValue.isEmpty()) {
+            return;
+        }
+
         // 2. 加载 Character 宽度映射
         Map<Integer, Integer> charMap = new HashMap<>();
         configManager
@@ -80,9 +88,8 @@ public class AdvanceLoader {
                         }
                 ));
 
-        // 3. 构建 Advance 对象
-        AdvanceConfig advance = AdvanceConfig.builder()
-                .font(fontKey)
+        fontValue.forEach(e -> advanceConfig.put(e, AdvanceConfig.builder()
+                .font(e)
                 .defaultWidth(configManager.getYmlValue(
                         YML_ADVANCE,
                         basePath + ".Default",
@@ -90,9 +97,7 @@ public class AdvanceLoader {
                         ParseType.INTEGER
                 ))
                 .charWidthMap(charMap)
-                .build();
-
-        advanceConfig.put(fontKey, advance);
+                .build()));
     }
 
 

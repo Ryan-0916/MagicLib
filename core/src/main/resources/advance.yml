@@ -1,6 +1,7 @@
 Advance:
   Template:
-    Font: 'minecraft:default:'
+    Font:
+      - 'minecraft:default:'
     Default: 8
     Character:
       # Char

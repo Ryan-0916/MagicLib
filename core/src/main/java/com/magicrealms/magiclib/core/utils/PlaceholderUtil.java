@@ -6,8 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Ryan-0916
@@ -60,8 +62,8 @@ public final class PlaceholderUtil {
         if (text == null || text.isEmpty()) {
             return text;
         }
-        text.forEach(e -> replacePlaceholders(e, player));
-        return text;
+        return text.stream().map(e -> replacePlaceholders(e, player))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static List<String> replacePlaceholders(List<String> text, Map<String, String> placeholders,
@@ -69,8 +71,8 @@ public final class PlaceholderUtil {
         if (text == null || text.isEmpty()) {
             return text;
         }
-        text.forEach(e -> replacePlaceholders(e, placeholders, player));
-        return text;
+        return text.stream().map(e -> replacePlaceholders(e, placeholders, player))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 }
