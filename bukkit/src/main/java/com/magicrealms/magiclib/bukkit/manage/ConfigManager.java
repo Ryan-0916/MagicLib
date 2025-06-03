@@ -5,6 +5,7 @@ import com.magicrealms.magiclib.common.enums.ParseType;
 import com.magicrealms.magiclib.bukkit.manage.entity.FileMirrorInfo;
 import com.magicrealms.magiclib.common.utils.StringUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import org.jetbrains.annotations.Nullable;
@@ -305,4 +306,37 @@ public class ConfigManager {
                         .or(Optional::empty);
     }
 
+    /**
+     * 获取指定镜像文件中 key 对应的配置节
+     * @param mirrorPath 镜像文件的路径
+     * @param key 需要查找的 key
+     * @return 如果 key 存在且其值为配置节类型，返回包含ConfigurationSection的Optional，否则返回Optional.empty()
+     */
+    public Optional<ConfigurationSection> getYmlSection(String mirrorPath, String key) {
+        Optional<FileMirrorInfo> fileMirrorInfo = Optional.ofNullable(ALL_CONFIG.get(mirrorPath));
+        return fileMirrorInfo.flatMap(mirrorInfo -> {
+            YamlConfiguration yamlConfig = mirrorInfo.getYamlConfiguration();
+            if (yamlConfig.contains(key) && yamlConfig.isConfigurationSection(key)) {
+                return Optional.ofNullable(yamlConfig.getConfigurationSection(key));
+            } else {
+                return generateMirrorYamlSection(mirrorPath, key);
+            }
+        });
+    }
+
+    /**
+     * 镜像生成 Yaml 配置节
+     * @param mirrorPath 镜像文件地址
+     * @param key 需要镜像生成的 key
+     * @return 返回生成该 key 的配置节
+     */
+    private Optional<ConfigurationSection> generateMirrorYamlSection(String mirrorPath, String key) {
+        Optional<YamlConfiguration> yamlConfiguration = mirrorCreateYamlKey(mirrorPath, key);
+        return yamlConfiguration.flatMap(config -> {
+            if (config.isConfigurationSection(key)) {
+                return Optional.ofNullable(config.getConfigurationSection(key));
+            }
+            return Optional.empty();
+        });
+    }
 }

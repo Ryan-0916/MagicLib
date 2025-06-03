@@ -1,5 +1,6 @@
 package com.magicrealms.magiclib.common.repository;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
@@ -9,9 +10,9 @@ public interface IBaseRepository<T> {
 
     T queryById(Object id);
 
-    void asyncUpdateById(Object id, Consumer<T> entity);
+    CompletableFuture<Boolean> asyncUpdateById(Object id, Consumer<T> entity);
 
-    void updateById(Object id, Consumer<T> entity);
+    boolean updateById(Object id, Consumer<T> entity);
 
     void deleteById(Object id);
 

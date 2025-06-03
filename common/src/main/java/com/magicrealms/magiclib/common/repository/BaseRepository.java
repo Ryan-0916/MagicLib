@@ -108,42 +108,45 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
         return null;
     }
 
-    @Override
-    public void asyncUpdateById(Object id, Consumer<T> updater) {
-        CompletableFuture.runAsync(() -> updateById(id, updater));
+    public CompletableFuture<Boolean> asyncUpdateById(Object id, Consumer<T> updater) {
+        return CompletableFuture.supplyAsync(() -> updateById(id, updater));
     }
 
-
-    public void updateById(Object id, Consumer<T> updater) {
+    public boolean updateById(Object id, Consumer<T> updater) {
         if (id == null || filedId == null) {
-            return;
+            return false;
         }
         String subKey = filedId.ignoreCase() ? StringUtils.upperCase(id.toString())
                 : id.toString();
         String lockKey = String.format(LOCK_KEY_TEMPLATE, cacheHkey, subKey);
-        RedissonUtil.doWithLock(redisStore, lockKey, subKey,
-                DEFAULT_LOCK_TIMEOUT, () -> {
-                    T data = queryById(id);
-                    if (data == null) {
-                        return;
-                    }
-                    updater.accept(data);
-                    boolean updateSuccess = mongoDBStore.updateOne(
-                            tableName,
-                            getIdFilter(id),
-                            new Document("$set", MongoDBUtil.toDocument(data))
-                    );
-                    if (!updateSuccess) {
-                        return;
-                    }
-                    if (isAutoCache()) {
-                        redisStore.hGetObject(cacheHkey, subKey, entityClass)
-                                .ifPresent(cachedEntity -> {
-                                    updater.accept(cachedEntity);
-                                    cacheEntity(subKey, cachedEntity);
-                                });
-                    }
-                });
+        try {
+            return RedissonUtil.doWithLock(redisStore, lockKey, subKey,
+                    DEFAULT_LOCK_TIMEOUT, () -> {
+                        T data = queryById(id);
+                        if (data == null) {
+                            return false;
+                        }
+                        updater.accept(data);
+                        boolean updateSuccess = mongoDBStore.updateOne(
+                                tableName,
+                                getIdFilter(id),
+                                new Document("$set", MongoDBUtil.toDocument(data))
+                        );
+                        if (!updateSuccess) {
+                            return false;
+                        }
+                        if (isAutoCache()) {
+                            redisStore.hGetObject(cacheHkey, subKey, entityClass)
+                                    .ifPresent(cachedEntity -> {
+                                        updater.accept(cachedEntity);
+                                        cacheEntity(subKey, cachedEntity);
+                                    });
+                        }
+                        return true;
+                    });
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
