@@ -178,6 +178,7 @@ public final class ItemUtil {
         Optional<Material> material = getMaterial(configManager, configPath, key);
         Optional<String> name = getOptionalString(configManager, configPath, key, "Name");
         Optional<List<String>> lore = getOptionalList(configManager, configPath, key, "Lore");
+        Optional<String> color = getOptionalString(configManager, configPath, key, "Color");
         boolean hideTooltip = configManager.getYmlValue(configPath, key + ".HideTooltip", false, ParseType.BOOLEAN);
         if (material.isEmpty()) {
             return AIR;
@@ -194,6 +195,9 @@ public final class ItemUtil {
             itemBuilder = itemBuilder.setLore(lore.get().stream().map(e ->
                 PlaceholderUtil.replacePlaceholders(e, map, player)
             ).collect(Collectors.toList()));
+        }
+        if (color.isPresent()) {
+            itemBuilder = itemBuilder.setColor(color.get());
         }
         return itemBuilder.builder();
     }
