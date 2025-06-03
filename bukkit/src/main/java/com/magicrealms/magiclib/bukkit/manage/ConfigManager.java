@@ -61,7 +61,8 @@ public class ConfigManager {
      */
     public void loadMirrorConfig(String mirrorPath, @Nullable String sourcePath) {
         getYamlConfiguration(mirrorPath, sourcePath)
-                .ifPresent(e -> ALL_CONFIG.put(mirrorPath, new FileMirrorInfo(mirrorPath, sourcePath, e)));
+                .ifPresent(e -> ALL_CONFIG
+                        .put(mirrorPath, new FileMirrorInfo(mirrorPath, sourcePath, e)));
     }
 
     /**

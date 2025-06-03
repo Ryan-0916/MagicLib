@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.apache.commons.lang3.StringUtils;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -18,6 +20,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -409,6 +412,7 @@ public final class ItemUtil {
         private int customModelData;
         private ItemFlag[] itemFlags;
         private boolean hideTooltip;
+        private Color color;
 
         public Builder(Material material) {
             this.MATERIAL = material;
@@ -452,6 +456,34 @@ public final class ItemUtil {
             return this;
         }
 
+        /**
+         * 设置物品颜色（支持皮革装备染色）
+         * @param hex 颜色字符串，支持十六进制格式如 "#FFF" 或 "#FFFFFF"
+         * @return Builder实例
+         */
+        public Builder setColor(String hex) {
+            if (StringUtils.isBlank(hex)) {
+                return this;
+            }
+            if (!hex.matches("^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$")) {
+                return this;
+            }
+            try {
+                String hexColor = hex.substring(1);
+                if (hexColor.length() == 3) {
+                    hexColor = String.format("%c%c%c%c%c%c",
+                            hexColor.charAt(0), hexColor.charAt(0),
+                            hexColor.charAt(1), hexColor.charAt(1),
+                            hexColor.charAt(2), hexColor.charAt(2));
+                }
+                int rgb = Integer.parseInt(hexColor, 16);
+                this.color = Color.fromRGB(rgb);
+            } catch (Exception e) {
+                log.warn("无法解析颜色值: {}", hex);
+            }
+            return this;
+        }
+
         public ItemStack builder() {
             ItemStack itemStack = new ItemStack(MATERIAL);
             ItemMeta itemMeta = itemStack.getItemMeta();
@@ -460,6 +492,12 @@ public final class ItemUtil {
             itemMeta.lore(lore);
             itemMeta.addItemFlags(itemFlags);
             itemMeta.setHideTooltip(hideTooltip);
+            itemStack.setItemMeta(itemMeta);
+            if (color != null && itemMeta instanceof LeatherArmorMeta armorMeta) {
+                armorMeta.setColor(color);
+                itemStack.setItemMeta(armorMeta);
+                return itemStack;
+            }
             itemStack.setItemMeta(itemMeta);
             return itemStack;
         }
