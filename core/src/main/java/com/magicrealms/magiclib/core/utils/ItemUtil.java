@@ -476,8 +476,7 @@ public final class ItemUtil {
                             hexColor.charAt(1), hexColor.charAt(1),
                             hexColor.charAt(2), hexColor.charAt(2));
                 }
-                int rgb = Integer.parseInt(hexColor, 16);
-                this.color = Color.fromRGB(rgb);
+                this.color = Color.fromRGB(Integer.parseInt(hexColor, 16));
             } catch (Exception e) {
                 log.warn("无法解析颜色值: {}", hex);
             }
