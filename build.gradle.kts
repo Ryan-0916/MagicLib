@@ -35,6 +35,8 @@ subprojects {
         maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         /* Rtag */
         maven("https://jitpack.io")
+        /* Crunch */
+        maven("https://redempt.dev")
     }
 
     tasks.processResources {

@@ -45,6 +45,7 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     private static final String VOLUME_PATH_SUFFIX = ".Volume";
     private static final String PITCH_PATH_SUFFIX = ".Pitch";
     private static final String SPEED_PATH_SUFFIX = ".Speed";
+    protected static final String ICON_DISPLAY = "Icons.%s.Display";
 
     private final MagicRealmsPlugin plugin;
     private final String configPath;

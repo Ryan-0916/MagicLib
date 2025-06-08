@@ -35,7 +35,7 @@ public class MC_1_21_R3_NMSDispatcher implements INMSDispatcher {
 
     private final static List<String> history = new ArrayList<>();
 
-    private static volatile  MC_1_21_R3_NMSDispatcher INSTANCE;
+    private static volatile MC_1_21_R3_NMSDispatcher INSTANCE;
 
     private static final String DIALOG_PATH = "MAGIC_LIB_DIALOG";
 
