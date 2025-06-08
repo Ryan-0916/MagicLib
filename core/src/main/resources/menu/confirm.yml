@@ -18,8 +18,8 @@ Layout:
 Icons:
   A:
     Display:
-      Mats: GLASS_PANE
-      ModelData: 0
+      Mats: PAPER
+      ModelData: 10000
       Name: '&E&L确认'
       Lore:
         - ''
@@ -27,8 +27,8 @@ Icons:
         - ''
   C:
     Display:
-      Mats: GLASS_PANE
-      ModelData: 0
+      Mats: PAPER
+      ModelData: 10000
       Mame: '&E&L取消'
       Lore:
         - ''

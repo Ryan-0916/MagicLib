@@ -48,7 +48,7 @@ public abstract class AbstractPaPiHolder extends PlaceholderExpansion {
     public String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null || params.isEmpty()) { return null; }
         try {
-            return onOffline(player, params);
+            return player.isOnline() ? onOnline(player.getPlayer(), params) : onOffline(player, params);
         } catch (Exception e) {
             return null;
         }

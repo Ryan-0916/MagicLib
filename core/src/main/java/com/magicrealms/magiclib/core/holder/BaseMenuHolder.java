@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 @Getter
 public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder {
-    // 配置路径常量
     protected static final String TITLE_TEXT_PATH = "Title.%s.Text";
+    protected static final String ICON_DISPLAY = "Icons.%s.Display";
     private static final String OFFSET_PATH = "Title.%s.Offset";
     private static final String CENTER_PATH = "Title.%s.Center";
     private static final String LEFT_PATH = "Title.%s.Left";
@@ -45,7 +45,6 @@ public abstract class BaseMenuHolder implements InventoryHolder, IBaseMenuHolder
     private static final String VOLUME_PATH_SUFFIX = ".Volume";
     private static final String PITCH_PATH_SUFFIX = ".Pitch";
     private static final String SPEED_PATH_SUFFIX = ".Speed";
-    protected static final String ICON_DISPLAY = "Icons.%s.Display";
 
     private final MagicRealmsPlugin plugin;
     private final String configPath;
