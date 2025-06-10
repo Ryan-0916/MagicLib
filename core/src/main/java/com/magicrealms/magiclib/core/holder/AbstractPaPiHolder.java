@@ -65,4 +65,9 @@ public abstract class AbstractPaPiHolder extends PlaceholderExpansion {
         }
     }
 
+    @Override
+    public boolean persist() {
+        return true;
+    }
+
 }

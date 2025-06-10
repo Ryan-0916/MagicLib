@@ -61,12 +61,12 @@ public class AdvanceManager {
                 iterableTexts = miniMessageToIterable(text);
         int totalAdvance = 0;
         for (Tuple<String, Key, Boolean> element : iterableTexts) {
-            AdvanceConfig data = advanceLoader.getAdvanceConfig().get(element.mid());
+            AdvanceConfig data = advanceLoader.getAdvanceConfig().get(element.second());
             if (data == null) {
-                plugin.getLoggerManager().warning("未知的字体: " + element.mid() + " 请添加到 Advance.yml");
+                plugin.getLoggerManager().warning("未知的字体: " + element.second() + " 请添加到 Advance.yml");
                 continue;
             }
-            char[] chars = element.left().toCharArray();
+            char[] chars = element.first().toCharArray();
             for (int j = 0; j < chars.length; j++) {
                 int advance;
                 if (Character.isHighSurrogate(chars[j])) {
@@ -81,7 +81,7 @@ public class AdvanceManager {
                     );
                 }
                 totalAdvance += advance;
-                if (element.right()) {
+                if (element.third()) {
                     totalAdvance += 1;
                 }
             }
