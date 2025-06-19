@@ -17,7 +17,7 @@ pluginManagement {
         maven("https://repo.codemc.io/repository/maven-snapshots/")
         /* PlaceholderApi */
         maven("https://repo.extendedclip.com/releases/")
-        /* Rtag */
+        /* Rtag, Vault */
         maven("https://jitpack.io")
         /* Crunch */
         maven("https://redempt.dev")

@@ -7,5 +7,6 @@ commands:
     description: '魔法领域-集成'
 depend:
   - packetevents
+  - Vault
 softDepend:
   - PlaceholderAPI

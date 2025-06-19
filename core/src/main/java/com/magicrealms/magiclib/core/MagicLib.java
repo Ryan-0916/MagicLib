@@ -7,6 +7,8 @@ import com.magicrealms.magiclib.bukkit.manage.PacketManager;
 import com.magicrealms.magiclib.core.advance.AdvanceManager;
 import com.magicrealms.magiclib.core.dispatcher.MessageDispatcher;
 import com.magicrealms.magiclib.core.listener.PlayerListener;
+import com.magicrealms.magiclib.core.manager.IVaultManager;
+import com.magicrealms.magiclib.core.manager.VaultManager;
 import com.magicrealms.magiclib.core.offset.OffsetManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -27,6 +29,8 @@ public class MagicLib extends MagicRealmsPlugin {
 
     private AdvanceManager advanceManager;
 
+    private IVaultManager vaultManager;
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -37,8 +41,13 @@ public class MagicLib extends MagicRealmsPlugin {
             registerPacketListener(packetManager);
             setupOffset();
             setupAdvance();
+            setupVault();
             Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
-        });
+        }, "Vault", "packetevents");
+    }
+
+    private void setupVault() {
+        this.vaultManager = new VaultManager(this);
     }
 
     public void setupAdvance() {

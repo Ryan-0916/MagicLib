@@ -5,7 +5,6 @@ import com.magicrealms.magiclib.common.store.MongoDBStore;
 import com.magicrealms.magiclib.common.store.RedisStore;
 import com.magicrealms.magiclib.common.utils.MongoDBUtil;
 import com.magicrealms.magiclib.common.utils.RedissonUtil;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -23,20 +22,14 @@ public abstract class BaseRepository<T> implements IBaseRepository<T> {
     private static final String LOCK_KEY_TEMPLATE = "%s_LOCK_%s";
     private static final long DEFAULT_LOCK_TIMEOUT = 5000L;
 
-    @Getter
-    private final MongoDBStore mongoDBStore;
-    @Getter
-    private final RedisStore redisStore;
-    @Getter
-    private final String tableName;
-    @Getter
-    private final String cacheHkey;
-    @Getter
-    private final long cacheExpire;
-
-    private final boolean autoCache;
-    private final MongoId filedId;
-    private final Class<T> entityClass;
+    protected final MongoDBStore mongoDBStore;
+    protected final RedisStore redisStore;
+    protected final String tableName;
+    protected final String cacheHkey;
+    protected final long cacheExpire;
+    protected final boolean autoCache;
+    protected final MongoId filedId;
+    protected final Class<T> entityClass;
 
     public BaseRepository(MongoDBStore mongoDBStore, String tableName,
                           RedisStore redisStore, Class<T> clazz) {
